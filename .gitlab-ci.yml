@@ -9,7 +9,7 @@ workflow:
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_BRANCH == "main"
 
-# Cache para acelerar a pipeline (preserva vendor e node_modules entre execucoes)
+# Cache para acelerar a pipeline
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
@@ -20,8 +20,7 @@ variables:
   # Configuracoes para testes rapidos (SQLite em memoria)
   DB_CONNECTION: sqlite
   DB_DATABASE: ":memory:"
-  NODE_ENV: production
-  # Pre-definindo uma chave para evitar problemas na análise estática
+  # Pre-definindo uma chave para evitar problemas na analise estatica
   APP_KEY: base64:Ppk+rJp+6vE+Gpj3E6pXo0ToITkXnnDGKGGpp76onv0=
 
 stages:
@@ -33,14 +32,14 @@ stages:
 
 # --------------------------------------------------------------------------
 # ESTAGIO: BUILD
-# Instala dependencias e compila o frontend (Vite)
 # --------------------------------------------------------------------------
 build:
   stage: build
   script:
     - composer install --prefer-dist --no-ansi --no-interaction --no-progress
-    - npm install
-    - npm run build
+    # Usamos npm install para garantir compatibilidade caso o lock-file seja de versao diferente
+    - npm install --include=dev 
+    - NODE_ENV=production npm run build
   artifacts:
     paths:
       - vendor/
@@ -50,7 +49,6 @@ build:
 
 # --------------------------------------------------------------------------
 # ESTAGIO: LINT
-# Garante que o codigo esta formatado corretamente (Laravel Pint)
 # --------------------------------------------------------------------------
 linting:
   stage: lint
@@ -60,7 +58,6 @@ linting:
 
 # --------------------------------------------------------------------------
 # ESTAGIO: ANALYZE
-# Analise Estatica Profunda (PHPStan Nivel 9)
 # --------------------------------------------------------------------------
 analysis:
   stage: analyze
@@ -70,7 +67,6 @@ analysis:
 
 # --------------------------------------------------------------------------
 # ESTAGIO: TEST
-# Execucao dos Testes Automatizados (Pest 4)
 # --------------------------------------------------------------------------
 testing:
   stage: test
