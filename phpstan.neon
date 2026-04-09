@@ -1,0 +1,13 @@
+parameters:
+
+    paths:
+        - app/
+        - config/
+        - routes/
+        - tests/
+
+    # Level 9 is the highest level
+    level: max
+
+    scanFiles:
+        - tests/Pest.php

@@ -1,0 +1,86 @@
+# Pipeline GitLab CI/CD para Laravel 13 + Starter Kit
+# Imagem otimizada para PHP 8.3 e Ferramentas Modernas
+image: edbizarro/gitlab-ci-pipeline-php:8.3
+
+# Cache para acelerar a pipeline (preserva vendor e node_modules entre estágios)
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - vendor/
+    - node_modules/
+
+variables:
+  # Configurações para testes rápidos (SQLite em memória)
+  DB_CONNECTION: sqlite
+  DB_DATABASE: ":memory:"
+  NODE_ENV: production
+
+stages:
+  - build
+  - lint
+  - analyze
+  - test
+  - deploy
+
+# --------------------------------------------------------------------------
+# ESTÁGIO: BUILD
+# Instala dependências e compila o frontend (Vite)
+# --------------------------------------------------------------------------
+build:
+  stage: build
+  script:
+    - composer install --prefer-dist --no-ansi --no-interaction --no-progress
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - public/build/
+    expire_in: 1 week
+
+# --------------------------------------------------------------------------
+# ESTÁGIO: LINT
+# Garante que o código está formatado corretamente (Laravel Pint)
+# --------------------------------------------------------------------------
+linting:
+  stage: lint
+  needs: ["build"]
+  script:
+    - composer lint:check
+
+# --------------------------------------------------------------------------
+# ESTÁGIO: ANALYZE
+# Análise Estática Profunda (PHPStan Nível 9)
+# --------------------------------------------------------------------------
+analysis:
+  stage: analyze
+  needs: ["build"]
+  script:
+    - composer phpstan
+
+# --------------------------------------------------------------------------
+# ESTÁGIO: TEST
+# Execução dos Testes Automatizados (Pest 4)
+# --------------------------------------------------------------------------
+testing:
+  stage: test
+  needs: ["build"]
+  script:
+    - cp .env.example .env
+    - php artisan key:generate
+    - composer test
+
+# --------------------------------------------------------------------------
+# ESTÁGIO: DEPLOY (Exemplo)
+# Configurar quando houver servidor de destino
+# --------------------------------------------------------------------------
+production:
+  stage: deploy
+  script:
+    - echo "Implantando na Produção..."
+    - echo "Dica: Use SSH keys ou Laravel Forge para este passo!"
+  environment:
+    name: production
+    url: http://meu-projeto.com
+  when: manual # Executar manualmente via interface do GitLab
+  only:
+    - main

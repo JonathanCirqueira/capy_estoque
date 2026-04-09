@@ -1,0 +1,20 @@
+# Dependências
+node_modules
+vendor
+
+# Build e Assets
+public/build
+public/hot
+storage
+resources/js/components/ui/
+
+# Configurações e Logs
+.github
+.vscode
+.phpunit.cache
+.pestphp-cache
+tests/_output
+tests/_support
+
+# Arquivos de log do Laravel
+storage/logs/*.log

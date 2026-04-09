@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "react",
+    "jsx-a11y",
+    "unicorn",
+    "oxc"
+  ],
+  "categories": {
+    "correctness": "error",
+    "perf": "error",
+    "suspicious": "error"
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "max-lines-per-function": "off",
+    "no-inline-comments": "off",
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "jsx-a11y/no-autofocus": "off",
+    "jsx-a11y/tabindex-no-positive": "off",
+    "no-shadow": "off",
+    "react/jsx-no-constructed-context-values": "off"
+  },
+  "globals": {
+    "route": "readonly"
+  },
+  "env": {
+    "browser": true,
+    "builtin": true
+  }
+}
