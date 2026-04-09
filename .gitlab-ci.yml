@@ -1,5 +1,6 @@
 # Pipeline GitLab CI/CD para Laravel 13 + Starter Kit
-image: edbizarro/gitlab-ci-pipeline-php:8.3
+# Imagem otimizada para PHP 8.3 e Node 22
+image: pionl/docker-php-laravel-ci:8.3-node-22
 
 # Regras de workflow para economizar minutos de pipeline
 workflow:
@@ -20,6 +21,8 @@ variables:
   DB_CONNECTION: sqlite
   DB_DATABASE: ":memory:"
   NODE_ENV: production
+  # Pre-definindo uma chave para evitar problemas na análise estática
+  APP_KEY: base64:Ppk+rJp+6vE+Gpj3E6pXo0ToITkXnnDGKGGpp76onv0=
 
 stages:
   - build
@@ -74,7 +77,6 @@ testing:
   needs: ["build"]
   script:
     - cp .env.example .env
-    - php artisan key:generate
     - composer test
 
 # --------------------------------------------------------------------------
