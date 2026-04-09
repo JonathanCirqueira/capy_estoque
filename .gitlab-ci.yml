@@ -2,6 +2,13 @@
 # Imagem otimizada para PHP 8.3 e Ferramentas Modernas
 image: edbizarro/gitlab-ci-pipeline-php:8.3
 
+# Regras de workflow para economizar minutos de pipeline
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "main"
+
 # Cache para acelerar a pipeline (preserva vendor e node_modules entre estágios)
 cache:
   key: ${CI_COMMIT_REF_SLUG}
