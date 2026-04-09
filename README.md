@@ -40,6 +40,9 @@ php artisan key:generate
 php artisan migrate --seed
 ```
 
+> [!IMPORTANT]
+> **Configuração do .env**: Certifique-se de que a variável `APP_URL` no seu arquivo `.env` contenha a porta correta (ex: `http://localhost:8000`). Se a URL estiver incorreta, o Vite e as rotas internas podem não funcionar como esperado ao rodar o `composer dev`.
+
 ---
 
 ## 🚀 Fluxo de Trabalho Recomendado
