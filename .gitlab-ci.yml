@@ -1,5 +1,4 @@
 # Pipeline GitLab CI/CD para Laravel 13 + Starter Kit
-# Imagem otimizada para PHP 8.3 e Ferramentas Modernas
 image: edbizarro/gitlab-ci-pipeline-php:8.3
 
 # Regras de workflow para economizar minutos de pipeline
@@ -9,7 +8,7 @@ workflow:
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_BRANCH == "main"
 
-# Cache para acelerar a pipeline (preserva vendor e node_modules entre estágios)
+# Cache para acelerar a pipeline (preserva vendor e node_modules entre execucoes)
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
@@ -17,7 +16,7 @@ cache:
     - node_modules/
 
 variables:
-  # Configurações para testes rápidos (SQLite em memória)
+  # Configuracoes para testes rapidos (SQLite em memoria)
   DB_CONNECTION: sqlite
   DB_DATABASE: ":memory:"
   NODE_ENV: production
@@ -30,8 +29,8 @@ stages:
   - deploy
 
 # --------------------------------------------------------------------------
-# ESTÁGIO: BUILD
-# Instala dependências e compila o frontend (Vite)
+# ESTAGIO: BUILD
+# Instala dependencias e compila o frontend (Vite)
 # --------------------------------------------------------------------------
 build:
   stage: build
@@ -41,12 +40,14 @@ build:
     - npm run build
   artifacts:
     paths:
+      - vendor/
+      - node_modules/
       - public/build/
-    expire_in: 1 week
+    expire_in: 2 hours
 
 # --------------------------------------------------------------------------
-# ESTÁGIO: LINT
-# Garante que o código está formatado corretamente (Laravel Pint)
+# ESTAGIO: LINT
+# Garante que o codigo esta formatado corretamente (Laravel Pint)
 # --------------------------------------------------------------------------
 linting:
   stage: lint
@@ -55,8 +56,8 @@ linting:
     - composer lint:check
 
 # --------------------------------------------------------------------------
-# ESTÁGIO: ANALYZE
-# Análise Estática Profunda (PHPStan Nível 9)
+# ESTAGIO: ANALYZE
+# Analise Estatica Profunda (PHPStan Nivel 9)
 # --------------------------------------------------------------------------
 analysis:
   stage: analyze
@@ -65,8 +66,8 @@ analysis:
     - composer phpstan
 
 # --------------------------------------------------------------------------
-# ESTÁGIO: TEST
-# Execução dos Testes Automatizados (Pest 4)
+# ESTAGIO: TEST
+# Execucao dos Testes Automatizados (Pest 4)
 # --------------------------------------------------------------------------
 testing:
   stage: test
@@ -77,17 +78,15 @@ testing:
     - composer test
 
 # --------------------------------------------------------------------------
-# ESTÁGIO: DEPLOY (Exemplo)
-# Configurar quando houver servidor de destino
+# ESTAGIO: DEPLOY
 # --------------------------------------------------------------------------
 production:
   stage: deploy
   script:
-    - echo "Implantando na Produção..."
-    - echo "Dica: Use SSH keys ou Laravel Forge para este passo!"
+    - echo "Deploy para producao (exemplo)"
   environment:
     name: production
     url: http://meu-projeto.com
-  when: manual # Executar manualmente via interface do GitLab
+  when: manual
   only:
     - main
