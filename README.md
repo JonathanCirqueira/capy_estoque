@@ -2,6 +2,23 @@
 
 Um sistema moderno construído com Laravel 13, React 19 e Inertia 3.
 
+---
+
+## 📚 Documentação Completa
+
+Para detalhes sobre o funcionamento do projeto, padrões e arquitetura, consulte nossa documentação interna:
+
+- **[Página Inicial da Doc](docs/README.md)**
+- [🚀 Funcionalidades](docs/01-FUNCIONALIDADES.md)
+- [🏗️ Arquitetura](docs/02-ARQUITETURA.md)
+- [🎨 Padrões de Código](docs/03-PADROES.md)
+- [📖 Glossário e Status](docs/04-STATUS-GLOSSARIO.md)
+- [🌍 Ambiente e Deploy](docs/05-AMBIENTE-DEPLOY.md)
+- [💎 Design e Assets](docs/06-DESIGN-RESOURCES.md)
+- [🧪 Estratégia de Testes](docs/07-TESTES-E2E.md)
+
+---
+
 ## 🚀 Tecnologias
 
 - **Backend:** Laravel 13
@@ -148,5 +165,33 @@ Para que a pipeline funcione corretamente, especialmente na etapa de deploy ou c
 
 > [!IMPORTANT]
 > Se você adicionar uma nova variável obrigatória ao `.env.example`, certifique-se de adicioná-la também nas **Variables** do GitLab para não quebrar a pipeline.
+
+# 📚 Documentação do Projeto
+
+- Este diretório contém guias detalhados sobre como o sistema funciona, as decisões técnicas tomadas e os padrões que seguimos.
+
+---
+
+## 📂 Índice
+
+1.  **[🚀 Funcionalidades e Regras de Negócio](01-FUNCIONALIDADES.md)**
+    O "O que" o sistema faz. Fluxos de usuário, regras de negócio e estados de interface.
+2.  **[🏗️ Arquitetura e Decisões Técnicas](02-ARQUITETURA.md)**
+    O "Por que" das escolhas. Registros de Decisões de Arquitetura (ADRs).
+3.  **[🎨 Guia de Estilo e Padrões](03-PADROES.md)**
+    O "Como" escrevemos código. Nomenclatura, Git, Commits e Testes.
+4.  **[📖 Glossário e Tabela de Status](04-STATUS-GLOSSARIO.md)**
+    Dicionário técnico e códigos de status utilizados no sistema.
+5.  **[🌍 Ambiente e Deploy](05-AMBIENTE-DEPLOY.md)**
+    Configuração de ambiente, variáveis `.env` e fluxo de CI/CD.
+6.  **[💎 Design e Identidade Visual](06-DESIGN-RESOURCES.md)**
+    Recursos visuais, links para Figma, tipografia e paleta de cores.
+7.  **[🧪 Testes E2E e Qualidade](07-TESTES-E2E.md)**
+    Estratégia de testes de ponta a ponta e ferramentas de qualidade.
+
+---
+
+> [!TIP]
+> Use a navegação lateral do VS Code ou os links acima no GitHub/GitLab para navegar facilmente entre os documentos.
 
 ---
