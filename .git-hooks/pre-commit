@@ -1,11 +1,10 @@
 #!/bin/sh
 
-# Se qualquer comando falhar, o commit será abortado.
 set -e
 
 echo "🔍 Running pre-commit checks (Lint/Styles)..."
 
-# Rodar lint-staged para formatar arquivos modificados (Pint e Prettier)
+
 npx lint-staged
 
 echo "✅ All styles checked!"
