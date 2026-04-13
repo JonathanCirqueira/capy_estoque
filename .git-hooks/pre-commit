@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Se qualquer comando falhar, o commit será abortado.
+set -e
+
+echo "🔍 Running pre-commit checks..."
+
+# Rodar lint-staged para formatar arquivos modificados
+npx lint-staged
+
+# Rodar composer verify (testes, phpstan, rector, etc.)
+composer verify
+
+echo "✅ All checks passed!"
