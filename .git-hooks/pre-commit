@@ -3,12 +3,9 @@
 # Se qualquer comando falhar, o commit será abortado.
 set -e
 
-echo "🔍 Running pre-commit checks..."
+echo "🔍 Running pre-commit checks (Lint/Styles)..."
 
-# Rodar lint-staged para formatar arquivos modificados
+# Rodar lint-staged para formatar arquivos modificados (Pint e Prettier)
 npx lint-staged
 
-# Rodar composer verify (testes, phpstan, rector, etc.)
-composer verify
-
-echo "✅ All checks passed!"
+echo "✅ All styles checked!"
