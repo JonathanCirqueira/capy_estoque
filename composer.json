@@ -49,18 +49,18 @@
     },
     "scripts": {
         "setup": [
-            "npm.cmd install",
+            "npm install",
             "git config core.hooksPath .git-hooks",
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
             "@php artisan migrate --force",
-            "npm.cmd run build"
+            "npm run build"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npm.cmd install",
-            "npx.cmd concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm.cmd run dev\" --names='server,queue,vite'"
+            "npm install",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
         ],
         "fix": [
             "@rector",
@@ -81,14 +81,14 @@
             "@php vendor/bin/pint --test"
         ],
         "oxlint": [
-            "npm.cmd run lint"
+            "npm run lint"
         ],
         "oxlint:fix": [
-            "npm.cmd run lint:fix"
+            "npm run lint:fix"
         ],
         "format": [
             "@lint",
-            "npm.cmd run format"
+            "npm run format"
         ],
         "phpstan": [
             "@php vendor/bin/phpstan analyse --memory-limit=2G"
@@ -110,9 +110,9 @@
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
             "@oxlint",
-            "npm.cmd run lint:eslint:check",
-            "npm.cmd run format:check",
-            "npm.cmd run types:check",
+            "npm run lint:eslint:check",
+            "npm run format:check",
+            "npm run types:check",
             "@test"
         ],
         "fresh": [
