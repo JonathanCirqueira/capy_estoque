@@ -5,7 +5,6 @@ image: pionl/docker-php-laravel-ci:8.3-node-22
 # Regras de workflow para economizar minutos de pipeline
 workflow:
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_BRANCH == "main"
 
@@ -19,7 +18,7 @@ cache:
 variables:
   # Configuracoes para testes rapidos (SQLite em memoria)
   DB_CONNECTION: sqlite
-  DB_DATABASE: ":memory:"
+  DB_DATABASE: ':memory:'
   # Pre-definindo uma chave para evitar problemas na analise estatica
   APP_KEY: base64:Ppk+rJp+6vE+Gpj3E6pXo0ToITkXnnDGKGGpp76onv0=
 
@@ -38,7 +37,7 @@ build:
   script:
     - composer install --prefer-dist --no-ansi --no-interaction --no-progress
     # Usamos npm install para garantir compatibilidade caso o lock-file seja de versao diferente
-    - npm install --include=dev 
+    - npm install --include=dev
     - NODE_ENV=production npm run build
   artifacts:
     paths:
@@ -52,7 +51,7 @@ build:
 # --------------------------------------------------------------------------
 linting:
   stage: lint
-  needs: ["build"]
+  needs: ['build']
   script:
     - composer lint:check
 
@@ -61,7 +60,7 @@ linting:
 # --------------------------------------------------------------------------
 analysis:
   stage: analyze
-  needs: ["build"]
+  needs: ['build']
   script:
     - composer phpstan
 
@@ -70,7 +69,7 @@ analysis:
 # --------------------------------------------------------------------------
 testing:
   stage: test
-  needs: ["build"]
+  needs: ['build']
   script:
     - cp .env.example .env
     - composer test
