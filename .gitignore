@@ -21,8 +21,26 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 /auth.json
+
+# IDE Helpers
+/_ide_helper.php
+/_ide_helper_models.php
+/.phpstorm.meta.php
+
+# PHPStan & Tools
+/phpstan_errors.json
+/phpstan_errors.txt
+/.phpstan.cache
+
+# Stitch & Gemini
+/stitch_assets/
+/.gemini/
+/walkthrough.md
+
+# Editor folders
 /.fleet
 /.idea
 /.nova
 /.vscode
 /.zed
+
