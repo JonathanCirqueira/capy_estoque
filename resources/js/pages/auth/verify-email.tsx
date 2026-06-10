@@ -7,21 +7,19 @@ import { logout } from '@/routes';
 export default function VerifyEmail({ status }: { status?: string }) {
     return (
         <>
-            <Head title="Email verification" />
+            <Head title="Verificação de e-mail" />
 
             {status === 'verification-link-sent' && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    A new verification link has been sent to the email address you provided during registration.
+                    Um novo link de verificação foi enviado para o endereço de e-mail fornecido durante o cadastro.
                 </div>
             )}
 
             <form className="space-y-6 text-center">
-                <Button variant="secondary">
-                    Resend verification email
-                </Button>
+                <Button variant="secondary">Reenviar e-mail de verificação</Button>
 
                 <TextLink href={logout()} className="mx-auto block text-sm">
-                    Log out
+                    Sair
                 </TextLink>
             </form>
         </>
@@ -29,6 +27,6 @@ export default function VerifyEmail({ status }: { status?: string }) {
 }
 
 VerifyEmail.layout = {
-    title: 'Verify email',
-    description: 'Please verify your email address by clicking on the link we just emailed to you.',
+    title: 'Verificar e-mail',
+    description: 'Por favor, verifique seu endereço de e-mail clicando no link que acabamos de enviar para você.',
 };

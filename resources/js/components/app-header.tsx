@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, Sun, Moon } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
@@ -17,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
+import { useAppearance } from '@/hooks/use-appearance';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
@@ -53,6 +54,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     const { auth } = page.props;
     const getInitials = useInitials();
     const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
+    const { resolvedAppearance, updateAppearance } = useAppearance();
+
+    const toggleTheme = () => {
+        updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark');
+    };
 
     return (
         <>
@@ -118,7 +124,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         <NavigationMenu className="flex h-full items-stretch">
                             <NavigationMenuList className="flex h-full items-stretch space-x-2">
                                 {mainNavItems.map((item) => (
-                                    <NavigationMenuItem key={toUrl(item.href)} className="relative flex h-full items-center">
+                                    <NavigationMenuItem
+                                        key={toUrl(item.href)}
+                                        className="relative flex h-full items-center"
+                                    >
                                         <Link
                                             href={item.href}
                                             className={cn(
@@ -143,6 +152,21 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         <div className="relative flex items-center space-x-1">
                             <Button variant="ghost" size="icon" className="group h-9 w-9 cursor-pointer">
                                 <Search className="!size-5 opacity-80 group-hover:opacity-100" />
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={toggleTheme}
+                                className="group h-9 w-9 cursor-pointer"
+                                title={
+                                    resolvedAppearance === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'
+                                }
+                            >
+                                {resolvedAppearance === 'dark' ? (
+                                    <Sun className="!size-5 opacity-80 group-hover:opacity-100" />
+                                ) : (
+                                    <Moon className="!size-5 opacity-80 group-hover:opacity-100" />
+                                )}
                             </Button>
                             <div className="ml-1 hidden gap-1 lg:flex">
                                 {rightNavItems.map((item) => (
