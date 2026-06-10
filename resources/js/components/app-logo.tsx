@@ -1,14 +1,13 @@
-import AppLogoIcon from '@/components/app-logo-icon';
+import { cn } from '@/lib/utils';
 
-export default function AppLogo() {
+export default function AppLogo({ className }: { className?: string }) {
     return (
-        <>
-            <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-                <AppLogoIcon className="size-5 fill-current text-white dark:text-black" />
-            </div>
-            <div className="ml-1 grid flex-1 text-left text-sm">
-                <span className="mb-0.5 truncate leading-tight font-semibold">Laravel Starter Kit</span>
-            </div>
-        </>
+        <div className={cn('flex items-center justify-center transition-all duration-200 ease-linear', className)}>
+            <img
+                src="/logo_jhe_dark.png"
+                alt="JHE Veículos"
+                className="max-h-[90px] w-full max-w-[115px] object-contain transition-all duration-200 ease-linear group-data-[collapsible=icon]:max-w-[32px]"
+            />
+        </div>
     );
 }

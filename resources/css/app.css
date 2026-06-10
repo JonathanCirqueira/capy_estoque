@@ -2,6 +2,8 @@
 
 @import 'tw-animate-css';
 
+@import './local-fonts.css';
+
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
@@ -9,8 +11,10 @@
 
 @theme {
     --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+        'Open Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
+
+    --font-display: 'Montserrat', sans-serif;
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -58,6 +62,22 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    --color-success: var(--success);
+    --color-success-foreground: var(--success-foreground);
+    --color-warning: var(--warning);
+    --color-warning-foreground: var(--warning-foreground);
+    --color-error: var(--error);
+    --color-error-foreground: var(--error-foreground);
+    --color-info: var(--info);
+    --color-info-foreground: var(--info-foreground);
+
+    --color-brand-start: var(--brand-start);
+    --color-brand-end: var(--brand-end);
+    --color-brand-accent: var(--brand-accent);
+
+    --color-whatsapp: var(--whatsapp);
+    --color-whatsapp-hover: var(--whatsapp-hover);
 }
 
 :root {
@@ -67,33 +87,50 @@
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
+    --primary: oklch(0.312 0.106 255.93);
     --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
+    --secondary: oklch(0.958 0 89.88);
+    --secondary-foreground: oklch(0.312 0.106 255.93);
+    --muted: oklch(0.958 0 89.88);
+    --muted-foreground: oklch(0.556 0 89.88);
+    --accent: oklch(0.96 0.02 255.93);
+    --accent-foreground: oklch(0.312 0.106 255.93);
+    --destructive: oklch(0.547 0.2 10.6);
+    --destructive-foreground: oklch(0.985 0 0);
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
+    --ring: oklch(0.75 0.13 255.93);
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
+    --sidebar: oklch(0.312 0.106 255.93);
+    --sidebar-foreground: oklch(0.985 0 0 / 0.85);
+    --sidebar-primary: oklch(0.985 0 0);
+    --sidebar-primary-foreground: oklch(0.312 0.106 255.93);
+    --sidebar-accent: oklch(0.985 0 0 / 0.12);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(0.985 0 0 / 0.12);
     --sidebar-ring: oklch(0.87 0 0);
+
+    --success: oklch(0.801 0.188 137.47);
+    --success-foreground: oklch(0.25 0.08 137.47);
+    --warning: oklch(0.769 0.188 70.08);
+    --warning-foreground: oklch(0.145 0 0);
+    --error: oklch(0.547 0.2 10.6);
+    --error-foreground: oklch(0.985 0 0);
+
+    --info: oklch(0.55 0.14 198.66);
+    --info-foreground: oklch(0.15 0.05 198.66);
+
+    --brand-start: oklch(0.315 0.105 255.64);
+    --brand-end: oklch(43.485% 0.1243 258.611);
+    --brand-accent: oklch(0.672 0.147 237.22);
+
+    --whatsapp: #25d366;
+    --whatsapp-hover: #128c7e;
 }
 
 .dark {
@@ -103,32 +140,48 @@
     --card-foreground: oklch(0.985 0 0);
     --popover: oklch(0.145 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
+    --primary: oklch(0.72 0.13 255.93);
+    --primary-foreground: oklch(0.12 0.05 255.93);
+    --secondary: oklch(0.18 0.02 255.93);
+    --secondary-foreground: oklch(0.95 0.01 255.93);
+    --muted: oklch(0.18 0.02 255.93);
+    --muted-foreground: oklch(0.65 0.02 255.93);
+    --accent: oklch(0.22 0.04 255.93);
+    --accent-foreground: oklch(0.95 0.01 255.93);
+    --destructive: oklch(0.58 0.18 10.6);
+    --destructive-foreground: oklch(0.985 0 0);
+    --border: oklch(0.22 0.03 255.93);
+    --input: oklch(0.22 0.03 255.93);
+    --ring: oklch(0.45 0.08 255.93);
     --chart-1: oklch(0.488 0.243 264.376);
     --chart-2: oklch(0.696 0.17 162.48);
     --chart-3: oklch(0.769 0.188 70.08);
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar: oklch(18.839% 0.02635 253.994);
+    --sidebar-foreground: oklch(0.985 0 0 / 0.85);
     --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
+    --sidebar-primary-foreground: oklch(0.16 0.02 255.93);
+    --sidebar-accent: oklch(0.55 0.08 255.93 / 0.18);
+    --sidebar-accent-foreground: oklch(0.82 0.08 240);
+    --sidebar-border: oklch(0.55 0.08 255.93 / 0.15);
     --sidebar-ring: oklch(0.439 0 0);
+    --success: oklch(0.75 0.15 137.47);
+    --success-foreground: oklch(0.12 0.05 137.47);
+    --warning: oklch(0.769 0.188 70.08);
+    --warning-foreground: oklch(0.145 0 0);
+    --error: oklch(0.58 0.18 10.6);
+    --error-foreground: oklch(0.985 0 0);
+
+    --info: oklch(0.78 0.11 198.66);
+    --info-foreground: oklch(0.12 0.05 198.66);
+
+    --brand-start: oklch(20.848% 0.02385 262.295);
+    --brand-end: oklch(28.069% 0.04513 246.367);
+    --brand-accent: oklch(0.28 0.06 237.22);
+
+    --whatsapp: #25d366;
+    --whatsapp-hover: #128c7e;
 }
 
 @layer base {
@@ -138,5 +191,43 @@
 
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+/* Normalização de Inputs de Data e Hora */
+@layer components {
+    input[type='date'],
+    input[type='time'] {
+        position: relative;
+        color-scheme: dark; /* Garante que o seletor nativo use cores escuras no tema dark */
+    }
+
+    /* Esconde o ícone nativo no Chrome/Webkit */
+    input[type='date']::-webkit-calendar-picker-indicator,
+    input[type='time']::-webkit-calendar-picker-indicator {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 32px;
+        height: 100%;
+        padding: 0;
+        color: transparent;
+        background: transparent;
+        cursor: pointer;
+        opacity: 0;
+        z-index: 10;
+    }
+
+    /* Firefox: Remove/ajusta elementos nativos e esconde apenas o ícone de data duplicado */
+    @-moz-document url-prefix() {
+        input[type='date'],
+        input[type='time'] {
+            appearance: textfield;
+        }
+
+        /* Oculta apenas o ícone de calendário customizado, pois o Firefox já exibe o nativo */
+        input[type='date'] + .custom-input-icon {
+            display: none !important;
+        }
     }
 }
