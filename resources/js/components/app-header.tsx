@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Menu, Search, Sun, Moon } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -55,6 +56,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     const getInitials = useInitials();
     const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
     const { resolvedAppearance, updateAppearance } = useAppearance();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const toggleTheme = () => {
         updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark');
@@ -151,23 +157,29 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     <div className="ml-auto flex items-center space-x-2">
                         <div className="relative flex items-center space-x-1">
                             <Button variant="ghost" size="icon" className="group h-9 w-9 cursor-pointer">
-                                <Search className="!size-5 opacity-80 group-hover:opacity-100" />
+                                <Search className="size-5! opacity-80 group-hover:opacity-100" />
                             </Button>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={toggleTheme}
-                                className="group h-9 w-9 cursor-pointer"
-                                title={
-                                    resolvedAppearance === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'
-                                }
-                            >
-                                {resolvedAppearance === 'dark' ? (
-                                    <Sun className="!size-5 opacity-80 group-hover:opacity-100" />
-                                ) : (
-                                    <Moon className="!size-5 opacity-80 group-hover:opacity-100" />
-                                )}
-                            </Button>
+                            {!mounted ? (
+                                <div className="h-9 w-9" />
+                            ) : (
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={toggleTheme}
+                                    className="group h-9 w-9 cursor-pointer"
+                                    title={
+                                        resolvedAppearance === 'dark'
+                                            ? 'Mudar para tema claro'
+                                            : 'Mudar para tema escuro'
+                                    }
+                                >
+                                    {resolvedAppearance === 'dark' ? (
+                                        <Sun className="size-5! opacity-80 group-hover:opacity-100" />
+                                    ) : (
+                                        <Moon className="size-5! opacity-80 group-hover:opacity-100" />
+                                    )}
+                                </Button>
+                            )}
                             <div className="ml-1 hidden gap-1 lg:flex">
                                 {rightNavItems.map((item) => (
                                     <Tooltip key={item.title}>
