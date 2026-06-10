@@ -1,10 +1,10 @@
 {
-    "agents": [
-        "gemini"
-    ],
+    "agents": ["antigravity"],
+    "cloud": false,
     "guidelines": true,
     "mcp": true,
     "nightwatch_mcp": false,
+    "packages": ["fruitcake/laravel-debugbar"],
     "sail": false,
     "skills": [
         "fortify-development",
@@ -12,6 +12,7 @@
         "wayfinder-development",
         "pest-testing",
         "inertia-react-development",
-        "tailwindcss-development"
+        "tailwindcss-development",
+        "debug-using-debugbar"
     ]
 }
