@@ -23,20 +23,22 @@ Escolhemos o **Laravel 13** com **Inertia.js 3** e **React 19**.
 
 ---
 
-## [ADR-002] Blindagem do Código (Essentials)
+## [ADR-002] Blindagem do Código (Configurações Nativas)
 
-- **Status:** Aceito
+- **Status:** Aceito (Substituído por implementação nativa)
 
 ### Contexto
 
-Manter a integridade dos modelos e evitar comportamentos inesperados (N+1 queries invisíveis).
+Manter a integridade dos modelos e evitar comportamentos inesperados (N+1 queries invisíveis) sem adicionar dependências externas desnecessárias que possam ser descontinuadas ou causar quebras futuras.
 
 ### Decisão
 
-Uso do pacote **nunomaduro/essentials** para ativar:
+Configuração nativa diretamente no `AppServiceProvider.php` (e ambientes de testes) para ativar:
 
-- **Strict Models:** Erro imediato se tentar acessar um atributo inexistente ou disparar Lazy Loading.
-- **CarbonImmutable:** Todas as datas são imutáveis por padrão.
+- **Strict Models:** Erro imediato se tentar acessar um atributo inexistente, disparar Lazy Loading ou descartar atributos silenciados (`Model::shouldBeStrict()`).
+- **CarbonImmutable:** Todas as datas do framework usam datas imutáveis por padrão (`Date::use(CarbonImmutable::class)`).
+- **Proibições de Produção:** Proteção ativa de banco de dados (`DB::prohibitDestructiveCommands()`) e HTTPS forçado.
+- **Ambiente de Testes Seguro:** Bloqueio de requisições reais (`Http::preventStrayRequests()`) e simulações rápidas de tempo (`Sleep::fake()`).
 
 ---
 

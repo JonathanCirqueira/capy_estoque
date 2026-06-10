@@ -14,8 +14,7 @@
         "laravel/fortify": "^1.34",
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
-        "laravel/wayfinder": "^0.1.14",
-        "nunomaduro/essentials": "^1.2"
+        "laravel/wayfinder": "^0.1.14"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.7",
@@ -27,7 +26,6 @@
         "laravel/pail": "^1.2.5",
         "laravel/pint": "^1.27",
         "laravel/sail": "^1.53",
-        "lucascudo/laravel-pt-br-localization": "^3.0",
         "mockery/mockery": "^1.6",
         "mrpunyapal/peststan": "^0.2.3",
         "nunomaduro/collision": "^8.9",
@@ -41,10 +39,7 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        },
-        "files": [
-            "app/Support/helpers.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {

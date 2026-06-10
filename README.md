@@ -38,7 +38,7 @@ Um sistema moderno construído com Laravel 13, React 19 e Inertia 3.
 - **Frontend:** React 19 (via Inertia.js 3)
 - **Estilização:** Tailwind CSS 4
 - **Banco de Dados:** SQLite (padrão) / MySQL / PostgreSQL
-- **Ferramentas de Dev:** Laravel Wayfinder, Laravel Boost, Laravel Pail, Laravel Pint, Rector, Essentials, Oxlint (JS/TS Lint)
+- **Ferramentas de Dev:** Laravel Wayfinder, Laravel Boost, Laravel Pail, Laravel Pint, Rector, Oxlint (JS/TS Lint)
 - **CI/CD:** GitLab CI/CD (Pipeline automatizada)
 - **Testes:** Pest 4
 
@@ -132,14 +132,14 @@ O projeto utiliza o **Oxlint** para garantir a qualidade do código JavaScript e
 
 O Oxlint está integrado aos comandos `fix` e `verify` do Composer, garantindo que toda a aplicação seja validada em um único comando.
 
-### Laravel Essentials
+### Blindagem Nativa (Laravel)
 
-Este projeto utiliza o pacote `nunomaduro/essentials` para blindar a aplicação:
+Este projeto utiliza recursos nativos do próprio Laravel 13 (configurados no `AppServiceProvider.php`) para blindar a aplicação sem depender de pacotes de terceiros:
 
-- **Strict Models:** Bloqueia Lazy Loading e atributos inexistentes.
-- **Datas Imutáveis:** Uso de `CarbonImmutable`.
-- **Comandos de Ação:** Crie lógicas de negócio com `php artisan make:action Name`.
-- **Testes Blindados:** Bloqueia requisições reais e automatiza mocks de `sleep()`.
+- **Strict Models:** Bloqueia Lazy Loading, impede descartar atributos e atributos inexistentes (`Model::shouldBeStrict()`).
+- **Datas Imutáveis:** Uso automático de `CarbonImmutable` por padrão no framework.
+- **Segurança de Produção:** Força HTTPS e proíbe comandos destrutivos de banco de dados (`DB::prohibitDestructiveCommands()`) em produção de forma nativa.
+- **Testes Blindados:** Bloqueia requisições reais externas (`Http::preventStrayRequests()`) e simula tempo acelerado (`Sleep::fake()`) durante a execução dos testes.
 
 ---
 
