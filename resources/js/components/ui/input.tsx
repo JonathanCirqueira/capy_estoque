@@ -105,9 +105,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 {label && (
                     <label
                         htmlFor={props.id || id}
-                        className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                        className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1"
                     >
                         {label}
+                        {props.required && <span className="text-destructive">*</span>}
                     </label>
                 )}
 

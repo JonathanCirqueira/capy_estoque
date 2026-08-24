@@ -30,6 +30,7 @@ export interface SearchableSelectProps {
     searchPlaceholder?: string;
     emptyMessage?: string;
     label?: string;
+    required?: boolean;
     disabled?: boolean;
     error?: boolean | string;
     clearable?: boolean;
@@ -47,6 +48,7 @@ export function SearchableSelect({
     searchPlaceholder = 'Buscar...',
     emptyMessage = 'Nenhum resultado encontrado.',
     label,
+    required = false,
     disabled = false,
     error = false,
     clearable = false,
@@ -78,9 +80,10 @@ export function SearchableSelect({
             {label && (
                 <label
                     htmlFor={id}
-                    className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                    className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1"
                 >
                     {label}
+                    {required && <span className="text-destructive">*</span>}
                 </label>
             )}
 

@@ -15,6 +15,8 @@ import {
 } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
+import { Label } from '@/components/ui/label';
+
 interface MultiSelectProps {
     items: { value: string; label: string }[];
     value: string[];
@@ -22,9 +24,12 @@ interface MultiSelectProps {
     placeholder?: string;
     searchPlaceholder?: string;
     emptyMessage?: string;
+    label?: string;
+    required?: boolean;
     disabled?: boolean;
     className?: string;
-    error?: boolean;
+    containerClassName?: string;
+    error?: boolean | string;
 }
 
 export function MultiSelect({
@@ -34,8 +39,11 @@ export function MultiSelect({
     placeholder = 'Selecione as opções...',
     searchPlaceholder = 'Buscar...',
     emptyMessage = 'Nenhum resultado encontrado.',
+    label,
+    required = false,
     disabled = false,
     className,
+    containerClassName,
     error = false,
 }: MultiSelectProps) {
     const [open, setOpen] = React.useState(false);
@@ -53,7 +61,7 @@ export function MultiSelect({
         }
     };
 
-    return (
+    const multiSelectContent = (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild disabled={disabled}>
                 <Button
@@ -142,5 +150,24 @@ export function MultiSelect({
                 </Command>
             </PopoverContent>
         </Popover>
+    );
+
+    if (!label && typeof error !== 'string') {
+        return multiSelectContent;
+    }
+
+    return (
+        <div className={cn('flex flex-col gap-1.5 w-full', containerClassName)}>
+            {label && (
+                <Label className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase flex items-center gap-1">
+                    {label}
+                    {required && <span className="text-destructive">*</span>}
+                </Label>
+            )}
+            {multiSelectContent}
+            {typeof error === 'string' && (
+                <span className="text-xs text-destructive mt-0.5">{error}</span>
+            )}
+        </div>
     );
 }
