@@ -129,7 +129,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         onKeyDown={handleKeyDown}
                         onChange={handleChange}
                         className={cn(
-                            'flex h-11 w-full min-w-0 rounded-2xl border border-input bg-background py-2.5 text-sm shadow-2xs transition-all outline-none',
+                            'flex h-11 w-full min-w-0 rounded-2xl border border-input bg-muted/30 dark:bg-neutral-900/60 py-2.5 text-sm shadow-2xs transition-all outline-none',
                             'placeholder:text-muted-foreground/70 text-foreground',
                             'hover:border-primary/40',
                             'focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20',

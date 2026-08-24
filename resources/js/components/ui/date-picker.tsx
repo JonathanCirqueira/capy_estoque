@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 
 interface DatePickerProps {
     value?: string;
-    onValueChange: (value: string) => void;
+    onValueChange?: (value: string) => void;
     placeholder?: string;
     label?: string;
     required?: boolean;
@@ -140,7 +140,7 @@ export function DatePicker({
     }, [viewMonth, viewYear]);
 
     const handleSelectDate = (dateString: string) => {
-        onValueChange(dateString);
+        onValueChange?.(dateString);
         setOpen(false);
     };
 
@@ -171,9 +171,9 @@ export function DatePicker({
                     type="button"
                     variant="outline"
                     className={cn(
-                        'h-11 w-full justify-start rounded-xl border border-border/80 bg-muted/30 px-3.5 py-2.5 text-left text-sm font-medium transition-all hover:bg-muted/50 focus:border-primary focus:ring-2 focus:ring-primary/20 data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20 disabled:bg-muted/20 disabled:opacity-50 dark:bg-neutral-900/60 dark:hover:bg-neutral-900',
+                        'h-11 w-full justify-start rounded-2xl border border-input bg-muted/30 dark:bg-neutral-900/60 px-4 py-2.5 text-left text-sm font-medium transition-all hover:border-primary/40 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50',
                         !disabled && 'cursor-pointer',
-                        error && 'border-destructive focus:ring-destructive/20',
+                        error && 'border-destructive focus-visible:ring-destructive/20',
                         !value && 'text-muted-foreground',
                         className,
                     )}
