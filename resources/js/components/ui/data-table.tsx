@@ -2,16 +2,26 @@
 
 import * as React from 'react';
 import {
-    Search,
+    ArrowDown,
+    ArrowUp,
     ArrowUpDown,
     ChevronLeft,
     ChevronRight,
+    Download,
     MoreHorizontal,
+    Search,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { SearchableSelect } from '@/components/ui/searchable-select';
 import {
     Table,
     TableHeader,
@@ -32,18 +42,10 @@ export interface DataTableTab {
     badgeVariant?: 'default' | 'secondary' | 'outline' | 'success' | 'warning' | 'destructive';
 }
 
-export interface DataTableFilterSelect {
-    id: string;
-    placeholder: string;
-    options: { value: string; label: string }[];
-    value?: string;
-    onChange?: (value: string) => void;
-}
-
 export interface DataTableColumn<T> {
     accessorKey: keyof T | string;
     header: string;
-    sortable?: boolean;
+    sortable?: boolean; 
     className?: string;
     headerClassName?: string;
     cell?: (row: T, index: number) => React.ReactNode;
@@ -89,7 +91,7 @@ export function DataTableHeader({ title, subtitle, actions, className }: DataTab
 }
 
 /* ============================================================================
- * COMPONENT: DataTableTabs (Underline Style with Count Badges matching Screenshot)
+ * COMPONENT: DataTableTabs (Underline Style with Count Badges)
  * ============================================================================ */
 
 export interface DataTableTabsProps {
@@ -106,27 +108,45 @@ export function DataTableTabs({ tabs, activeTab, onTabChange, className }: DataT
                 {tabs.map((tab) => {
                     const isActive = activeTab === tab.id;
 
-                    const getBadgeStyle = () => {
+                    const getTabColors = () => {
                         switch (tab.badgeVariant) {
                             case 'success':
-                                return isActive
-                                    ? 'bg-emerald-600 text-white font-bold'
-                                    : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold';
+                                return {
+                                    text: isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground/80 hover:text-foreground',
+                                    border: isActive ? 'border-emerald-600 dark:border-emerald-400' : 'border-transparent',
+                                    badge: isActive
+                                        ? 'bg-emerald-600 text-white font-bold'
+                                        : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold',
+                                };
                             case 'warning':
-                                return isActive
-                                    ? 'bg-amber-600 text-white font-bold'
-                                    : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold';
+                                return {
+                                    text: isActive ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground/80 hover:text-foreground',
+                                    border: isActive ? 'border-amber-600 dark:border-amber-400' : 'border-transparent',
+                                    badge: isActive
+                                        ? 'bg-amber-600 text-white font-bold'
+                                        : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold',
+                                };
                             case 'destructive':
-                                return isActive
-                                    ? 'bg-rose-600 text-white font-bold'
-                                    : 'bg-rose-500/15 text-rose-600 dark:text-rose-400 font-bold';
+                                return {
+                                    text: isActive ? 'text-rose-600 dark:text-rose-400' : 'text-muted-foreground/80 hover:text-foreground',
+                                    border: isActive ? 'border-rose-600 dark:border-rose-400' : 'border-transparent',
+                                    badge: isActive
+                                        ? 'bg-rose-600 text-white font-bold'
+                                        : 'bg-rose-500/15 text-rose-600 dark:text-rose-400 font-bold',
+                                };
                             case 'secondary':
                             default:
-                                return isActive
-                                    ? 'bg-primary text-primary-foreground font-bold'
-                                    : 'bg-muted text-muted-foreground font-bold';
+                                return {
+                                    text: isActive ? 'text-primary font-bold' : 'text-muted-foreground/80 hover:text-foreground',
+                                    border: isActive ? 'border-primary' : 'border-transparent',
+                                    badge: isActive
+                                        ? 'bg-primary text-primary-foreground font-bold'
+                                        : 'bg-primary/15 text-primary font-bold',
+                                };
                         }
                     };
+
+                    const colors = getTabColors();
 
                     return (
                         <button
@@ -135,16 +155,15 @@ export function DataTableTabs({ tabs, activeTab, onTabChange, className }: DataT
                             onClick={() => onTabChange(tab.id)}
                             className={cn(
                                 'relative flex items-center gap-2.5 pb-2 text-xs md:text-sm font-bold transition-all cursor-pointer whitespace-nowrap border-b-[3px] -mb-px select-none',
-                                isActive
-                                    ? 'text-foreground border-primary'
-                                    : 'text-muted-foreground/80 border-transparent hover:text-foreground'
+                                colors.text,
+                                colors.border
                             )}
                         >
                             <span>{tab.label}</span>
                             <span
                                 className={cn(
                                     'px-2.5 py-0.5 rounded-full text-[11px] md:text-xs font-bold tracking-tight transition-colors',
-                                    getBadgeStyle()
+                                    colors.badge
                                 )}
                             >
                                 {tab.count}
@@ -158,15 +177,16 @@ export function DataTableTabs({ tabs, activeTab, onTabChange, className }: DataT
 }
 
 /* ============================================================================
- * COMPONENT: DataTableFilters (Clean Input Grid matching Screenshot)
+ * COMPONENT: DataTableFilters (Fixed Main Search + Export Menu + Children Below)
  * ============================================================================ */
 
 export interface DataTableFiltersProps {
     searchValue?: string;
     onSearchChange?: (value: string) => void;
     searchPlaceholder?: string;
-    filterSelects?: DataTableFilterSelect[];
-    extraActions?: React.ReactNode;
+    onExport?: () => void;
+    exportLabel?: string;
+    exportActions?: React.ReactNode;
     children?: React.ReactNode;
     className?: string;
 }
@@ -175,67 +195,63 @@ export function DataTableFilters({
     searchValue = '',
     onSearchChange,
     searchPlaceholder = 'Filtrar por nome ou série...',
-    filterSelects = [],
-    extraActions,
+    onExport,
+    exportLabel = 'Exportar Tabela',
+    exportActions,
     children,
     className,
 }: DataTableFiltersProps) {
-    const hasSearch = searchValue !== undefined || Boolean(onSearchChange);
-
     return (
-        <div className={cn('flex flex-col gap-3 p-5 md:p-6 w-full', className)}>
-            {/* Linha da Busca Principal */}
-            {hasSearch && (
-                <div className="flex items-center gap-2 w-full">
-                    <div className="relative flex-1">
-                        <Input
-                            value={searchValue}
-                            onChange={(e) => onSearchChange?.(e.target.value)}
-                            placeholder={searchPlaceholder}
-                            leftIcon={<Search className="size-4 text-muted-foreground/60" />}
-                            clearable={Boolean(searchValue)}
-                            onClear={() => onSearchChange?.('')}
-                            className="bg-background dark:bg-black h-10 rounded-2xl border-input/80 shadow-2xs"
-                        />
-                    </div>
-                    {extraActions || (
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="size-10 rounded-2xl shrink-0 border-0 bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40 shadow-none cursor-pointer"
-                        >
-                            <MoreHorizontal className="size-4" />
-                        </Button>
-                    )}
+        <div className={cn('flex flex-col gap-3.5 p-5 md:p-6 w-full', className)}>
+            {/* Linha Fixa da Busca Principal + Menu de Ações/Exportação */}
+            <div className="flex items-center gap-2.5 w-full">
+                <div className="relative flex-1">
+                    <Input
+                        value={searchValue}
+                        onChange={(e) => onSearchChange?.(e.target.value)}
+                        placeholder={searchPlaceholder}
+                        leftIcon={<Search className="size-4 text-muted-foreground/60" />}
+                        clearable={Boolean(searchValue)}
+                        onClear={() => onSearchChange?.('')}
+                        className="bg-background dark:bg-black h-10 border-input/80 shadow-2xs"
+                    />
                 </div>
-            )}
 
-            {/* Linha dos Filtros Select ou Children */}
-            {children ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 w-full">
-                    {children}
-                </div>
-            ) : filterSelects.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 w-full">
-                    {filterSelects.map((select) => (
-                        <SearchableSelect
-                            key={select.id}
-                            options={select.options}
-                            value={select.value}
-                            onValueChange={select.onChange}
-                            placeholder={select.placeholder}
-                            clearable
-                        />
-                    ))}
-                </div>
-            ) : null}
+                {exportActions ?? (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="size-10 rounded-md shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer"
+                            >
+                                <MoreHorizontal className="size-4" />
+                                <span className="sr-only">Opções</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                                Opções
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={onExport} className="cursor-pointer font-medium">
+                                <Download className="mr-2 size-4 text-muted-foreground" />
+                                <span>{exportLabel}</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
+            </div>
+
+            {/* Parte de baixo: Filtros extras passados via Children */}
+            {children && <div className="w-full pt-1">{children}</div>}
         </div>
     );
 }
 
 /* ============================================================================
- * COMPONENT: DataTablePagination (Footer Controls matching Screenshot)
+ * COMPONENT: DataTablePagination (Footer Controls)
  * ============================================================================ */
 
 export function DataTablePagination({
@@ -361,6 +377,8 @@ export function DataTableGrid<T>({
     data = [],
     columns = [],
     keyExtractor,
+    sortColumn,
+    sortDirection = 'asc',
     onSort,
     emptyMessage = 'Nenhum registro encontrado.',
     children,
@@ -373,26 +391,39 @@ export function DataTableGrid<T>({
                     <>
                         <TableHeader>
                             <TableRow className="border-b border-border/50 hover:bg-transparent">
-                                {columns.map((col, idx) => (
-                                    <TableHead
-                                        key={String(col.accessorKey)}
-                                        className={cn(
-                                            'py-2.5 px-3 text-[11px] md:text-xs font-bold uppercase tracking-wider text-muted-foreground/80 whitespace-nowrap select-none',
-                                            idx === 0 && 'pl-5 md:pl-6',
-                                            idx === columns.length - 1 && 'pr-5 md:pr-6',
-                                            col.sortable && 'cursor-pointer hover:text-foreground transition-colors',
-                                            col.headerClassName
-                                        )}
-                                        onClick={() => col.sortable && onSort?.(String(col.accessorKey))}
-                                    >
-                                        <div className={cn('flex items-center gap-1.5', col.headerClassName?.includes('text-center') && 'justify-center')}>
-                                            <span>{col.header}</span>
-                                            {col.sortable && (
-                                                <ArrowUpDown className="size-3 text-muted-foreground/40 shrink-0" />
+                                {columns.map((col, idx) => {
+                                    const isSortable = col.sortable !== false;
+                                    const isSorted = isSortable && sortColumn === String(col.accessorKey);
+
+                                    return (
+                                        <TableHead
+                                            key={String(col.accessorKey)}
+                                            className={cn(
+                                                'py-2.5 px-3 text-[11px] md:text-xs font-bold uppercase tracking-wider text-muted-foreground/80 whitespace-nowrap select-none',
+                                                idx === 0 && 'pl-5 md:pl-6',
+                                                idx === columns.length - 1 && 'pr-5 md:pr-6',
+                                                isSortable && 'cursor-pointer hover:text-foreground transition-colors',
+                                                col.headerClassName
                                             )}
-                                        </div>
-                                    </TableHead>
-                                ))}
+                                            onClick={() => isSortable && onSort?.(String(col.accessorKey))}
+                                        >
+                                            <div className={cn('flex items-center gap-1.5', col.headerClassName?.includes('text-center') && 'justify-center', col.headerClassName?.includes('text-right') && 'justify-end')}>
+                                                <span>{col.header}</span>
+                                                {isSortable && (
+                                                    isSorted ? (
+                                                        sortDirection === 'asc' ? (
+                                                            <ArrowUp className="size-3 text-primary shrink-0" />
+                                                        ) : (
+                                                            <ArrowDown className="size-3 text-primary shrink-0" />
+                                                        )
+                                                    ) : (
+                                                        <ArrowUpDown className="size-3 text-muted-foreground/40 shrink-0" />
+                                                    )
+                                                )}
+                                            </div>
+                                        </TableHead>
+                                    );
+                                })}
                             </TableRow>
                         </TableHeader>
 
@@ -439,7 +470,7 @@ export function DataTableGrid<T>({
 }
 
 /* ============================================================================
- * UNIFIED COMPONENT: DataTableCard (Everything Inside One Unified Card)
+ * UNIFIED COMPONENT: DataTableCard
  * ============================================================================ */
 
 export interface DataTableCardProps<T> {
@@ -448,13 +479,16 @@ export interface DataTableCardProps<T> {
     activeTab?: string;
     onTabChange?: (id: string) => void;
 
-    /* Filtros */
+    /* Busca e Exportação */
     searchValue?: string;
     onSearchChange?: (value: string) => void;
     searchPlaceholder?: string;
-    filterSelects?: DataTableFilterSelect[];
+    onExport?: () => void;
+    exportLabel?: string;
+    exportActions?: React.ReactNode;
+
+    /* Filtros customizados via children */
     filterChildren?: React.ReactNode;
-    extraActions?: React.ReactNode;
 
     /* Tabela */
     data?: T[];
@@ -482,9 +516,10 @@ export function DataTableCard<T>({
     searchValue,
     onSearchChange,
     searchPlaceholder,
-    filterSelects,
+    onExport,
+    exportLabel,
+    exportActions,
     filterChildren,
-    extraActions,
     data = [],
     columns = [],
     keyExtractor,
@@ -517,18 +552,17 @@ export function DataTableCard<T>({
                 </div>
             )}
 
-            {/* 2. Filtros e Busca */}
-            {(searchValue !== undefined || (filterSelects && filterSelects.length > 0) || filterChildren) && (
-                <DataTableFilters
-                    searchValue={searchValue}
-                    onSearchChange={onSearchChange}
-                    searchPlaceholder={searchPlaceholder}
-                    filterSelects={filterSelects}
-                    extraActions={extraActions}
-                >
-                    {filterChildren}
-                </DataTableFilters>
-            )}
+            {/* 2. Filtros (Fixo Busca + Menu Exportação + Children) */}
+            <DataTableFilters
+                searchValue={searchValue}
+                onSearchChange={onSearchChange}
+                searchPlaceholder={searchPlaceholder}
+                onExport={onExport}
+                exportLabel={exportLabel}
+                exportActions={exportActions}
+            >
+                {filterChildren}
+            </DataTableFilters>
 
             {/* 3. Tabela de Dados */}
             <div className="w-full py-0">
@@ -558,4 +592,3 @@ export const DataTable = Object.assign(DataTableCard, {
     Grid: DataTableGrid,
     Pagination: DataTablePagination,
 });
-

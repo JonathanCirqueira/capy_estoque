@@ -96,7 +96,7 @@ export function SearchableSelect({
                         aria-expanded={open}
                         aria-controls={`${id}-list`}
                         className={cn(
-                            'h-10 w-full justify-between rounded-2xl border border-input bg-background dark:bg-black px-3.5 py-2 text-xs md:text-sm font-normal text-foreground shadow-2xs transition-all',
+                            'h-10 w-full justify-between rounded-md border border-input bg-background dark:bg-black px-3.5 py-2 text-xs md:text-sm font-normal text-foreground shadow-2xs transition-all',
                             'hover:border-primary/40 hover:bg-background',
                             'focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20',
                             'data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20',

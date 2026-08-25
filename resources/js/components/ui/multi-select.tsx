@@ -91,7 +91,7 @@ export function MultiSelect({
                     aria-expanded={open}
                     aria-controls={id}
                     className={cn(
-                        'h-auto min-h-10 w-full justify-between rounded-2xl border border-input bg-background dark:bg-black px-3.5 py-1.5 text-xs md:text-sm font-normal text-foreground transition-all focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20',
+                        'h-auto min-h-10 w-full justify-between rounded-md border border-input bg-background dark:bg-black px-3.5 py-1.5 text-xs md:text-sm font-normal text-foreground transition-all focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20',
                         'hover:border-primary/40',
                         error && 'border-destructive focus:ring-destructive/20',
                         className,
