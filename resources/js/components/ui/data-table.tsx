@@ -45,7 +45,7 @@ export interface DataTableTab {
 export interface DataTableColumn<T> {
     accessorKey: keyof T | string;
     header: string;
-    sortable?: boolean; 
+    sortable?: boolean;
     className?: string;
     headerClassName?: string;
     cell?: (row: T, index: number) => React.ReactNode;
@@ -104,7 +104,7 @@ export interface DataTableTabsProps {
 export function DataTableTabs({ tabs, activeTab, onTabChange, className }: DataTableTabsProps) {
     return (
         <div className={cn('w-full border-b border-border/60 pb-0 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden', className)}>
-            <div className="flex px-6 items-center gap-6 md:gap-8 min-w-max">
+            <div className="flex px-5 md:px-6 items-center gap-6 md:gap-8 min-w-max">
                 {tabs.map((tab) => {
                     const isActive = activeTab === tab.id;
 
@@ -202,7 +202,7 @@ export function DataTableFilters({
     className,
 }: DataTableFiltersProps) {
     return (
-        <div className={cn('flex flex-col gap-3.5 p-5 md:p-6 w-full', className)}>
+        <div className={cn('flex flex-col gap-3.5 p-4 md:p-6 w-full', className)}>
             {/* Linha Fixa da Busca Principal + Menu de Ações/Exportação */}
             <div className="flex items-center gap-2.5 w-full">
                 <div className="relative flex-1">
@@ -292,7 +292,7 @@ export function DataTablePagination({
     return (
         <div
             className={cn(
-                'flex flex-col sm:flex-row items-center justify-between gap-3 py-4 md:py-5 border-t border-border/40 px-5 md:px-6 select-none',
+                'flex flex-col sm:flex-row items-center justify-between gap-3 py-4 md:py-5 border-t border-border/40 px-4 md:px-6 select-none',
                 className
             )}
         >
@@ -358,7 +358,7 @@ export function DataTablePagination({
 }
 
 /* ============================================================================
- * COMPONENT: DataTableGrid (Grid Table Element)
+ * COMPONENT: DataTableGrid (Desktop Table + Mobile Cards)
  * ============================================================================ */
 
 export interface DataTableGridProps<T> {
@@ -369,6 +369,7 @@ export interface DataTableGridProps<T> {
     sortDirection?: 'asc' | 'desc';
     onSort?: (columnKey: string) => void;
     emptyMessage?: string;
+    renderMobileCard?: (row: T, index: number) => React.ReactNode;
     children?: React.ReactNode;
     className?: string;
 }
@@ -381,90 +382,168 @@ export function DataTableGrid<T>({
     sortDirection = 'asc',
     onSort,
     emptyMessage = 'Nenhum registro encontrado.',
+    renderMobileCard,
     children,
     className,
 }: DataTableGridProps<T>) {
-    return (
-        <div className="relative w-full overflow-x-auto p-0">
-            <Table className={cn('w-full border-collapse', className)}>
-                {children || (
-                    <>
-                        <TableHeader>
-                            <TableRow className="border-b border-border/50 hover:bg-transparent">
-                                {columns.map((col, idx) => {
-                                    const isSortable = col.sortable !== false;
-                                    const isSorted = isSortable && sortColumn === String(col.accessorKey);
+    if (children) {
+        return <div className={cn('w-full', className)}>{children}</div>;
+    }
 
-                                    return (
-                                        <TableHead
+    /* Separação para renderização mobile automática a partir das colunas */
+    const primaryCol = columns[0];
+    const actionsCol = columns.find(
+        (c) => String(c.accessorKey).toLowerCase() === 'actions' || c.header === 'Ações'
+    );
+    const detailCols = columns.filter((c) => c !== primaryCol && c !== actionsCol);
+
+    return (
+        <div className={cn('w-full', className)}>
+            {/* 1. VISÃO DESKTOP (Tabela padrão em telas md e superiores) */}
+            <div className="hidden md:block relative w-full overflow-x-auto p-0">
+                <Table className="w-full border-collapse">
+                    <TableHeader>
+                        <TableRow className="border-b border-border/50 hover:bg-transparent">
+                            {columns.map((col, idx) => {
+                                const isSortable = col.sortable !== false;
+                                const isSorted = isSortable && sortColumn === String(col.accessorKey);
+
+                                return (
+                                    <TableHead
+                                        key={String(col.accessorKey)}
+                                        className={cn(
+                                            'py-2.5 px-3 text-[11px] md:text-xs font-bold uppercase tracking-wider text-muted-foreground/80 whitespace-nowrap select-none',
+                                            idx === 0 && 'pl-5 md:pl-6',
+                                            idx === columns.length - 1 && 'pr-5 md:pr-6',
+                                            isSortable && 'cursor-pointer hover:text-foreground transition-colors',
+                                            col.headerClassName
+                                        )}
+                                        onClick={() => isSortable && onSort?.(String(col.accessorKey))}
+                                    >
+                                        <div
+                                            className={cn(
+                                                'flex items-center gap-1.5',
+                                                col.headerClassName?.includes('text-center') && 'justify-center',
+                                                col.headerClassName?.includes('text-right') && 'justify-end'
+                                            )}
+                                        >
+                                            <span>{col.header}</span>
+                                            {isSortable &&
+                                                (isSorted ? (
+                                                    sortDirection === 'asc' ? (
+                                                        <ArrowUp className="size-3 text-primary shrink-0" />
+                                                    ) : (
+                                                        <ArrowDown className="size-3 text-primary shrink-0" />
+                                                    )
+                                                ) : (
+                                                    <ArrowUpDown className="size-3 text-muted-foreground/40 shrink-0" />
+                                                ))}
+                                        </div>
+                                    </TableHead>
+                                );
+                            })}
+                        </TableRow>
+                    </TableHeader>
+
+                    <TableBody>
+                        {data.length === 0 ? (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="h-28 text-center text-xs md:text-sm font-normal text-muted-foreground pl-5 md:pl-6 pr-5 md:pr-6"
+                                >
+                                    {emptyMessage}
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            data.map((row, rowIndex) => (
+                                <TableRow
+                                    key={keyExtractor ? keyExtractor(row, rowIndex) : rowIndex}
+                                    className="border-b border-border/40 hover:bg-muted/30 transition-colors"
+                                >
+                                    {columns.map((col, colIdx) => (
+                                        <TableCell
                                             key={String(col.accessorKey)}
                                             className={cn(
-                                                'py-2.5 px-3 text-[11px] md:text-xs font-bold uppercase tracking-wider text-muted-foreground/80 whitespace-nowrap select-none',
-                                                idx === 0 && 'pl-5 md:pl-6',
-                                                idx === columns.length - 1 && 'pr-5 md:pr-6',
-                                                isSortable && 'cursor-pointer hover:text-foreground transition-colors',
-                                                col.headerClassName
+                                                'py-2.5 px-3 text-xs md:text-sm font-normal align-middle',
+                                                colIdx === 0 && 'pl-5 md:pl-6',
+                                                colIdx === columns.length - 1 && 'pr-5 md:pr-6',
+                                                col.className
                                             )}
-                                            onClick={() => isSortable && onSort?.(String(col.accessorKey))}
                                         >
-                                            <div className={cn('flex items-center gap-1.5', col.headerClassName?.includes('text-center') && 'justify-center', col.headerClassName?.includes('text-right') && 'justify-end')}>
-                                                <span>{col.header}</span>
-                                                {isSortable && (
-                                                    isSorted ? (
-                                                        sortDirection === 'asc' ? (
-                                                            <ArrowUp className="size-3 text-primary shrink-0" />
-                                                        ) : (
-                                                            <ArrowDown className="size-3 text-primary shrink-0" />
-                                                        )
-                                                    ) : (
-                                                        <ArrowUpDown className="size-3 text-muted-foreground/40 shrink-0" />
-                                                    )
-                                                )}
-                                            </div>
-                                        </TableHead>
-                                    );
-                                })}
-                            </TableRow>
-                        </TableHeader>
-
-                        <TableBody>
-                            {data.length === 0 ? (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={columns.length}
-                                        className="h-28 text-center text-xs md:text-sm font-normal text-muted-foreground pl-5 md:pl-6 pr-5 md:pr-6"
-                                    >
-                                        {emptyMessage}
-                                    </TableCell>
+                                            {col.cell
+                                                ? col.cell(row, rowIndex)
+                                                : String((row as any)[col.accessorKey] ?? '')}
+                                        </TableCell>
+                                    ))}
                                 </TableRow>
-                            ) : (
-                                data.map((row, rowIndex) => (
-                                    <TableRow
-                                        key={keyExtractor ? keyExtractor(row, rowIndex) : rowIndex}
-                                        className="border-b border-border/40 hover:bg-muted/30 transition-colors"
-                                    >
-                                        {columns.map((col, colIdx) => (
-                                            <TableCell
-                                                key={String(col.accessorKey)}
-                                                className={cn(
-                                                    'py-2.5 px-3 text-xs md:text-sm font-normal align-middle',
-                                                    colIdx === 0 && 'pl-5 md:pl-6',
-                                                    colIdx === columns.length - 1 && 'pr-5 md:pr-6',
-                                                    col.className
-                                                )}
-                                            >
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
+
+            {/* 2. VISÃO MOBILE (Lista de Cards em telas menores que md) */}
+            <div className="block md:hidden space-y-3 px-4 pb-4">
+                {data.length === 0 ? (
+                    <div className="py-8 text-center text-xs font-normal text-muted-foreground bg-muted/20 rounded-2xl border border-border/60">
+                        {emptyMessage}
+                    </div>
+                ) : (
+                    data.map((row, rowIndex) => {
+                        const rowKey = keyExtractor ? keyExtractor(row, rowIndex) : rowIndex;
+
+                        if (renderMobileCard) {
+                            return <React.Fragment key={rowKey}>{renderMobileCard(row, rowIndex)}</React.Fragment>;
+                        }
+
+                        return (
+                            <div
+                                key={rowKey}
+                                className="rounded-2xl border border-border/70 bg-card p-4 flex flex-col gap-3 shadow-2xs"
+                            >
+                                {/* Header do Card Mobile: Coluna Principal + Ações */}
+                                <div className="flex items-start justify-between gap-3 pb-2.5 border-b border-border/40">
+                                    <div className="min-w-0 flex-1">
+                                        {primaryCol &&
+                                            (primaryCol.cell ? (
+                                                primaryCol.cell(row, rowIndex)
+                                            ) : (
+                                                <span className="font-bold text-foreground text-sm">
+                                                    {String((row as any)[primaryCol.accessorKey] ?? '')}
+                                                </span>
+                                            ))}
+                                    </div>
+                                    {actionsCol && (
+                                        <div className="shrink-0 pt-0.5">
+                                            {actionsCol.cell ? actionsCol.cell(row, rowIndex) : null}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Lista de Propriedades em formato Chave / Valor */}
+                                <div className="flex flex-col gap-2 pt-0.5">
+                                    {detailCols.map((col) => (
+                                        <div
+                                            key={String(col.accessorKey)}
+                                            className="flex items-center justify-between gap-3 text-xs"
+                                        >
+                                            <span className="text-muted-foreground/80 font-bold uppercase tracking-wider text-[11px] shrink-0">
+                                                {col.header}
+                                            </span>
+                                            <div className="text-foreground font-medium text-right min-w-0">
                                                 {col.cell
                                                     ? col.cell(row, rowIndex)
                                                     : String((row as any)[col.accessorKey] ?? '')}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })
                 )}
-            </Table>
+            </div>
         </div>
     );
 }
@@ -498,6 +577,7 @@ export interface DataTableCardProps<T> {
     sortDirection?: 'asc' | 'desc';
     onSort?: (columnKey: string) => void;
     emptyMessage?: string;
+    renderMobileCard?: (row: T, index: number) => React.ReactNode;
 
     /* Paginação */
     pagination?: DataTablePaginationProps;
@@ -527,28 +607,35 @@ export function DataTableCard<T>({
     sortDirection,
     onSort,
     emptyMessage,
+    renderMobileCard,
     pagination,
     children,
     className,
 }: DataTableCardProps<T>) {
     if (children) {
         return (
-            <div className={cn('rounded-3xl border border-border/70 bg-card p-0 shadow-2xs flex flex-col w-full overflow-hidden', className)}>
+            <div
+                className={cn(
+                    'rounded-3xl border border-border/70 bg-card p-0 shadow-2xs flex flex-col w-full overflow-hidden',
+                    className
+                )}
+            >
                 {children}
             </div>
         );
     }
 
     return (
-        <div className={cn('rounded-3xl border border-border/70 bg-card p-0 shadow-2xs flex flex-col w-full overflow-hidden', className)}>
+        <div
+            className={cn(
+                'rounded-3xl border border-border/70 bg-card p-0 shadow-2xs flex flex-col w-full overflow-hidden',
+                className
+            )}
+        >
             {/* 1. Abas de Status no Topo do Card */}
             {tabs && activeTab && onTabChange && (
                 <div className="pt-5 md:pt-6 pb-0">
-                    <DataTableTabs
-                        tabs={tabs}
-                        activeTab={activeTab}
-                        onTabChange={onTabChange}
-                    />
+                    <DataTableTabs tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} />
                 </div>
             )}
 
@@ -564,7 +651,7 @@ export function DataTableCard<T>({
                 {filterChildren}
             </DataTableFilters>
 
-            {/* 3. Tabela de Dados */}
+            {/* 3. Tabela de Dados (Desktop Table + Mobile Cards) */}
             <div className="w-full py-0">
                 <DataTableGrid
                     data={data}
@@ -574,6 +661,7 @@ export function DataTableCard<T>({
                     sortDirection={sortDirection}
                     onSort={onSort}
                     emptyMessage={emptyMessage}
+                    renderMobileCard={renderMobileCard}
                 />
             </div>
 
