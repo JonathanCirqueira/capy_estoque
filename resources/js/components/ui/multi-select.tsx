@@ -91,10 +91,9 @@ export function MultiSelect({
                     aria-expanded={open}
                     aria-controls={id}
                     className={cn(
-                        'h-auto min-h-11 w-full justify-between rounded-2xl border border-input bg-muted/30 dark:bg-neutral-900/60 px-4 py-2 text-sm font-medium text-foreground transition-all focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20',
+                        'h-auto min-h-10 w-full justify-between rounded-2xl border border-input bg-background dark:bg-black px-3.5 py-1.5 text-xs md:text-sm font-normal text-foreground transition-all focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20',
                         'hover:border-primary/40',
                         error && 'border-destructive focus:ring-destructive/20',
-                        value.length === 0 && 'text-muted-foreground',
                         className,
                     )}
                 >
@@ -167,7 +166,7 @@ export function MultiSelect({
                                                 : 'bg-background'
                                         )}
                                     >
-                                        {isAllSelected && <Check className="size-3.5 stroke-[3]" />}
+                                        {isAllSelected && <Check className="size-3.5 stroke-3" />}
                                     </div>
                                 </CommandItem>
                             )}
@@ -201,7 +200,7 @@ export function MultiSelect({
                                                     : 'bg-background'
                                             )}
                                         >
-                                            {isSelected && <Check className="size-3.5 stroke-[3]" />}
+                                            {isSelected && <Check className="size-3.5 stroke-3" />}
                                         </div>
                                     </CommandItem>
                                 );
