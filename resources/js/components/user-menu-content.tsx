@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { KeyRound, LogOut, Settings } from 'lucide-react';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -10,6 +10,7 @@ import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
+import { edit as editSecurity } from '@/routes/security';
 import type { User } from '@/types';
 
 type Props = {
@@ -35,8 +36,15 @@ export function UserMenuContent({ user }: Props) {
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                     <Link className="block w-full cursor-pointer" href={edit()} prefetch onClick={cleanup}>
-                        <Settings className="mr-2" />
+                        <Settings className="mr-2 size-4" />
                         Configurações
+                    </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                    <Link className="block w-full cursor-pointer" href={editSecurity()} prefetch onClick={cleanup}>
+                        <KeyRound className="mr-2 size-4" />
+                        Trocar Senha
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -49,7 +57,7 @@ export function UserMenuContent({ user }: Props) {
                     onClick={handleLogout}
                     data-test="logout-button"
                 >
-                    <LogOut className="mr-2" />
+                    <LogOut className="mr-2 size-4" />
                     Sair
                 </Link>
             </DropdownMenuItem>

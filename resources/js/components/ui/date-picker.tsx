@@ -6,13 +6,18 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
+import { Label } from '@/components/ui/label';
+
 interface DatePickerProps {
     value?: string;
-    onValueChange: (value: string) => void;
+    onValueChange?: (value: string) => void;
     placeholder?: string;
+    label?: string;
+    required?: boolean;
     disabled?: boolean;
     className?: string;
-    error?: boolean;
+    containerClassName?: string;
+    error?: boolean | string;
 }
 
 const MESES = [
@@ -52,8 +57,11 @@ export function DatePicker({
     value,
     onValueChange,
     placeholder = 'Selecione a data...',
+    label,
+    required = false,
     disabled = false,
     className,
+    containerClassName,
     error = false,
 }: DatePickerProps) {
     const [open, setOpen] = React.useState(false);
@@ -132,7 +140,7 @@ export function DatePicker({
     }, [viewMonth, viewYear]);
 
     const handleSelectDate = (dateString: string) => {
-        onValueChange(dateString);
+        onValueChange?.(dateString);
         setOpen(false);
     };
 
@@ -156,51 +164,51 @@ export function DatePicker({
         }
     };
 
-    return (
+    const datePickerContent = (
         <Popover open={open} onOpenChange={handlePopoverOpenChange}>
             <PopoverTrigger asChild disabled={disabled}>
                 <Button
                     type="button"
                     variant="outline"
                     className={cn(
-                        'h-11 w-full justify-start rounded-xl border border-border/85 bg-background px-4 py-3 text-left text-sm font-normal focus:outline-none focus:ring-[3px] focus:ring-primary/15 focus:border-primary focus-visible:ring-[3px] focus-visible:ring-primary/15 focus-visible:border-primary data-[state=open]:border-primary data-[state=open]:ring-[3px] data-[state=open]:ring-primary/15 disabled:bg-muted/30 disabled:opacity-75 transition-all',
+                        'h-10 w-full justify-start rounded-md border border-input bg-background dark:bg-black px-3.5 py-2 text-left text-xs md:text-sm font-normal transition-all hover:border-primary/40 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50',
                         !disabled && 'cursor-pointer',
-                        error && 'border-destructive focus:ring-destructive/20 focus-visible:ring-destructive/20',
-                        !value && 'text-muted-foreground',
+                        error && 'border-destructive focus-visible:ring-destructive/20',
                         className,
                     )}
                 >
-                    <CalendarIcon className="mr-2 h-4 w-4 shrink-0 opacity-80" />
+                    <CalendarIcon className="mr-2.5 h-4 w-4 shrink-0 text-muted-foreground" />
                     <span className="truncate">{formatarDataExibicao(value, placeholder)}</span>
                 </Button>
             </PopoverTrigger>
             <PopoverContent
-                className="w-auto rounded-2xl border border-border/40 bg-popover/95 backdrop-blur-md p-3 shadow-xl animate-none"
+                className="w-72 rounded-3xl border border-border/60 bg-popover/98 p-4 shadow-2xl backdrop-blur-md"
                 align="start"
+                sideOffset={6}
             >
                 {/* Header com os botões de navegação */}
                 <div className="flex items-center justify-between pb-3">
                     <button
                         type="button"
                         onClick={handlePrevMonth}
-                        className="flex size-7 cursor-pointer items-center justify-center rounded-lg border border-border/40 text-foreground transition-all hover:bg-muted"
+                        className="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-95"
                     >
                         <ChevronLeft className="size-4" />
                     </button>
-                    <div className="text-xs font-bold text-foreground">
+                    <div className="text-sm font-bold text-foreground">
                         {MESES[viewMonth]} {viewYear}
                     </div>
                     <button
                         type="button"
                         onClick={handleNextMonth}
-                        className="flex size-7 cursor-pointer items-center justify-center rounded-lg border border-border/40 text-foreground transition-all hover:bg-muted"
+                        className="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-95"
                     >
                         <ChevronRight className="size-4" />
                     </button>
                 </div>
 
                 {/* Grid dos dias da semana */}
-                <div className="mb-1.5 grid grid-cols-7 gap-1 border-b border-border/20 pb-1.5 text-center text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+                <div className="mb-2 grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-muted-foreground/70">
                     {DIAS_SEMANA.map((dia) => (
                         <div key={dia.id} className="flex size-8 items-center justify-center">
                             {dia.label}
@@ -219,15 +227,15 @@ export function DatePicker({
                                 type="button"
                                 onClick={() => handleSelectDate(d.dateString)}
                                 className={cn(
-                                    'flex size-8 cursor-pointer items-center justify-center rounded-lg text-xs font-semibold transition-all focus-visible:outline-hidden',
+                                    'flex size-8 cursor-pointer items-center justify-center rounded-xl text-xs font-semibold transition-all focus-visible:outline-none',
                                     d.isCurrentMonth
                                         ? 'text-foreground hover:bg-muted'
-                                        : 'text-muted-foreground/40 hover:bg-muted/50',
+                                        : 'text-muted-foreground/30 hover:bg-muted/40',
                                     isSelected &&
-                                        'bg-primary font-bold text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 hover:text-primary-foreground',
+                                        'border-2 border-primary bg-primary/10 font-bold text-primary shadow-xs dark:bg-sidebar-accent dark:text-sidebar-accent-foreground dark:border-sidebar-border',
                                     isHoje &&
                                         !isSelected &&
-                                        'border border-primary/30 font-bold text-primary',
+                                        'border border-primary/40 font-bold text-primary',
                                 )}
                             >
                                 {d.dia}
@@ -237,5 +245,24 @@ export function DatePicker({
                 </div>
             </PopoverContent>
         </Popover>
+    );
+
+    if (!label && typeof error !== 'string') {
+        return datePickerContent;
+    }
+
+    return (
+        <div className={cn('flex flex-col gap-1.5 w-full', containerClassName)}>
+            {label && (
+                <Label className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase flex items-center gap-1">
+                    {label}
+                    {required && <span className="text-destructive">*</span>}
+                </Label>
+            )}
+            {datePickerContent}
+            {typeof error === 'string' && (
+                <span className="text-xs text-destructive mt-0.5">{error}</span>
+            )}
+        </div>
     );
 }
