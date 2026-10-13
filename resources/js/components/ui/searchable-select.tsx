@@ -34,9 +34,11 @@ export interface SearchableSelectProps {
     disabled?: boolean;
     error?: boolean | string;
     clearable?: boolean;
+    onClear?: () => void;
     className?: string;
     triggerClassName?: string;
     contentClassName?: string;
+    modal?: boolean;
 }
 
 export function SearchableSelect({
@@ -52,9 +54,11 @@ export function SearchableSelect({
     disabled = false,
     error = false,
     clearable = false,
+    onClear,
     className,
     triggerClassName,
     contentClassName,
+    modal = true,
 }: SearchableSelectProps) {
     const [open, setOpen] = React.useState(false);
     const id = React.useId();
@@ -69,6 +73,7 @@ export function SearchableSelect({
     const handleClear = (e: React.MouseEvent | React.KeyboardEvent) => {
         e.stopPropagation();
         e.preventDefault();
+        if (onClear) onClear();
         if (onChange) onChange('');
         if (onValueChange) onValueChange('');
     };
@@ -87,7 +92,7 @@ export function SearchableSelect({
                 </label>
             )}
 
-            <Popover open={open} onOpenChange={setOpen}>
+            <Popover open={open} onOpenChange={setOpen} modal={modal}>
                 <PopoverTrigger asChild disabled={disabled}>
                     <Button
                         id={id}
@@ -96,7 +101,7 @@ export function SearchableSelect({
                         aria-expanded={open}
                         aria-controls={`${id}-list`}
                         className={cn(
-                            'h-10 w-full justify-between rounded-md border border-input bg-background dark:bg-black px-3.5 py-2 text-xs md:text-sm font-normal text-foreground shadow-2xs transition-all',
+                            'h-10 w-full justify-between rounded-xl border border-input bg-background dark:bg-card px-3.5 py-2 text-xs md:text-sm font-normal text-foreground shadow-2xs transition-all',
                             'hover:border-primary/40 hover:bg-background',
                             'focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20',
                             'data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20',
@@ -105,7 +110,7 @@ export function SearchableSelect({
                             triggerClassName
                         )}
                     >
-                        <span className="truncate">
+                        <span className={cn('truncate', !selectedOption && 'text-muted-foreground')}>
                             {selectedOption ? selectedOption.label : placeholder}
                         </span>
 
@@ -118,7 +123,7 @@ export function SearchableSelect({
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter' || e.key === ' ') handleClear(e);
                                     }}
-                                    className="rounded-full p-1 opacity-60 hover:opacity-100 hover:bg-muted transition-opacity"
+                                    className="rounded-full p-1 opacity-60 hover:opacity-100 hover:bg-muted transition-opacity cursor-pointer"
                                     title="Limpar seleção"
                                 >
                                     <X className="size-3.5 text-muted-foreground" />
@@ -131,7 +136,7 @@ export function SearchableSelect({
 
                 <PopoverContent
                     className={cn(
-                        'w-(--radix-popover-trigger-width) min-w-55 p-0 rounded-2xl border border-border/60 bg-popover text-popover-foreground shadow-lg overflow-hidden backdrop-blur-sm',
+                        'w-(--radix-popover-trigger-width) min-w-55 p-0 rounded-2xl border border-border/60 bg-popover text-popover-foreground shadow-lg overflow-hidden backdrop-blur-sm z-70',
                         contentClassName
                     )}
                     align="start"
@@ -154,7 +159,11 @@ export function SearchableSelect({
                                             key={String(option.value)}
                                             value={option.label}
                                             disabled={option.disabled}
+                                            onPointerDown={(e) => {
+                                                e.stopPropagation();
+                                            }}
                                             onSelect={() => handleSelect(String(option.value))}
+                                            onClick={() => handleSelect(String(option.value))}
                                             className={cn(
                                                 'relative flex cursor-pointer select-none items-center justify-between rounded-xl px-3 py-2.5 text-sm transition-colors my-0.5',
                                                 'data-[selected=true]:bg-muted/80 data-[selected=true]:text-foreground',

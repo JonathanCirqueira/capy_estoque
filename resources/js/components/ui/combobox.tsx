@@ -5,11 +5,12 @@ import { SearchableSelect, SearchableSelectProps, SearchableSelectOption } from 
 export type ComboboxItem = SearchableSelectOption;
 
 export interface ComboboxProps extends Omit<SearchableSelectProps, 'options'> {
-    items: ComboboxItem[];
+    items?: ComboboxItem[];
+    options?: ComboboxItem[];
 }
 
-export function Combobox({ items, ...props }: ComboboxProps) {
-    return <SearchableSelect options={items} {...props} />;
+export function Combobox({ items, options, ...props }: ComboboxProps) {
+    return <SearchableSelect options={items ?? options ?? []} {...props} />;
 }
 
 export { SearchableSelect };

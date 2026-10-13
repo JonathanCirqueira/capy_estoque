@@ -114,7 +114,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
                 <div className="relative flex items-center w-full">
                     {startIcon && (
-                        <div className="absolute left-3.5 flex items-center justify-center text-muted-foreground/70 pointer-events-none">
+                        <div className="absolute left-3.5 flex items-center justify-center text-muted-foreground/70 pointer-events-none z-10">
                             {startIcon}
                         </div>
                     )}
@@ -129,8 +129,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         onKeyDown={handleKeyDown}
                         onChange={handleChange}
                         className={cn(
-                            'flex h-10 w-full min-w-0 rounded-md border border-input bg-background dark:bg-black py-2 text-xs md:text-sm font-normal shadow-2xs transition-all outline-none',
-                            'placeholder:text-foreground text-foreground',
+                            'flex h-10 w-full min-w-0 rounded-xl border border-input bg-background dark:bg-card py-2 text-xs md:text-sm font-normal shadow-2xs transition-all outline-none',
+                            'placeholder:text-muted-foreground text-foreground',
                             'hover:border-primary/40',
                             'focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20',
                             'disabled:cursor-not-allowed disabled:opacity-50',
