@@ -14,6 +14,7 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         AddOverrideAttributeToOverriddenMethodsRector::class,
+        __DIR__.'/app/Templates',
     ])
     ->withPreparedSets(
         deadCode: true,
