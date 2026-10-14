@@ -53,7 +53,7 @@ Antes de gerar ou alterar qualquer listagem, inspecione:
       title="Gestão de Usuários"
       description="Controle os usuários, cargos e departamentos com acesso ao sistema."
       action={{
-          label: '+ Cadastrar',
+          label: 'Cadastrar',
           onClick: handleCadastrar,
       }}
   />
@@ -150,7 +150,7 @@ Antes de gerar ou alterar qualquer listagem, inspecione:
   - **Coluna AÇÕES (Head e Cell):**
     - Head: `<TableHead className="w-12 pl-3 pr-5 py-3 text-right font-display text-[11px] font-bold tracking-wider text-muted-foreground/80 uppercase md:pr-6 xl:w-16 xl:pr-6">AÇÕES</TableHead>`
     - Cell: `<TableCell className="w-12 pl-3 pr-5 py-3 text-right whitespace-nowrap md:pr-6 xl:w-16 xl:pr-6">`
-    - Menu de 3 pontinhos contendo **apenas "Editar"** (`Edit3`), disparando `onEditar(item)`.
+    - Menu de 3 pontinhos contendo **apenas "Editar"** (`Pencil`), disparando `onEditar(item)`.
 - **Tipografia Uniforme:** Todas as células de dados usam tamanho `text-sm font-normal`.
 - **REGRA DE NEGRITO:** **PROIBIDO negrito em qualquer coluna de dados**, exceto **EXCLUSIVAMENTE no Badge de Status** (`font-bold text-[10px] uppercase`).
 

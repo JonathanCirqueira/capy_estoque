@@ -1,4 +1,4 @@
-import { MoreHorizontal, Edit3 } from 'lucide-react';
+import { MoreHorizontal, Pencil } from 'lucide-react';
 import { SortableTableHead } from '@/components/ui/sortable-table-head';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -202,7 +202,7 @@ export function TableTemplate({
                                                     onClick={() => onEditar?.(item)}
                                                     className="cursor-pointer gap-2.5 py-2 text-xs font-semibold"
                                                 >
-                                                    <Edit3 className="size-4 text-muted-foreground" />
+                                                    <Pencil className="size-4 text-muted-foreground" />
                                                     Editar
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
@@ -265,7 +265,7 @@ export function TableTemplate({
                                             onClick={() => onEditar?.(item)}
                                             className="cursor-pointer gap-2.5 py-2 text-xs font-semibold"
                                         >
-                                            <Edit3 className="size-4 text-muted-foreground" />
+                                            <Pencil className="size-4 text-muted-foreground" />
                                             Editar
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>

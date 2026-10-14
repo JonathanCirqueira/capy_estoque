@@ -19,8 +19,8 @@ Antes de gerar qualquer tela ou componente de cadastro, conte a quantidade total
 
 | Quantidade de Campos | Abordagem Obrigatória | Arquivo Base do Template | Como Acionar na Listagem |
 | :--- | :--- | :--- | :--- |
-| **Até 8 Campos (`<= 8`)** | **MODAL (Dialog)** | [`modal-template.tsx`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/templates/form-cadastro/modal-template.tsx) | `<PageHeader action={{ label: '+ Cadastrar', onClick: () => setModalAberto(true) }} />` |
-| **Mais de 8 Campos (`> 8`)** | **PÁGINA COMPLETA CONTÍNUA** | [`page-template.tsx`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/templates/form-cadastro/page-template.tsx) | `<PageHeader action={{ label: '+ Cadastrar', href: '/[entidade]/cadastrar' }} />` |
+| **Até 8 Campos (`<= 8`)** | **MODAL (Dialog)** | [`modal-template.tsx`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/templates/form-cadastro/modal-template.tsx) | `<PageHeader action={{ label: 'Cadastrar', onClick: () => setModalAberto(true) }} />` |
+| **Mais de 8 Campos (`> 8`)** | **PÁGINA COMPLETA CONTÍNUA** | [`page-template.tsx`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/templates/form-cadastro/page-template.tsx) | `<PageHeader action={{ label: 'Cadastrar', href: '/[entidade]/cadastrar' }} />` |
 
 ---
 

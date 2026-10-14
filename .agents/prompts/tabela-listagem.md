@@ -16,7 +16,7 @@ Use a skill @[skills/tabela-listagem] para gerar a página de listagem completa 
 - **Entidade:** [Ex: Fornecedor / Fornecedores]
 - **Título da Página:** [Ex: Gestão de Fornecedores]
 - **Descrição:** [Ex: Visualize e gerencie os fornecedores cadastrados no sistema.]
-- **Botão Principal:** "+ Novo [Ex: Fornecedor]"
+- **Botão Principal:** "Novo [Ex: Fornecedor]"
 
 - **Colunas da Tabela:**
     - [Nome da Coluna 1] (ordenável: sim/não)

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
-import { Link } from '@inertiajs/react';
 import Heading from '@/components/heading';
+import { Botao, type BotaoProps } from '@/components/botao';
 import { cn } from '@/lib/utils';
 
 export interface PageHeaderAction {
@@ -10,6 +10,9 @@ export interface PageHeaderAction {
     onClick?: () => void;
     icon?: React.ReactNode;
     className?: string;
+    loading?: boolean;
+    disabled?: boolean;
+    variant?: BotaoProps['variant'];
 }
 
 export interface PageHeaderProps {
@@ -35,27 +38,22 @@ export function PageHeader({ title, description, action, children, className, sh
         if (!showAction || !action) return null;
 
         if (isActionConfig(action)) {
-            const buttonClasses = cn(
-                'inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground shadow-2xs transition-all select-none hover:bg-primary/90 active:scale-[0.98]',
-                action.className,
-            );
-
+            // Remove prefixo '+' do label caso tenha sido passado, evitando duplicar com o ícone Plus
+            const cleanLabel = action.label.replace(/^\+\s*/, '');
             const iconElement = action.icon !== undefined ? action.icon : <Plus className="size-4" strokeWidth={2.5} />;
 
-            if (action.href) {
-                return (
-                    <Link href={action.href} className={buttonClasses}>
-                        {iconElement}
-                        <span>{action.label}</span>
-                    </Link>
-                );
-            }
-
             return (
-                <button type="button" onClick={action.onClick} className={buttonClasses}>
-                    {iconElement}
-                    <span>{action.label}</span>
-                </button>
+                <Botao
+                    variant={action.variant || 'default'}
+                    href={action.href}
+                    onClick={action.onClick}
+                    icon={iconElement}
+                    className={action.className}
+                    loading={action.loading}
+                    disabled={action.disabled}
+                >
+                    {cleanLabel}
+                </Botao>
             );
         }
 
