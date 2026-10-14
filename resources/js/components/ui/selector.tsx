@@ -67,7 +67,7 @@ export function SelectorItem<T extends string = string>({
             className={cn(
                 'relative flex items-center justify-between rounded-2xl p-4 transition-all cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-primary',
                 isSelected
-                    ? 'border-2 border-primary bg-[#F3F6FA] dark:bg-primary/10 shadow-2xs'
+                    ? 'border border-primary bg-[#F8FAFC] dark:bg-primary/10 shadow-2xs'
                     : 'border border-border/80 bg-background hover:border-border hover:bg-muted/30 dark:bg-card',
                 isItemDisabled && 'cursor-not-allowed opacity-50',
                 className
@@ -80,39 +80,39 @@ export function SelectorItem<T extends string = string>({
                         {OptionIcon && (
                             <div
                                 className={cn(
-                                    'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors',
+                                    'flex size-10 shrink-0 items-center justify-center rounded-xl transition-colors',
                                     isSelected
                                         ? 'bg-primary text-primary-foreground shadow-2xs'
-                                        : 'bg-muted/60 text-muted-foreground'
+                                        : 'bg-muted/70 text-muted-foreground border border-border/40'
                                 )}
                             >
-                                <OptionIcon className="size-5" />
+                                <OptionIcon className="size-4" />
                             </div>
                         )}
 
                         {/* Text Details */}
                         <div className="flex flex-col min-w-0">
-                            <span className="truncate font-bold text-xs md:text-sm tracking-wide text-foreground uppercase">
+                            <span className="truncate font-bold text-xs tracking-wide text-foreground uppercase">
                                 {title}
                             </span>
                             {description && (
-                                <span className="truncate text-xs text-muted-foreground font-medium mt-0.5">
+                                <span className="truncate text-[11px] text-muted-foreground font-normal mt-0.5">
                                     {description}
                                 </span>
                             )}
                         </div>
                     </div>
 
-                    {/* Selection Indicator (Square checkbox style) */}
+                    {/* Selection Indicator (Circular check indicator matching image) */}
                     <div
                         className={cn(
-                            'flex size-5 shrink-0 items-center justify-center rounded-md transition-all',
+                            'flex size-5 shrink-0 items-center justify-center rounded-full transition-all',
                             isSelected
                                 ? 'bg-primary text-primary-foreground'
                                 : 'border border-muted-foreground/30 bg-background'
                         )}
                     >
-                        {isSelected && <Check className="size-3.5 stroke-3 text-primary-foreground" />}
+                        {isSelected && <Check className="size-3 stroke-3 text-primary-foreground" />}
                     </div>
                 </>
             )}
@@ -170,10 +170,10 @@ export function SelectorRoot<T extends string = string>({
             <div className={cn('w-full space-y-3.5', className)}>
                 {/* Header label with icon (only if label or icon provided) */}
                 {(label || HeaderIcon) && (
-                    <div className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-muted-foreground/80">
+                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                         {HeaderIcon && (
-                            <div className="flex size-7 items-center justify-center rounded-xl bg-muted/60 text-muted-foreground border border-border/40">
-                                <HeaderIcon className="size-4" />
+                            <div className="flex size-6 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground border border-border/40">
+                                <HeaderIcon className="size-3.5" />
                             </div>
                         )}
                         {label && <span>{label}</span>}

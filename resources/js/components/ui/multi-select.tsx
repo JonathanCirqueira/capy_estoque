@@ -1,215 +1,336 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronsUpDown, X, Check, Users } from 'lucide-react';
+import { Check, ChevronsUpDown, X, Search, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
 
 export interface MultiSelectItem {
     value: string;
     label: string;
+    sublabel?: string;
     description?: string;
 }
 
 export interface MultiSelectProps {
     items: MultiSelectItem[];
-    value: string[];
-    onValueChange: (value: string[]) => void;
+    selectedValues?: string[] | null;
+    value?: string[] | null;
+    onSelectedValuesChange?: (values: string[] | null) => void;
+    onValueChange?: (values: string[] | null) => void;
     placeholder?: string;
     searchPlaceholder?: string;
     emptyMessage?: string;
-    label?: string;
-    required?: boolean;
-    icon?: React.ReactNode;
-    selectAllOption?: boolean;
-    selectAllLabel?: string;
     disabled?: boolean;
     className?: string;
-    containerClassName?: string;
     error?: boolean | string;
+    disablePortal?: boolean;
+    modal?: boolean;
+    selectAllOption?: boolean;
+    selectAllLabel?: string;
+    nullWhenAll?: boolean;
+    icon?: React.ReactNode;
+    itemIcon?: React.ReactNode;
+    label?: string;
+    required?: boolean;
+    containerClassName?: string;
 }
 
 export function MultiSelect({
     items = [],
-    value = [],
+    selectedValues,
+    value,
+    onSelectedValuesChange,
     onValueChange,
-    placeholder = 'Selecione os usuários...',
-    searchPlaceholder = 'Buscar por nome ou e-mail...',
+    placeholder = 'Selecione os serviços...',
+    searchPlaceholder = 'Buscar serviço...',
     emptyMessage = 'Nenhum resultado encontrado.',
-    label,
-    required = false,
-    icon,
-    selectAllOption = true,
-    selectAllLabel = 'Todos os Usuários',
     disabled = false,
     className,
-    containerClassName,
     error = false,
+    disablePortal: _disablePortal = false,
+    modal = true,
+    selectAllOption = true,
+    selectAllLabel = 'Todos os Serviços',
+    nullWhenAll = true,
+    icon = <Briefcase className="size-3 text-muted-foreground dark:text-zinc-300 shrink-0" />,
+    itemIcon,
+    label,
+    required = false,
+    containerClassName,
 }: MultiSelectProps) {
     const [open, setOpen] = React.useState(false);
-    const id = React.useId();
+    const [search, setSearch] = React.useState('');
 
-    const isAllSelected = items.length > 0 && value.length === items.length;
+    // Determina o valor bruto fornecido pelas props
+    const rawValue = selectedValues !== undefined ? selectedValues : value;
 
-    const handleUnselect = (itemValue: string) => {
-        onValueChange(value.filter((val) => val !== itemValue));
-    };
-
-    const handleSelect = (itemValue: string) => {
-        if (value.includes(itemValue)) {
-            handleUnselect(itemValue);
-        } else {
-            onValueChange([...value, itemValue]);
+    // Detecta se "Todos" está selecionado (seja por valor null, '__ALL__', ou todos os IDs presentes)
+    const isAllSelected = React.useMemo(() => {
+        if (rawValue === null) return true;
+        if (Array.isArray(rawValue)) {
+            if (rawValue.includes('__ALL__') || rawValue.includes('all')) return true;
+            if (items.length > 0 && items.every((item) => rawValue.includes(item.value))) return true;
         }
+        return false;
+    }, [rawValue, items]);
+
+    // Array de valores efetivos quando NÃO está em modo "Todos"
+    const currentValues = React.useMemo(() => {
+        if (rawValue === null) return [];
+        return Array.isArray(rawValue) ? rawValue : [];
+    }, [rawValue]);
+
+    const updateValues = (nextValues: string[] | null) => {
+        onSelectedValuesChange?.(nextValues);
+        onValueChange?.(nextValues);
     };
 
-    const handleToggleSelectAll = () => {
+    const toggleSelectAll = () => {
         if (isAllSelected) {
-            onValueChange([]);
+            updateValues([]);
         } else {
-            onValueChange(items.map((item) => item.value));
+            updateValues(nullWhenAll ? null : items.map((item) => item.value));
         }
     };
+
+    const toggleItem = (val: string) => {
+        // Se estava em modo "Todos", selecionar um item individual isola a seleção nele
+        if (isAllSelected) {
+            updateValues([val]);
+            return;
+        }
+
+        if (currentValues.includes(val)) {
+            updateValues(currentValues.filter((v) => v !== val));
+        } else {
+            const next = [...currentValues, val];
+            if (items.length > 0 && items.every((item) => next.includes(item.value))) {
+                updateValues(nullWhenAll ? null : next);
+            } else {
+                updateValues(next);
+            }
+        }
+    };
+
+    const handleUnselect = (val: string, e: React.MouseEvent | React.KeyboardEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (isAllSelected) {
+            // Se desmarcou a partir da tag "Todos", desseleciona tudo
+            updateValues([]);
+        } else {
+            updateValues(currentValues.filter((v) => v !== val));
+        }
+    };
+
+    const filteredItems = React.useMemo(() => {
+        if (!search) return items;
+        const s = search.toLowerCase();
+        return items.filter(
+            (item) =>
+                item.label.toLowerCase().includes(s) ||
+                (item.sublabel && item.sublabel.toLowerCase().includes(s)) ||
+                (item.description && item.description.toLowerCase().includes(s))
+        );
+    }, [items, search]);
 
     const multiSelectContent = (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild disabled={disabled}>
-                <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    aria-controls={id}
-                    className={cn(
-                        'h-auto min-h-10 w-full justify-between rounded-md border border-input bg-background dark:bg-black px-3.5 py-1.5 text-xs md:text-sm font-normal text-foreground transition-all focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20',
-                        'hover:border-primary/40',
-                        error && 'border-destructive focus:ring-destructive/20',
-                        className,
-                    )}
-                >
-                    <div className="flex flex-wrap gap-1.5 max-w-[90%] items-center text-left">
-                        {value.length === 0 ? (
-                            <span className="truncate">{placeholder}</span>
-                        ) : (
-                            value.map((val) => {
-                                const matchedItem = items.find((item) => item.value === val);
-                                if (!matchedItem) return null;
-                                return (
-                                    <Badge
-                                        key={val}
-                                        variant="secondary"
-                                        className="h-6 rounded-lg gap-1 border border-border/50 bg-secondary/80 px-2 py-0 text-xs font-semibold text-foreground hover:bg-secondary flex items-center shrink-0"
-                                    >
-                                        <span className="max-w-32 truncate">{matchedItem.label}</span>
-                                        <span
-                                            role="button"
-                                            tabIndex={0}
-                                            onClick={(e) => {
+        <div className="relative w-full">
+            <Popover open={open} onOpenChange={setOpen} modal={modal}>
+                <PopoverTrigger asChild disabled={disabled}>
+                    <Button
+                        disabled={disabled}
+                        variant="outline"
+                        role="combobox"
+                        aria-controls="multi-select-options"
+                        aria-expanded={open}
+                        className={cn(
+                            'min-h-11 h-auto w-full justify-between rounded-xl border border-input px-3 py-2 text-sm font-medium text-neutral-900 dark:text-white transition-all focus:outline-none focus:ring-[3px] focus:ring-primary/15 focus:border-primary focus-visible:ring-[3px] focus-visible:ring-primary/15 focus-visible:border-primary data-[state=open]:border-primary data-[state=open]:ring-[3px] data-[state=open]:ring-primary/15 dark:bg-[#0A0A0A] disabled:bg-muted/30 disabled:opacity-50',
+                            !disabled && 'hover:border-primary/30 hover:bg-primary/2 dark:hover:bg-primary/1.5',
+                            Boolean(error) && 'border-destructive focus:ring-destructive/20',
+                            className,
+                        )}
+                    >
+                        <div className="flex flex-wrap gap-1.5 max-w-[90%] text-left text-neutral-900 dark:text-white">
+                            {isAllSelected ? (
+                                <span className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 text-xs font-medium text-neutral-900 dark:text-white select-none">
+                                    {itemIcon || icon || <Briefcase className="size-3 text-muted-foreground dark:text-zinc-300 shrink-0" />}
+                                    <span className="truncate max-w-44">{selectAllLabel}</span>
+                                    <span
+                                        role="button"
+                                        tabIndex={0}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            updateValues([]);
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
                                                 e.stopPropagation();
                                                 e.preventDefault();
-                                                handleUnselect(val);
+                                                updateValues([]);
+                                            }
+                                        }}
+                                        className="ml-0.5 rounded-sm p-0.5 hover:bg-muted text-muted-foreground hover:text-foreground focus:outline-none cursor-pointer"
+                                    >
+                                        <X className="size-3" />
+                                    </span>
+                                </span>
+                            ) : currentValues.length > 0 ? (
+                                items
+                                    .filter((item) => currentValues.includes(item.value))
+                                    .map((item) => (
+                                        <span
+                                            key={item.value}
+                                            className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 text-xs font-medium text-neutral-900 dark:text-white select-none"
+                                        >
+                                            {itemIcon || icon || <Briefcase className="size-3 text-muted-foreground dark:text-zinc-300 shrink-0" />}
+                                            <span className="truncate max-w-36">{item.label}</span>
+                                            <span
+                                                role="button"
+                                                tabIndex={0}
+                                                onClick={(e) => handleUnselect(item.value, e)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        handleUnselect(item.value, e);
+                                                    }
+                                                }}
+                                                className="ml-0.5 rounded-sm p-0.5 hover:bg-muted text-muted-foreground hover:text-foreground focus:outline-none cursor-pointer"
+                                            >
+                                                <X className="size-3" />
+                                            </span>
+                                        </span>
+                                    ))
+                            ) : (
+                                <span className="text-muted-foreground font-normal">{placeholder}</span>
+                            )}
+                        </div>
+                        <ChevronsUpDown className="size-4 shrink-0 opacity-70 ml-2 text-muted-foreground" />
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                    className="w-(--radix-popover-trigger-width) p-0 rounded-xl border border-border shadow-xl bg-popover z-70 overflow-hidden"
+                    align="start"
+                    sideOffset={6}
+                    onCloseAutoFocus={(e) => e.preventDefault()}
+                    id="multi-select-options"
+                >
+                    <div className="flex flex-col w-full">
+                        {/* Campo de Busca */}
+                        <div className="flex items-center border-b border-border/50 px-3 py-1 bg-muted/10">
+                            <Search className="mr-2 size-4 shrink-0 opacity-50 text-muted-foreground" />
+                            <input
+                                placeholder={searchPlaceholder}
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="flex h-10 w-full rounded-md bg-transparent py-3 text-xs outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 text-foreground border-none ring-0 focus:ring-0 focus:outline-none"
+                            />
+                        </div>
+
+                        {/* Lista de Opções com Rolagem Dedicada */}
+                        <div className="max-h-56 overflow-y-auto p-1.5 space-y-0.5">
+                            {/* Opção "Todos os Serviços" / Selecionar Todos */}
+                            {selectAllOption && items.length > 0 && !search && (
+                                <div
+                                    role="button"
+                                    tabIndex={0}
+                                    onPointerDown={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        toggleSelectAll();
+                                    }}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            toggleSelectAll();
+                                        }
+                                    }}
+                                    className={cn(
+                                        "relative flex w-full cursor-pointer select-none items-center justify-between rounded-lg py-2 px-2.5 text-xs font-normal outline-none transition-colors hover:bg-muted focus:bg-muted text-foreground"
+                                    )}
+                                >
+                                    <span className="truncate font-normal text-foreground">{selectAllLabel}</span>
+                                    <div
+                                        className={cn(
+                                            'flex size-4 shrink-0 items-center justify-center rounded border border-muted-foreground/30 transition-all ml-2',
+                                            isAllSelected
+                                                ? 'border-primary bg-primary text-primary-foreground scale-100'
+                                                : 'bg-transparent',
+                                        )}
+                                    >
+                                        {isAllSelected && <Check className="size-3 stroke-3 text-white" />}
+                                    </div>
+                                </div>
+                            )}
+
+                            {filteredItems.length === 0 ? (
+                                <div className="py-6 text-center text-xs text-muted-foreground">
+                                    {emptyMessage}
+                                </div>
+                            ) : (
+                                filteredItems.map((item) => {
+                                    const isSelected = !isAllSelected && currentValues.includes(item.value);
+                                    return (
+                                        <div
+                                            key={item.value}
+                                            role="button"
+                                            tabIndex={0}
+                                            onPointerDown={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                toggleItem(item.value);
+                                            }}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
                                             }}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter' || e.key === ' ') {
-                                                    e.stopPropagation();
                                                     e.preventDefault();
-                                                    handleUnselect(val);
+                                                    e.stopPropagation();
+                                                    toggleItem(item.value);
                                                 }
                                             }}
-                                            className="rounded-sm opacity-60 hover:opacity-100 transition-opacity p-0.5"
-                                        >
-                                            <X className="h-3 w-3" />
-                                        </span>
-                                    </Badge>
-                                );
-                            })
-                        )}
-                    </div>
-                    <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 ml-2" />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent
-                align="start"
-                className="w-(--radix-popover-trigger-width) min-w-[320px] p-0 rounded-2xl border border-border/50 bg-popover/98 backdrop-blur-md shadow-xl animate-none"
-            >
-                <Command>
-                    <CommandInput placeholder={searchPlaceholder} className="h-11" />
-                    <CommandList id={id} className="max-h-72 p-1.5 space-y-1">
-                        <CommandEmpty className="py-6 text-center text-xs text-muted-foreground">
-                            {emptyMessage}
-                        </CommandEmpty>
-
-                        <CommandGroup>
-                            {/* Opção "Todos os Usuários" / Selecionar Todos */}
-                            {selectAllOption && items.length > 0 && (
-                                <CommandItem
-                                    value={selectAllLabel}
-                                    onSelect={handleToggleSelectAll}
-                                    className="flex items-center justify-between rounded-xl px-3 py-2.5 my-0.5 text-sm font-semibold cursor-pointer transition-colors focus:bg-muted/70 hover:bg-muted/70"
-                                >
-                                    <span className="text-foreground">{selectAllLabel}</span>
-                                    <div
-                                        className={cn(
-                                            'size-4.5 rounded-md border border-input shadow-2xs flex items-center justify-center transition-all shrink-0 ml-2',
-                                            isAllSelected
-                                                ? 'bg-primary border-primary text-primary-foreground'
-                                                : 'bg-background'
-                                        )}
-                                    >
-                                        {isAllSelected && <Check className="size-3.5 stroke-3" />}
-                                    </div>
-                                </CommandItem>
-                            )}
-
-                            {/* Lista de Itens Individuais */}
-                            {items.map((item) => {
-                                const isSelected = value.includes(item.value);
-                                return (
-                                    <CommandItem
-                                        key={item.value}
-                                        value={`${item.label} ${item.description || ''}`}
-                                        onSelect={() => handleSelect(item.value)}
-                                        className="flex items-center justify-between rounded-xl px-3 py-2.5 my-0.5 text-sm cursor-pointer transition-colors focus:bg-muted/70 hover:bg-muted/70"
-                                    >
-                                        <div className="flex flex-col min-w-0 pr-2">
-                                            <span className="font-semibold text-foreground truncate">
-                                                {item.label}
-                                            </span>
-                                            {item.description && (
-                                                <span className="text-xs text-muted-foreground font-normal truncate">
-                                                    {item.description}
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        <div
                                             className={cn(
-                                                'size-4.5 rounded-md border border-input shadow-2xs flex items-center justify-center transition-all shrink-0 ml-2',
-                                                isSelected
-                                                    ? 'bg-primary border-primary text-primary-foreground'
-                                                    : 'bg-background'
+                                                "relative flex w-full cursor-pointer select-none items-center justify-between rounded-lg py-2 px-2.5 text-xs font-normal outline-none transition-colors hover:bg-muted focus:bg-muted text-foreground",
+                                                isSelected && "bg-muted/40 font-medium"
                                             )}
                                         >
-                                            {isSelected && <Check className="size-3.5 stroke-3" />}
+                                            <div className="flex flex-col min-w-0 flex-1 pr-4 leading-snug">
+                                                <span className="truncate font-normal text-foreground">{item.label}</span>
+                                                {(item.sublabel || item.description) && (
+                                                    <span className="truncate text-[11px] font-normal text-muted-foreground/80">
+                                                        {item.sublabel || item.description}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div
+                                                className={cn(
+                                                    'flex size-4 shrink-0 items-center justify-center rounded border border-muted-foreground/30 transition-all ml-2',
+                                                    isSelected
+                                                        ? 'border-primary bg-primary text-primary-foreground scale-100'
+                                                        : 'bg-transparent',
+                                                )}
+                                            >
+                                                {isSelected && <Check className="size-3 stroke-3 text-white" />}
+                                            </div>
                                         </div>
-                                    </CommandItem>
-                                );
-                            })}
-                        </CommandGroup>
-                    </CommandList>
-                </Command>
-            </PopoverContent>
-        </Popover>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </div>
+                </PopoverContent>
+            </Popover>
+        </div>
     );
 
     if (!label && typeof error !== 'string') {
@@ -219,8 +340,8 @@ export function MultiSelect({
     return (
         <div className={cn('flex flex-col gap-1.5 w-full', containerClassName)}>
             {label && (
-                <Label className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase flex items-center gap-1.5">
-                    {icon || <Users className="size-3.5 text-muted-foreground" />}
+                <Label className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase flex items-center gap-1.5">
+                    {icon}
                     <span>{label}</span>
                     {required && <span className="text-destructive">*</span>}
                 </Label>

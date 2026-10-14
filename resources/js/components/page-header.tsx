@@ -18,6 +18,7 @@ export interface PageHeaderProps {
     action?: PageHeaderAction | React.ReactNode;
     children?: React.ReactNode;
     className?: string;
+    showAction?: boolean;
 }
 
 function isActionConfig(action: unknown): action is PageHeaderAction {
@@ -29,9 +30,9 @@ function isActionConfig(action: unknown): action is PageHeaderAction {
     );
 }
 
-export function PageHeader({ title, description, action, children, className }: PageHeaderProps) {
+export function PageHeader({ title, description, action, children, className, showAction = true }: PageHeaderProps) {
     const renderAction = () => {
-        if (!action) return null;
+        if (!showAction || !action) return null;
 
         if (isActionConfig(action)) {
             const buttonClasses = cn(
@@ -61,7 +62,7 @@ export function PageHeader({ title, description, action, children, className }: 
         return action;
     };
 
-    const hasActions = Boolean(action || children);
+    const hasActions = Boolean((showAction && action) || children);
 
     return (
         <div
