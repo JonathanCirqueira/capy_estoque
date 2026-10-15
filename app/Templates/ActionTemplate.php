@@ -50,13 +50,14 @@ final readonly class ActionTemplate
     public function execute(Collection $data): Model
     {
         return DB::transaction(static function (): Model {
-            // 1. Criação do registro principal da entidade
+            // 1. Criação do registro principal da entidade (ZERO STRINGS MÁGICAS: use Enums tipados)
             // /** @var [Entidade] $[entidade] */
             // $[entidade] = [Entidade]::query()->create([
             //     'campo_1' => $data->get('campo_1'),
             //     'campo_2' => $data->get('campo_2'),
             //     'relacionamento_id' => $data->get('relacionamento_id'),
-            //     'is_active' => true,
+            //     'status' => Status[Entidade]::Pendente, // NUNCA usar 'pendente' ou strings soltas
+            //     'perfil' => Perfil[Entidade]::Padrao,
             // ]);
 
             // 2. Sincronização ou vinculação de relacionamentos many-to-many (se houver)
@@ -128,9 +129,9 @@ final readonly class ActionTemplate
     public function aplicarFiltroAba(Builder $query, string $aba): Builder
     {
         return match ($aba) {
-            // 'ativos' => $query->where('is_active', true),
-            // 'inativos' => $query->where('is_active', false),
-            // 'pendentes' => $query->whereNull('data_confirmacao'),
+            // Status[Entidade]::Ativo->value => $query->where('status', Status[Entidade]::Ativo),
+            // Status[Entidade]::Inativo->value => $query->where('status', Status[Entidade]::Inativo),
+            // Status[Entidade]::Pendente->value => $query->where('status', Status[Entidade]::Pendente),
             default => $query,
         };
     }

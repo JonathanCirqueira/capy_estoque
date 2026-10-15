@@ -17,11 +17,11 @@ priority: HIGH
 
 Antes de gerar ou alterar qualquer listagem, inspecione:
 
-1. **Página Principal:** [`resources/js/templates/data-table/page-template.tsx`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/templates/data-table/page-template.tsx)
-2. **Componente de Tabela:** [`resources/js/templates/data-table/table-template.tsx`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/templates/data-table/table-template.tsx)
-3. **Tipos e Interfaces:** [`resources/js/templates/data-table/types.ts`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/templates/data-table/types.ts)
-4. **Cabeçalho Compartilhado:** [`resources/js/components/page-header.tsx`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/components/page-header.tsx)
-5. **Cabeçalho Ordenável:** [`resources/js/components/ui/sortable-table-head.tsx`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/components/ui/sortable-table-head.tsx)
+1. **Página Principal:** `resources/js/templates/data-table/page-template.tsx`
+2. **Componente de Tabela:** `resources/js/templates/data-table/table-template.tsx`
+3. **Tipos e Interfaces:** `resources/js/templates/data-table/types.ts`
+4. **Cabeçalho Compartilhado:** `resources/js/components/page-header.tsx`
+5. **Cabeçalho Ordenável:** `resources/js/components/ui/sortable-table-head.tsx`
 
 ---
 

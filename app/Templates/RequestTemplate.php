@@ -18,26 +18,17 @@ use Illuminate\Validation\Rule;
  *
  * Convenções e Boas Práticas:
  * - Strict types habilitado
- * - Sanitização e valores padrão via prepareForValidation()
+ * - Autorização no Controller via Gate::authorize() (sem necessidade de declarar authorize() retornando true)
+ * - Sanitização e normalização exclusivamente no prepareForValidation() usando API fluente do Laravel ($this->string()) e Helpers Globais
  * - Regras organizadas em arrays com objetos Rule::*
- * - Suporte a Route Model Binding com ignore() na edição
- * - Tratamento condicional para requisições de toggle de status
+ * - Zero getters customizados (Controller/Action consomem via collect($request->validated()))
+ * - Nomenclatura estrita em português snake_case e foreign keys no padrão tabela_singular_id
  * - Atributos traduzidos amigáveis via attributes()
  */
 final class RequestTemplate extends FormRequest
 {
     /**
-     * Determina se o usuário tem autorização para fazer esta requisição.
-     * Como a autorização é centralizada nas Policies via Gate::authorize() no Controller,
-     * este método pode retornar true por padrão.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    /**
-     * Obtém as regras de validação aplicáveis à requisição.
+     * Obtém as regras de validação aplicáveis à requisição (compatível com Laravel Precognition).
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
@@ -79,7 +70,7 @@ final class RequestTemplate extends FormRequest
 
         return [
             // Campo de texto obrigatório
-            // 'campo_texto' => [
+            // 'nome' => [
             //     'required',
             //     'string',
             //     'max:255',
@@ -95,26 +86,26 @@ final class RequestTemplate extends FormRequest
             // ],
 
             // Chave estrangeira com validação de existência
-            // 'relacionamento_id' => [
+            // 'departamento_id' => [
             //     'required',
             //     'integer',
             //     Rule::exists([EntidadeRelacionada]::class, 'id'),
             // ],
 
             // Lista / Array de IDs selecionados (ex: multi-select / checkboxes)
-            // 'itens_relacionados' => [
+            // 'servico_ids' => [
             //     'nullable',
             //     'array',
             // ],
-            // 'itens_relacionados.*' => [
+            // 'servico_ids.*' => [
             //     'integer',
             //     Rule::exists([ItemRelacionado]::class, 'id'),
             // ],
 
-            // Campo de status com valores controlados
-            // 'status' => [
+            // Campo de status ou perfil com valores controlados via Enum
+            // 'nivel_acesso' => [
             //     'required',
-            //     Rule::enum([MeuEnumStatus]::class), // ou Rule::in(['ativo', 'inativo'])
+            //     Rule::enum([MeuEnumStatus]::class),
             // ],
         ];
     }
@@ -127,12 +118,12 @@ final class RequestTemplate extends FormRequest
     public function attributes(): array
     {
         return [
-            // 'campo_texto' => 'nome do campo',
+            // 'nome' => 'nome completo',
             // 'email' => 'e-mail',
-            // 'relacionamento_id' => 'vínculo relacionado',
-            // 'itens_relacionados' => 'itens selecionados',
-            // 'itens_relacionados.*' => 'item',
-            // 'status' => 'situação / status',
+            // 'departamento_id' => 'departamento',
+            // 'servico_ids' => 'serviços vinculados',
+            // 'servico_ids.*' => 'serviço',
+            // 'nivel_acesso' => 'nível de acesso',
         ];
     }
 
@@ -150,20 +141,38 @@ final class RequestTemplate extends FormRequest
 
     /**
      * Prepara os dados antes da validação.
-     * Útil para definir valores padrão (ex: aba ativa) ou sanitizar entradas.
+     * Centraliza a sanitização e normalização usando a API Fluente do Laravel ($this->string())
+     * ou Helpers Globais (clean_digits, clean_moeda, clean_placa).
      */
     protected function prepareForValidation(): void
     {
-        // Exemplo: Garante aba padrão na listagem
+        /*
+        |--------------------------------------------------------------------------
+        | Exemplo de Sanitização com API Fluente do Laravel e Helpers:
+        |--------------------------------------------------------------------------
+        */
         // $this->merge([
+        //     'nome' => $this->filled('nome')
+        //         ? $this->string('nome')->trim()->toString()
+        //         : $this->input('nome'),
+        //
+        //     'email' => $this->filled('email')
+        //         ? $this->string('email')->trim()->lower()->toString()
+        //         : $this->input('email'),
+        //
+        //     'documento' => $this->filled('documento')
+        //         ? clean_digits((string) $this->input('documento'))
+        //         : $this->input('documento'),
+        //
+        //     'valor' => $this->filled('valor')
+        //         ? clean_moeda((string) $this->input('valor'))
+        //         : $this->input('valor'),
+        //
+        //     'servico_ids' => is_array($this->input('servico_ids'))
+        //         ? array_values(array_filter($this->input('servico_ids')))
+        //         : $this->input('servico_ids'),
+        //
         //     'aba' => $this->input('aba', 'todos'),
         // ]);
-
-        // Exemplo: Limpeza ou formatação de strings/documentos
-        // if ($this->has('documento')) {
-        //     $this->merge([
-        //         'documento' => preg_replace('/\D/', '', (string) $this->input('documento')),
-        //     ]);
-        // }
     }
 }

@@ -19,17 +19,17 @@ Antes de gerar qualquer tela ou componente de cadastro, conte a quantidade total
 
 | Quantidade de Campos | Abordagem Obrigatória | Arquivo Base do Template | Como Acionar na Listagem |
 | :--- | :--- | :--- | :--- |
-| **Até 8 Campos (`<= 8`)** | **MODAL (Dialog)** | [`modal-template.tsx`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/templates/form-cadastro/modal-template.tsx) | `<PageHeader action={{ label: 'Cadastrar', onClick: () => setModalAberto(true) }} />` |
-| **Mais de 8 Campos (`> 8`)** | **PÁGINA COMPLETA CONTÍNUA** | [`page-template.tsx`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/templates/form-cadastro/page-template.tsx) | `<PageHeader action={{ label: 'Cadastrar', href: '/[entidade]/cadastrar' }} />` |
+| **Até 8 Campos (`<= 8`)** | **MODAL (Dialog)** | `resources/js/templates/form-cadastro/modal-template.tsx` | `<PageHeader action={{ label: 'Cadastrar', onClick: () => setModalAberto(true) }} />` |
+| **Mais de 8 Campos (`> 8`)** | **PÁGINA COMPLETA CONTÍNUA** | `resources/js/templates/form-cadastro/page-template.tsx` | `<PageHeader action={{ label: 'Cadastrar', href: '/[entidade]/cadastrar' }} />` |
 
 ---
 
 ## 📁 Arquivos de Referência do Template
 
-1. **Tipos e Interfaces:** [`resources/js/templates/form-cadastro/types.ts`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/templates/form-cadastro/types.ts)
-2. **Template Modal (`<= 8` campos):** [`resources/js/templates/form-cadastro/modal-template.tsx`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/templates/form-cadastro/modal-template.tsx)
-3. **Template Página Completa (`> 8` campos):** [`resources/js/templates/form-cadastro/page-template.tsx`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/templates/form-cadastro/page-template.tsx)
-4. **Exportações:** [`resources/js/templates/form-cadastro/index.ts`](file:///c:/Users/jonathan.coelho/Desktop/projetos/Starter_kit_team_raphael/resources/js/templates/form-cadastro/index.ts)
+1. **Tipos e Interfaces:** `resources/js/templates/form-cadastro/types.ts`
+2. **Template Modal (`<= 8` campos):** `resources/js/templates/form-cadastro/modal-template.tsx`
+3. **Template Página Completa (`> 8` campos):** `resources/js/templates/form-cadastro/page-template.tsx`
+4. **Exportações:** `resources/js/templates/form-cadastro/index.ts`
 
 ---
 
