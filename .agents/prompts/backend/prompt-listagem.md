@@ -1,5 +1,9 @@
 # 📋 Prompts para Listagem Backend (Index, Filtros e Abas)
 
+> 💡 **Princípio Schema First:**
+> Sempre declare campos, filtros e Enums alinhados com o Model (`app/Models/`) e migrations reais.
+> Relacionamentos em `with()` devem ser métodos Eloquent reais (nunca inclua colunas JSON/array nativas).
+
 Use os modelos deste arquivo para solicitar a implementação completa da camada backend de listagem e consulta (Index/Filters) seguindo o padrão canônico do Starter Kit: **Thin Controller + Action de Filtragem sem N+1 + FormRequest de Listagem + Contadores de Abas Cloned**.
 
 ---
@@ -63,11 +67,10 @@ Use a skill @[skills/backend-listagem-itens] para implementar a listagem, filtro
     - Campos pesquisados: `name`, `email`
 
 - **Filtros Secundários em Grid:**
-    - `departamento_id`: chave estrangeira de `departamentos`
-    - `perfil`: valor de enum `App\Enums\PerfilUsuario`
+    - `nivel_acesso`: valor de enum `App\Enums\NivelAcesso`
 
 - **Relacionamentos Eager Loading (Prevenção de N+1):**
-    - `departamento`, `servicos`
+    - Nenhum (a coluna `servicos` é um campo JSON nativo da tabela `users`, não é um método de relação Eloquent e NÃO deve ser passada no `with()`)
 
 - **Ordenação:**
     - Campos permitidos: `name`, `email`, `created_at`

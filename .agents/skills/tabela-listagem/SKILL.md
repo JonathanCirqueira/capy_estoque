@@ -222,6 +222,17 @@ Antes de gerar ou alterar qualquer listagem, inspecione:
   };
   ```
 
+### 10. Integração Obrigatória com a Sidebar (`AppSidebar`) e Rotas
+- **MANDATÓRIO:** Toda nova listagem gerada **DEVE** ser automaticamente adicionada ao menu de navegação lateral (`AppSidebar`) e às rotas (`routes/web.php`):
+  1. **Rota:** Declarar em `routes/web.php` dentro do grupo autenticado:
+     ```php
+     Route::inertia('[entidade_plural]', '[entidade_plural]/index')->name('[entidade_plural].index');
+     ```
+  2. **Sidebar:** Adicionar o item no array `mainNavItems` em `resources/js/components/app-sidebar.tsx`:
+     - Título conforme o nome solicitado no prompt (ex: `Usuários`).
+     - Rota correspondente (ex: `href: '/usuarios'` ou route Wayfinder).
+     - Ícone do `lucide-react` semanticamente compatível (ex: `Users`, `Boxes`, `FileText`, `Truck`, etc.).
+
 ---
 
 ## 🚀 Fluxo de Geração
@@ -230,7 +241,7 @@ Ao criar uma nova listagem a partir de um prompt:
 1. **Tipos (`types.ts`):** Definir interface com os campos e tipagem de filtros e ordenação.
 2. **Tabela (`tabela-[entidade].tsx`):** Clonar `table-template.tsx`, ajustar colunas em UPPERCASE, status badge e cards mobile sem ícones.
 3. **Página (`index.tsx`):** Clonar `page-template.tsx`, usar `<PageHeader>`, posicionar `<StatusTabs>` dentro do card e montar grid de Comboboxes.
-4. **Rotas e Navegação:**
-   - Adicionar rota em `routes/web.php` com `Inertia::render()`.
-   - Adicionar item no `AppSidebar` (`resources/js/components/app-sidebar.tsx`).
-5. **Validação:** Rodar `npm run build` e `composer verify`.
+4. **Rotas e Navegação (MANDATÓRIO):**
+   - Adicionar a rota em `routes/web.php`.
+   - Registrar imediatamente o link no `AppSidebar` (`resources/js/components/app-sidebar.tsx`) com o nome e ícone apropriados.
+5. **Validação:** Rodar `npm run build` e verificar integridade.

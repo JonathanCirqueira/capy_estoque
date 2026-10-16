@@ -60,13 +60,14 @@ final class RequestTemplate extends FormRequest
 
         /*
         |--------------------------------------------------------------------------
-        | Cenário 3: Form Request de Criação ou Edição Completa
+        | Cenário 3: Form Request de Criação ou Edição Completa (Salvar[Entidade]Request)
         |--------------------------------------------------------------------------
         */
-        // Identifica o ID do registro na rota para ignorar na regra de unicidade durante a edição
+        // Identifica o ID do registro na rota (ou no payload) para ignorar na regra de unicidade durante a edição
         // /** @var [Entidade]|string|int|null $entidadeRoute */
-        // $entidadeRoute = $this->route('[entidade]');
+        // $entidadeRoute = $this->route('[entidade]') ?? $this->route('id') ?? $this->input('id');
         // $entidadeId = $entidadeRoute instanceof [Entidade] ? $entidadeRoute->id : $entidadeRoute;
+        // $isUpdate = $this->isMethod('put') || $this->isMethod('patch') || $entidadeId !== null;
 
         return [
             // Campo de texto obrigatório
@@ -83,6 +84,13 @@ final class RequestTemplate extends FormRequest
             //     'email',
             //     'max:255',
             //     Rule::unique([Entidade]::class, 'email')->ignore($entidadeId),
+            // ],
+
+            // Exemplo de campo condicional (obrigatório na criação, opcional na edição)
+            // 'senha' => [
+            //     $isUpdate ? 'nullable' : 'required',
+            //     'string',
+            //     'min:8',
             // ],
 
             // Chave estrangeira com validação de existência
@@ -135,7 +143,8 @@ final class RequestTemplate extends FormRequest
     public function messages(): array
     {
         return [
-            // 'email.unique' => 'Este e-mail já está sendo utilizado por outro cadastro.',
+            // 'email.unique' => 'Este e-mail já está cadastrado no sistema.',
+            // 'codigo.unique' => 'Este código já está em uso por outro registro.',
         ];
     }
 

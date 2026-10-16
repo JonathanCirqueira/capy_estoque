@@ -18,6 +18,9 @@ use Illuminate\Support\Facades\DB;
  * - Single Responsibility: Uma classe focada em executar uma operação de negócio específica.
  * - Imutabilidade: Sempre declarada como `final readonly class`.
  * - Entrada flexível e tipada: Recebe `Collection<string, mixed>` oriunda do Form Request validado.
+ * - Confiança Total no FormRequest: NUNCA revalidar campos já validados (sem ternários redundantes, sem isset/empty desnecessários).
+ * - Sem Conversões Redundantes de Enums: NUNCA faça `instanceof Enum ? ... : Enum::from(...)`. O Eloquent já realiza o cast nativo via casts() da Model, aceitando tanto a string validada quanto a instância do Enum.
+ * - Código Direto (Sem Variáveis Temporárias Redundantes): Mapeie diretamente `$data->get('campo')` nos atributos da Model.
  * - Atomicidade & Integridade: Operações de escrita executadas dentro de `DB::transaction(...)`.
  * - Efeitos Colaterais: Disparo de Mails, Notificações ou Events após a persistência.
  * - Retorno tipado: Retorna a instância do Model criado/atualizado ou o Query Builder.
@@ -56,8 +59,8 @@ final readonly class ActionTemplate
             //     'campo_1' => $data->get('campo_1'),
             //     'campo_2' => $data->get('campo_2'),
             //     'relacionamento_id' => $data->get('relacionamento_id'),
-            //     'status' => Status[Entidade]::Pendente, // NUNCA usar 'pendente' ou strings soltas
-            //     'perfil' => Perfil[Entidade]::Padrao,
+            //     'status' => Status[Entidade]::Pendente, // NUNCA usar 'pendente' ou strings soltas (use Enum direto)
+            //     'perfil' => $data->get('perfil'), // Eloquent cuida do cast nativo do Enum via casts() da Model (PROIBIDO ternário com instanceof)
             // ]);
 
             // 2. Sincronização ou vinculação de relacionamentos many-to-many (se houver)

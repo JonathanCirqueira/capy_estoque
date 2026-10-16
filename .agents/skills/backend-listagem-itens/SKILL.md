@@ -43,6 +43,25 @@ Antes de gerar ou refatorar qualquer código de listagem no backend, inspecione 
 
 ## 📋 Passo a Passo Canônico de Implementação
 
+### Passo 0: Inspeção Obrigatória do Banco Real e Schema First (MANDATÓRIO)
+
+> ⚠️ **REGRA DE OURO - ZERO ALUCINAÇÕES DE BANCO:**
+> Antes de criar ou alterar qualquer arquivo (FormRequest, Action, Controller ou Policy), **SEMPRE** inspecione:
+> 1. O Model correspondente (`app/Models/[Entidade].php`) e seu método `casts()`.
+> 2. As migrations da tabela (`database/migrations/`).
+> 3. Os Enums reais existentes em `app/Enums/`.
+
+- **Mapeamento Direto do Schema Real:**
+  - Se o prompt fornecido pelo usuário contiver nomes de colunas, tabelas ou enums hipotéticos (ex: `departamentos`, `departamento_id`, `PerfilUsuario`), **NUNCA** crie tabelas ou migrations imaginárias. Mapeie imediatamente para os campos e Enums reais já presentes no projeto (ex: `nivel_acesso` mapeado para `App\Enums\NivelAcesso`).
+- **Diferença Crítica: Relações Eloquent vs Colunas JSON/Array:**
+  - O método `with(['relacionamento'])` para prevenção de N+1 é **EXCLUSIVO para métodos de relacionamento declarados no Model** (`belongsTo`, `hasMany`, `belongsToMany`, etc.).
+  - **NUNCA passe colunas nativas ou campos com cast de JSON/array (como `servicos` em `users`) para o `with()`**, pois isso lançará a exceção `Call to undefined relationship`.
+  - Confirme no Model se o atributo é um relacionamento antes de incluí-lo no `with()`.
+- **Validação de Colunas de Busca e Ordenação:**
+  - Certifique-se de que todas as colunas passadas para `$query->where()`, `$query->orWhere()` ou `$query->orderBy()` existem fisicamente na tabela.
+
+---
+
 ### Passo 1: Definir a Rota (`routes/web.php`)
 
 Defina a rota GET com nome canônico:
@@ -114,7 +133,7 @@ final class ListarItensRequest extends FormRequest
 > 📖 **Basear-se em:** `app/Templates/ActionTemplate.php` (Padrão 2: `executeQuery` e `aplicarFiltroAba`)
 
 - **Arquivo:** `app/Actions/Filtrar[Entidades]Action.php`
-- **Eager Loading Anti-N+1:** Sempre incluir relacionamentos exibidos na tabela via `with(['categoria', 'servicos'])`.
+- **Eager Loading Anti-N+1:** Incluir relacionamentos Eloquent declarados no Model que serão exibidos na tabela via `with(['categoria'])`. **Atenção:** Jamais incluir colunas JSON nativas no `with()`.
 - **Busca Textual:** Cláusula `when()` com agrupamento seguro `orWhere`.
 - **Separação de Abas:** O método `aplicarFiltroAba()` isola o filtro específico de status para que a query base possa ser reutilizada pelos contadores.
 
@@ -289,11 +308,12 @@ final class ItemPolicy
 ## 🛡️ Checklist de Verificação da Skill
 
 Ao concluir uma listagem backend, confirme:
+- [ ] **Schema First:** Inspecionou o Model (`app/Models/[Entidade].php`), migrations e Enums antes de codificar, garantindo que todos os campos, enums e relações existem fisicamente no projeto (sem inventar tabelas como `departamentos`).
 - [ ] Rota GET nomeada registrada em `routes/web.php`.
 - [ ] **ZERO STRINGS MÁGICAS:** Status, abas e perfis possuem Enums tipados em `app/Enums/` e não utilizam strings soltas nas queries/filtros.
 - [ ] Baseou-se no `app/Templates/RequestTemplate.php` garantindo sanitização e default de `'aba' => 'todos'`.
 - [ ] Baseou-se no `app/Templates/ActionTemplate.php` separando `executeQuery` de `aplicarFiltroAba`.
-- [ ] Carregou relacionamentos com `with()` para prevenir N+1.
+- [ ] **Eager Loading Válido:** O `with()` contém apenas métodos de relacionamentos Eloquent verdadeiros (`belongsTo`, `hasMany`, `belongsToMany`), nunca colunas JSON/array nativas.
 - [ ] Baseou-se no `app/Templates/ControllerTemplate.php` usando `clone $queryBase` comparando com o Enum para os contadores das abas.
 - [ ] Paginação encadeada com `->withQueryString()`.
 - [ ] Se houver exportação CSV, seguiu o blueprint de streaming do `app/Templates/ExportTemplate.php`.

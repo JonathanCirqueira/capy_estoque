@@ -60,10 +60,9 @@ export function PageCadastroTemplate({
     const isView = mode === 'view';
 
     const [isLoadingOptions] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
 
     // Inertia useForm gerenciando todos os campos
-    const { data, setData, processing, errors, setError, clearErrors } = useForm<ExemploCadastroComplexo>({
+    const { data, setData, post, put, processing, errors, setError, clearErrors } = useForm<ExemploCadastroComplexo>({
         codigo: item?.codigo || '',
         nome: item?.nome || '',
         categoria_id: item?.categoria_id || '',
@@ -136,12 +135,31 @@ export function PageCadastroTemplate({
             return;
         }
 
-        setIsSaving(true);
-        setTimeout(() => {
-            setIsSaving(false);
-            toast.success(isEdit ? 'Cadastro atualizado com sucesso!' : 'Novo bem cadastrado com sucesso!');
-            router.visit('/patrimonios');
-        }, 800);
+        if (isEdit && item?.id) {
+            put(`/[modulo]/${item.id}`, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success('Cadastro atualizado com sucesso!');
+                    router.visit('/[modulo]');
+                },
+                onError: (errs) => {
+                    const primeiraMensagem = Object.values(errs)[0];
+                    toast.error(primeiraMensagem || 'Ocorreu um erro ao atualizar o registro.');
+                },
+            });
+        } else {
+            post('/[modulo]', {
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success('Novo bem cadastrado com sucesso!');
+                    router.visit('/[modulo]');
+                },
+                onError: (errs) => {
+                    const primeiraMensagem = Object.values(errs)[0];
+                    toast.error(primeiraMensagem || 'Ocorreu um erro ao salvar o registro.');
+                },
+            });
+        }
     };
 
     const titulos = {

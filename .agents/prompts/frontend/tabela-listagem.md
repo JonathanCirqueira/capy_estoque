@@ -16,6 +16,7 @@ Use a skill @[skills/tabela-listagem] para gerar a página de listagem completa 
 - **Entidade:** [Ex: Fornecedor / Fornecedores]
 - **Título da Página:** [Ex: Gestão de Fornecedores]
 - **Descrição:** [Ex: Visualize e gerencie os fornecedores cadastrados no sistema.]
+- **Menu na Sidebar:** [Ex: Fornecedores (ícone sugerido: Truck)]
 - **Botão Principal:** "Novo [Ex: Fornecedor]"
 
 - **Colunas da Tabela:**
@@ -48,6 +49,7 @@ Use a skill @[skills/tabela-listagem] para gerar a página de listagem completa 
 
 - **Entidade:** Usuário / Usuários
 - **Título da Página:** Gestão de Usuários
+- **Menu na Sidebar:** Usuários (ícone: Users)
 - **Descrição:** Controle os usuários, perfis de acesso e departamentos do sistema.
 - **Botão Principal:** "Cadastrar"
 

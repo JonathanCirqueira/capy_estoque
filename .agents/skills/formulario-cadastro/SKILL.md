@@ -110,13 +110,40 @@ Antes de gerar qualquer tela ou componente de cadastro, conte a quantidade total
   )}
   ```
 
+### 4.1 Envio Diferenciado no `handleSubmit`: Criação (`POST`) vs Edição (`PUT`)
+- **REGRA DE OURO - ZERO FALSOS POSITIVOS DE UNICIDADE:**
+  - No formulário de cadastro, determine se o formulário está criando ou editando:
+    ```tsx
+    const isEdit = Boolean(item?.id);
+    const { data, setData, post, put, processing, errors, setError, clearErrors, reset } = useForm<...>(...);
+    ```
+  - **No `handleSubmit`:**
+    - Quando for **edição** (`isEdit` é true): utilize **`put('/[modulo]/' + item.id, { ... })`** (ou `put(route('[modulo].update', item.id))`).
+    - Quando for **criação** (`isEdit` é false): utilize **`post('/[modulo]', { ... })`** (ou `post(route('[modulo].store'))`).
+  - **Por que isso é crítico?**
+    - Ao enviar via `PUT /[modulo]/{id}`, o Laravel injeta o registro na rota. O FormRequest do backend obtém esse ID e aplica `Rule::unique('tabela', 'coluna')->ignore($id)`.
+    - Isso impede o erro crítico onde o usuário edita um item mantendo o mesmo e-mail, código ou CPF e o backend rejeita com "Este e-mail já está cadastrado no sistema."
+
 ### 5. Skeleton Loaders para Opções Assíncronas
 - Quando os selects dependerem de dados do backend:
   - Exibir componentes `<Skeleton className="h-10 w-full rounded-xl" />` enquanto as opções estiverem sendo carregadas.
 
-### 6. Notificações com Sonner Toast
+### 6. Notificações com Sonner Toast e Contrato de Erros do Backend
 - Importar `toast` de `sonner`.
-- Erros de validação: `toast.error('Preencha os campos obrigatórios corretamente.')`.
+- Validação prévia local: `toast.error('Preencha os campos obrigatórios corretamente.')`.
+- **Tratamento de Erros da API / Backend (`onError`):**
+  - **PROIBIDO:** Exibir mensagens de erro genéricas e estáticas como `toast.error('Ocorreu um erro')` quando a validação do backend falhar (ex: unicidade de e-mail, código duplicado).
+  - Sempre capturar e exibir a primeira mensagem retornada pelo backend:
+    ```tsx
+    onError: (errs) => {
+        const primeiraMensagem = Object.values(errs)[0];
+        if (primeiraMensagem) {
+            toast.error(primeiraMensagem);
+        } else {
+            toast.error('Ocorreu um erro ao salvar o registro.');
+        }
+    }
+    ```
 - Sucesso de cadastro: `toast.success('[Entidade] cadastrada com sucesso!')`.
 - Sucesso de edição: `toast.success('[Entidade] atualizada com sucesso!')`.
 
@@ -225,6 +252,10 @@ Antes de gerar qualquer tela ou componente de cadastro, conte a quantidade total
 >      };
 >      ```
 >    - A página completa de cadastro deve aceitar o parâmetro ou prop de edição, preencher o formulário e ajustar o título conforme o contexto (`isEditing ? 'Editar Entidade' : 'Cadastrar Entidade'`).
+
+### 12. Feedback de Notificações Toast (Cores e Contraste)
+- Todas as notificações acionadas via `toast.error()`, `toast.success()`, etc. utilizam o componente `@/components/ui/sonner`.
+- O texto superior do toast deve seguir estritamente o tema com alto contraste e legibilidade: no Light Mode o texto de erro deve ser escuro/saturado (`text-destructive`), e no Dark Mode deve usar a variante apropriada (`dark:text-error`), evitando que fique texto branco sobre fundo claro ou desbotado.
 
 ---
 

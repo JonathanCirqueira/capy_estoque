@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
 import { UserCheck, Check } from 'lucide-react';
 import { toast } from 'sonner';
@@ -64,18 +64,17 @@ export function ModalCadastroTemplate({
     const isEdit = modo === 'edit' || Boolean(item?.id);
     const isView = modo === 'view';
 
-    const [isSaving, setIsSaving] = useState(false);
-
     // Inicialização do useForm do Inertia
-    const { data, setData, processing, errors, setError, clearErrors, reset } = useForm<ExemploCadastroSimples>({
-        nome: item?.nome || '',
-        email: item?.email || '',
-        cargo_id: item?.cargo_id || '',
-        departamento_id: item?.departamento_id || '',
-        telefone: item?.telefone || '',
-        status: item?.status || 'ativo',
-        observacoes: item?.observacoes || '',
-    });
+    const { data, setData, post, put, processing, errors, setError, clearErrors, reset } =
+        useForm<ExemploCadastroSimples>({
+            nome: item?.nome || '',
+            email: item?.email || '',
+            cargo_id: item?.cargo_id || '',
+            departamento_id: item?.departamento_id || '',
+            telefone: item?.telefone || '',
+            status: item?.status || 'ativo',
+            observacoes: item?.observacoes || '',
+        });
 
     // Sincroniza dados caso o item selecionado mude
     useEffect(() => {
@@ -135,20 +134,39 @@ export function ModalCadastroTemplate({
         }
 
         if (!validarCampos()) {
-            toast.error('Por favor, preencha todos os campos obrigatórios corretamente.');
+            toast.error('Preencha os campos obrigatórios corretamente.');
             return;
         }
 
-        setIsSaving(true);
-
-        // Simulação de requisição / Em produção use: router.post('/rota', data, { onSuccess: ... })
-        setTimeout(() => {
-            setIsSaving(false);
-            toast.success(isEdit ? 'Registro atualizado com sucesso!' : 'Registro cadastrado com sucesso!');
-            onConfirmar?.(data);
-            onAbertoAlterado(false);
-            reset();
-        }, 600);
+        if (isEdit && item?.id) {
+            put(`/[modulo]/${item.id}`, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success('Registro atualizado com sucesso!');
+                    onConfirmar?.(data);
+                    onAbertoAlterado(false);
+                    reset();
+                },
+                onError: (errs) => {
+                    const primeiraMensagem = Object.values(errs)[0];
+                    toast.error(primeiraMensagem || 'Ocorreu um erro ao atualizar o registro.');
+                },
+            });
+        } else {
+            post('/[modulo]', {
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success('Registro cadastrado com sucesso!');
+                    onConfirmar?.(data);
+                    onAbertoAlterado(false);
+                    reset();
+                },
+                onError: (errs) => {
+                    const primeiraMensagem = Object.values(errs)[0];
+                    toast.error(primeiraMensagem || 'Ocorreu um erro ao salvar o registro.');
+                },
+            });
+        }
     };
 
     const titulos = {
