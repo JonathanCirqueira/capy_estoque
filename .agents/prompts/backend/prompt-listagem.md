@@ -13,7 +13,7 @@ Use os modelos deste arquivo para solicitar a implementação completa da camada
 ```markdown
 /backend-listagem [Nome da Entidade]
 
-Use a skill @[skills/backend-listagem-itens] para implementar a listagem e filtros de consulta no backend seguindo o padrão canônico do Starter Kit:
+Use a skill @[skills/backend-listagem] para implementar a listagem e filtros de consulta no backend seguindo o padrão canônico do Starter Kit:
 
 - **Entidade:** [Ex: Fornecedor / Fornecedores]
 - **Tabela / Model:** [Ex: fornecedores / App\Models\Fornecedor]
@@ -49,7 +49,7 @@ Use a skill @[skills/backend-listagem-itens] para implementar a listagem e filtr
 ```markdown
 /backend-listagem Usuarios
 
-Use a skill @[skills/backend-listagem-itens] para implementar a listagem, filtros e abas de usuários no backend com base no template canônico:
+Use a skill @[skills/backend-listagem] para implementar a listagem, filtros e abas de usuários no backend com base no template canônico:
 
 - **Entidade:** Usuário (`App\Models\User`)
 - **Tabela / Model:** `users` / `App\Models\User`

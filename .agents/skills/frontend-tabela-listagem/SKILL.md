@@ -1,8 +1,8 @@
 ---
-name: tabela-listagem
+name: frontend-tabela-listagem
 description: Padronização e geração de páginas e tabelas de listagem completas no Starter Kit com React 19, Inertia.js v3, Tailwind CSS v4, StatusTabs, busca, grid de filtros dinâmico, ordenação, exportação e cards mobile agnósticos.
 allowed-tools: Read, Write, Edit
-version: 1.1
+version: 1.2
 priority: HIGH
 ---
 
@@ -139,7 +139,7 @@ Antes de gerar ou alterar qualquer listagem, inspecione:
 
 ### 5. Tabela Desktop (`md:block`)
 - **Cabeçalho Ordenável:** Usar `SortableTableHead` de `@/components/ui/sortable-table-head`.
-- **Rótulos em MAIÚSCULO:** Todos os títulos de colunas no `<TableHeader>` devem ser em maiúsculo (ex: `NOME COMPLETO`, `E-MAIL`, `STATUS`, `AÇÕES`).
+- **Rótulos em MAIÚSCULO vs Paridade de Campos:** Todos os títulos de colunas no `<TableHeader>` devem ser em maiúsculo (ex: `label="NOME COMPLETO"`). **Contudo**, o identificador do campo e a chave de ordenação **DEVEM ser exatamente o nome canônico do backend** (`coluna="nome"` e `item.nome`, **NUNCA** `nomeCompleto`).
 - **PROIBIDO Coluna `#`:** Não incluir coluna de índice numérico.
 - **Linha do Cabeçalho:** `<TableRow className="border-b border-border/50 bg-muted/10 hover:bg-muted/10">`
 - **Linha de Dados:** `<TableRow className="group/row border-b border-border/40 transition-colors duration-200 hover:bg-muted/20">`

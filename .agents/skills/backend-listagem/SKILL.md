@@ -1,8 +1,8 @@
 ---
-name: backend-listagem-itens
+name: backend-listagem
 description: "Passo a passo padronizado para listagem, filtros reativos e contadores de abas no backend Laravel com Inertia, seguindo strict types, Thin Controllers, FormRequests de listagem e Actions de consulta sem N+1."
 allowed-tools: Read, Write, Edit
-version: 1.1
+version: 1.2
 priority: HIGH
 ---
 

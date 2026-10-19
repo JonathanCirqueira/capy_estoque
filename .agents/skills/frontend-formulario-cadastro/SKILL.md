@@ -1,8 +1,8 @@
 ---
-name: formulario-cadastro
-description: Padronização e geração de formulários e telas de cadastro no Starter Kit com React 19, Inertia.js v3, Tailwind CSS v4, com decisão arquitetural automática entre Modal (até 8 campos) e Página Completa (mais de 8 campos).
+name: frontend-formulario-cadastro
+description: Padronização e geração de formulários e telas de cadastro no Starter Kit com React 19, Inertia.js v3, Tailwind CSS v4, espelhamento de Enums em TypeScript, com decisão arquitetural automática entre Modal (até 8 campos) e Página Completa (mais de 8 campos).
 allowed-tools: Read, Write, Edit
-version: 1.1
+version: 1.2
 priority: HIGH
 ---
 
@@ -118,11 +118,103 @@ Antes de gerar qualquer tela ou componente de cadastro, conte a quantidade total
     const { data, setData, post, put, processing, errors, setError, clearErrors, reset } = useForm<...>(...);
     ```
   - **No `handleSubmit`:**
-    - Quando for **edição** (`isEdit` é true): utilize **`put('/[modulo]/' + item.id, { ... })`** (ou `put(route('[modulo].update', item.id))`).
-    - Quando for **criação** (`isEdit` é false): utilize **`post('/[modulo]', { ... })`** (ou `post(route('[modulo].store'))`).
+    - Quando for **edição** (`isEdit` é true): utilize **`put('/[modulo]/' + item.id, { ... })`** (ou `put(route('[modulo].update', item.id))` / `put(moduloRoutes.update.url(item.id))`).
+    - Quando for **criação** (`isEdit` é false): utilize **`post('/[modulo]', { ... })`** (ou `post(route('[modulo].store'))` / `post(moduloRoutes.store.url())`).
   - **Por que isso é crítico?**
     - Ao enviar via `PUT /[modulo]/{id}`, o Laravel injeta o registro na rota. O FormRequest do backend obtém esse ID e aplica `Rule::unique('tabela', 'coluna')->ignore($id)`.
     - Isso impede o erro crítico onde o usuário edita um item mantendo o mesmo e-mail, código ou CPF e o backend rejeita com "Este e-mail já está cadastrado no sistema."
+
+### 4.2 Conexão Minimalista com Endpoints (Wayfinder) e Paridade Estrita de Campos (Anti-Redundância)
+- **PADRONIZAÇÃO ESTRITA DE NOMES (FRONTEND = BACKEND):**
+  - Os nomes das propriedades no `data` do `useForm` **DEVEM ser exatamente os mesmos esperados pelo FormRequest do backend** (ex: sempre `nome`, **NUNCA** `nomeCompleto` ou nomes duplos).
+  - É **TERMINANTEMENTE PROIBIDO** manter chaves redundantes no `useForm` (como `nome` e `nomeCompleto` no mesmo formulário).
+  - Rótulos visuais de UI (Labels e cabeçalhos de tabela) podem ser descritivos (ex: `"NOME COMPLETO"`), mas o identificador de dados e estado deve ser estritamente `nome`.
+- **PADRÃO CANÔNICO E MINIMALISTA DE ENVIO (WAYFINDER + ONERROR):**
+  ```tsx
+  const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+
+      if (!validarCampos()) {
+          toast.error('Preencha os campos obrigatórios corretamente.');
+          return;
+      }
+
+      const url = isEdit && item?.id
+          ? itemRoutes.update.url(Number(item.id))
+          : itemRoutes.store.url();
+
+      (isEdit ? put : post)(url, {
+          preserveScroll: true,
+          onSuccess: () => {
+              toast.success(isEdit ? '[Entidade] atualizada com sucesso!' : '[Entidade] cadastrada com sucesso!');
+              onConfirmar?.(data);
+              router.reload({ only: ['[entidades]'] });
+              onAbertoAlterado(false);
+              reset();
+          },
+          onError: (errs) => {
+              const primeiraMensagem = Object.values(errs)[0];
+              toast.error(primeiraMensagem || 'Ocorreu um erro ao salvar o registro.');
+          },
+      });
+  };
+  ```
+
+### 4.3 Espelhamento Obrigatório de Enums em TypeScript (Zero Strings Mágicas & Validação Pré-Envio)
+- **REGRA DE OURO - ZERO STRINGS MÁGICAS NO FRONTEND:**
+  - Sempre inspecione os Enums do backend em `app/Enums/` associados à entidade (ex: `StatusUsuario`, `NivelAcesso`, `StatusPatrimonio`).
+  - Para cada Enum no backend PHP, declare o `enum` correspondente em TypeScript no arquivo `types.ts` do módulo com o mesmo nome, cases e valores:
+    ```typescript
+    export enum NivelAcesso {
+        Administrador = 'ADMINISTRADOR',
+        Comprador = 'COMPRADOR',
+        UsuarioPadrao = 'USUARIO_PADRAO',
+    }
+    ```
+  - **PROIBIDO:** Usar unions literais soltas (`'ADMINISTRADOR' | 'COMPRADOR' | 'USUARIO_PADRAO'`) ou strings cruas em arquivos de componente.
+  - **Em Opções e Seletores (Selector / Combobox / MultiSelect):** Utilize os membros do Enum como `id` ou `value`:
+    ```typescript
+    const OPCOES_NIVEL_ACESSO: SelectorOption<NivelAcesso>[] = [
+        {
+            id: NivelAcesso.Administrador,
+            title: 'ADMINISTRADOR',
+            description: 'Acesso irrestrito',
+            icon: Shield,
+        },
+        {
+            id: NivelAcesso.Comprador,
+            title: 'COMPRADOR',
+            description: 'Acesso financeiro',
+            icon: Briefcase,
+        },
+        {
+            id: NivelAcesso.UsuarioPadrao,
+            title: 'USUÁRIO PADRÃO',
+            description: 'Acesso padrão',
+            icon: User,
+        },
+    ];
+    ```
+  - **Em Funções Auxiliares de Mapeamento:**
+    Funções de mapeamento ou resolução de perfil devem ter retorno tipado com o Enum TypeScript:
+    ```typescript
+    function resolverNivelAcesso(perfil?: string): NivelAcesso {
+        if (!perfil) return NivelAcesso.UsuarioPadrao;
+        const perfilLower = perfil.toLowerCase();
+        if (perfilLower.includes('admin')) return NivelAcesso.Administrador;
+        if (perfilLower.includes('gestor') || perfilLower.includes('comprador')) return NivelAcesso.Comprador;
+        return NivelAcesso.UsuarioPadrao;
+    }
+    ```
+  - **Validação Pré-Envio no Cadastro (`validarCampos`):**
+    Valide o campo do formulário verificando se o valor está presente nos valores do Enum:
+    ```typescript
+    if (!Object.values(NivelAcesso).includes(data.nivelAcesso)) {
+        setError('nivelAcesso', 'Selecione um nível de acesso válido.');
+        valido = false;
+    }
+    ```
+  - **No `useForm`:** O campo deve ser tipado com o Enum (`nivelAcesso: NivelAcesso`), garantindo sincronia total com o backend e sem risco de inconsistências ou typos.
 
 ### 5. Skeleton Loaders para Opções Assíncronas
 - Quando os selects dependerem de dados do backend:
@@ -259,7 +351,7 @@ Antes de gerar qualquer tela ou componente de cadastro, conte a quantidade total
 
 ---
 
-## 🔌 Como Integrar com a Página de Listagem (`tabela-listagem`)
+## 🔌 Como Integrar com a Página de Listagem (`frontend-tabela-listagem`)
 
 ### Caso 1: Cadastro via Modal (`<= 8` campos)
 No arquivo `resources/js/pages/[modulo]/index.tsx`:

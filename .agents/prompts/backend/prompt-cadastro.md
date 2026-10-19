@@ -14,7 +14,7 @@ Copie e envie o prompt abaixo quando a tela de cadastro for um **Modal (Dialog)*
 ```markdown
 /backend-cadastro [Nome da Entidade]
 
-Use a skill @[skills/backend-cadastro-item] para implementar a funcionalidade completa de cadastro no backend com base no template canônico:
+Use a skill @[skills/backend-cadastro] para implementar a funcionalidade completa de cadastro no backend com base no template canônico:
 
 - **Entidade:** [Ex: Fornecedor / App\Models\Fornecedor]
 - **Tabela:** [Ex: fornecedores]
@@ -58,7 +58,7 @@ Use a skill @[skills/backend-cadastro-item] para implementar a funcionalidade co
 ```markdown
 /backend-cadastro Usuario
 
-Use a skill @[skills/backend-cadastro-item] para implementar a funcionalidade completa de cadastro/convite e edição de usuário no backend com base no template canônico:
+Use a skill @[skills/backend-cadastro] para implementar a funcionalidade completa de cadastro/convite e edição de usuário no backend com base no template canônico:
 
 - **Entidade:** Usuário (`App\Models\User`)
 - **Tabela:** `users`
@@ -108,7 +108,7 @@ Copie e envie o prompt abaixo quando a tela de cadastro for uma **Página Comple
 ```markdown
 /backend-cadastro [Nome da Entidade]
 
-Use a skill @[skills/backend-cadastro-item] para implementar a funcionalidade completa de cadastro em página completa no backend com base no template canônico:
+Use a skill @[skills/backend-cadastro] para implementar a funcionalidade completa de cadastro em página completa no backend com base no template canônico:
 
 - **Entidade:** [Ex: Patrimônio / App\Models\Patrimonio]
 - **Tabela:** [Ex: patrimonios]
@@ -151,7 +151,7 @@ Use a skill @[skills/backend-cadastro-item] para implementar a funcionalidade co
 ```markdown
 /backend-cadastro Patrimonio
 
-Use a skill @[skills/backend-cadastro-item] para implementar a funcionalidade completa de cadastro de patrimônio no backend com base no template canônico:
+Use a skill @[skills/backend-cadastro] para implementar a funcionalidade completa de cadastro de patrimônio no backend com base no template canônico:
 
 - **Entidade:** Patrimônio (`App\Models\Patrimonio`)
 - **Tabela:** `patrimonios`

@@ -138,35 +138,21 @@ export function ModalCadastroTemplate({
             return;
         }
 
-        if (isEdit && item?.id) {
-            put(`/[modulo]/${item.id}`, {
-                preserveScroll: true,
-                onSuccess: () => {
-                    toast.success('Registro atualizado com sucesso!');
-                    onConfirmar?.(data);
-                    onAbertoAlterado(false);
-                    reset();
-                },
-                onError: (errs) => {
-                    const primeiraMensagem = Object.values(errs)[0];
-                    toast.error(primeiraMensagem || 'Ocorreu um erro ao atualizar o registro.');
-                },
-            });
-        } else {
-            post('/[modulo]', {
-                preserveScroll: true,
-                onSuccess: () => {
-                    toast.success('Registro cadastrado com sucesso!');
-                    onConfirmar?.(data);
-                    onAbertoAlterado(false);
-                    reset();
-                },
-                onError: (errs) => {
-                    const primeiraMensagem = Object.values(errs)[0];
-                    toast.error(primeiraMensagem || 'Ocorreu um erro ao salvar o registro.');
-                },
-            });
-        }
+        const url = isEdit && item?.id ? `/[modulo]/${item.id}` : '/[modulo]';
+
+        (isEdit ? put : post)(url, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success(isEdit ? 'Registro atualizado com sucesso!' : 'Registro cadastrado com sucesso!');
+                onConfirmar?.(data);
+                onAbertoAlterado(false);
+                reset();
+            },
+            onError: (errs) => {
+                const primeiraMensagem = Object.values(errs)[0];
+                toast.error(primeiraMensagem || 'Ocorreu um erro ao salvar o registro.');
+            },
+        });
     };
 
     const titulos = {

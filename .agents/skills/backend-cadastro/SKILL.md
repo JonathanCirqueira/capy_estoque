@@ -1,8 +1,8 @@
 ---
-name: backend-cadastro-item
-description: "Passo a passo padronizado para implementação de criação/cadastro de recursos no backend Laravel com Inertia, seguindo strict types, Thin Controllers, FormRequests com Precognition e Actions transacionais."
+name: backend-cadastro
+description: "Passo a passo padronizado para implementação de criação/cadastro de recursos no backend Laravel com Inertia, seguindo strict types, Thin Controllers, FormRequests com Precognition, espelhamento de Enums em TypeScript e Actions transacionais."
 allowed-tools: Read, Write, Edit
-version: 1.1
+version: 1.2
 priority: HIGH
 ---
 
@@ -30,10 +30,11 @@ Antes de gerar ou refatorar qualquer código de cadastro no backend, inspecione 
 
 | Camada | Arquivo de Destino | Responsabilidade Exclusiva | Template de Origem |
 | :--- | :--- | :--- | :--- |
-| **Enum Tipado** | `app/Enums/[Nome]Enum.php` | **ZERO STRINGS MÁGICAS**: Status, perfis, tipos e categorias devem ser Backed Enums com `options()` e `label()` | `app/Templates/EnumTemplate.php` |
+| **Enum Tipado (Backend)** | `app/Enums/[Nome]Enum.php` | **ZERO STRINGS MÁGICAS**: Status, perfis, tipos e categorias devem ser Backed Enums com `options()` e `label()` | `app/Templates/EnumTemplate.php` |
+| **Enum Tipado (Frontend)** | `resources/js/pages/[modulo]/types.ts` ou `resources/js/types/` | **ESPELHAMENTO 1:1**: Enum TypeScript espelhado do backend, eliminando strings mágicas no React | N/A |
 | **Migration** | `database/migrations/...` | Criação/alteração de tabelas e colunas em português. Sem método `down()` para evitar acidentes de rollback | N/A |
 | **Rota** | `routes/web.php` | Registro direto de POST/Resource sob middleware `auth`, `verified` | N/A |
-| **Form Request** | `app/Http/Requests/Salvar[Entidade]Request.php` | 100% da validação, sanitização no `prepareForValidation()` com API Fluente, sem `authorize` redundante, Precognition | `app/Templates/RequestTemplate.php` |
+| **Form Request** | `app/Http/Requests/Salvar[Entidade]Request.php` | 100% da validação com `Rule::enum()`, sanitização no `prepareForValidation()` com API Fluente, sem `authorize` redundante, Precognition | `app/Templates/RequestTemplate.php` |
 | **Policy** | `app/Policies/[Entidade]Policy.php` | Regras de autorização RBAC e permissões no método `create()` | `app/Templates/PolicyTemplate.php` |
 | **Action** | `app/Actions/Criar[Entidade]Action.php` | Único ponto de escrita no banco via `DB::transaction()`. Usa Enums para status/tipos. Retorna a Model | `app/Templates/ActionTemplate.php` |
 | **Thin Controller** | `app/Http/Controllers/[Entidade]Controller.php` | Orquestra HTTP: `Gate::authorize`, invoca Action e redireciona (< 10 linhas) | `app/Templates/ControllerTemplate.php` |
@@ -55,6 +56,21 @@ Antes de gerar ou refatorar qualquer código de cadastro no backend, inspecione 
   - Se a tabela já existir, adeque os campos validados e atribuídos exatamente às colunas existentes e aos Enums reais do projeto.
   - Se o campo for armazenado diretamente como JSON (ex: `servicos` em `users`), atribua o valor diretamente no array de criação ou atualização da Model (graças ao cast `'servicos' => 'array'`), sem tentar chamar métodos inexistentes de relacionamento pivot como `->servicos()->sync()`.
   - Só crie novas migrations se a entidade ou coluna realmente não existir no banco.
+
+- **Inspeção e Espelhamento de Enums Backend -> Frontend (TypeScript) (MANDATÓRIO):**
+  - Inspecione todos os Enums em `app/Enums/` associados à entidade (ex: `StatusUsuario`, `NivelAcesso`, `StatusPatrimonio`).
+  - **Espelhamento Obrigatório em TypeScript:** Todo Backed Enum PHP deve ter seu correspondente exato em TypeScript declarado em `resources/js/pages/[modulo]/types.ts` ou `resources/js/types/`:
+    ```typescript
+    export enum NivelAcesso {
+        Administrador = 'ADMINISTRADOR',
+        Comprador = 'COMPRADOR',
+        UsuarioPadrao = 'USUARIO_PADRAO',
+    }
+    ```
+  - **ZERO STRINGS MÁGICAS NO FRONTEND:** É terminantemente proibido o uso de unions literais cruas (ex: `'ADMINISTRADOR' | 'COMPRADOR'`) ou strings soltas em cards de `Selector`, opções de `Combobox`, `MultiSelect`, `StatusTabs` e no estado do `useForm`. O frontend deve importar e usar `NivelAcesso.Administrador`, `NivelAcesso.Comprador`, etc.
+  - **Validação Pré-Envio no Cadastro:** No formulário de cadastro, a validação de cliente deve verificar a conformidade com o Enum via `Object.values(NomeEnum).includes(data.campo as NomeEnum)`, evitando envio de payloads corrompidos.
+  - **Validação no Backend:** No FormRequest, valide com `Rule::enum(NomeEnum::class)`.
+  - **Funções de Resolução:** Funções auxiliares (ex: `resolverNivelAcesso`) devem sempre ter tipagem estrita de retorno com o Enum TypeScript (`: NivelAcesso`).
 
 ---
 
@@ -432,7 +448,7 @@ Ao solicitar a implementação do cadastro backend via prompt, siga as 2 decisõ
 | | **Sem E-mail** | Persistência pura no banco dentro de `DB::transaction()`. |
 
 ```markdown
-Use a skill @[skills/backend-cadastro-item] para implementar o cadastro no backend:
+Use a skill @[skills/backend-cadastro] para implementar o cadastro no backend:
 
 - **Entidade:** [Ex: Fornecedor / App\Models\Fornecedor]
 - **Tabela:** [Ex: fornecedores]
@@ -473,7 +489,7 @@ Ao concluir uma implementação de cadastro backend, confirme:
 - [ ] **Fluxo de Edição / Atualização (PUT/PATCH):** Rotas `POST` e `PUT` definidas, FormRequest ignora o ID do registro atual em regras `Rule::unique()->ignore($id)`, e regras sensíveis a criação (como senha) são ajustadas condicionalmente.
 - [ ] Se o caso de uso requereu e-mail: implementou `ShouldQueue` com `$this->afterCommit()`. Se NÃO requereu: Action limpa sem chamadas de Mail.
 - [ ] Rotas diretas sem prefixos redundantes em `routes/web.php`.
-- [ ] **ZERO STRINGS MÁGICAS:** Status, perfis e tipos possuem Enum em `app/Enums/` (baseado em `app/Templates/EnumTemplate.php`) e foram usados como constante do Enum na Action e cast na Model.
+- [ ] **ZERO STRINGS MÁGICAS & ESPELHAMENTO DE ENUMS (BACKEND -> FRONTEND):** Status, perfis e tipos possuem Enum em `app/Enums/` (baseado em `app/Templates/EnumTemplate.php`), validados via `Rule::enum()` e espelhados como TypeScript `enum` no frontend (`types.ts`), eliminando strings mágicas no `useForm`, seletores e validações.
 - [ ] **Schema Canônico (Single Source of Truth):** Segue estritamente as colunas canônicas da tabela e da Model (ex: em `users`, usa-se apenas `name` sem redundância de colunas).
 - [ ] Baseou-se no `app/Templates/RequestTemplate.php` com `prepareForValidation()` para limpeza de dados direta sem ternários e recuperação segura do ID para regras `Rule::unique()->ignore(...)`.
 - [ ] Sem getters customizados no Request (`$request->getItem()` proibido).

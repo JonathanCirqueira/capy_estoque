@@ -6,12 +6,12 @@ Use os modelos deste arquivo para solicitar a criação de telas completas de li
 
 ## 🎯 Modelo Canônico (Copie, Preencha e Envie no Chat)
 
-> **Dica:** Não é necessário especificar paginação, cards mobile ou detalhes de layout. A skill `@[skills/tabela-listagem]` já aplica toda a arquitetura visual canônica automaticamente.
+> **Dica:** Não é necessário especificar paginação, cards mobile ou detalhes de layout. A skill `@[skills/frontend-tabela-listagem]` já aplica toda a arquitetura visual canônica automaticamente.
 
 ```markdown
 /table [Nome da Entidade]
 
-Use a skill @[skills/tabela-listagem] para gerar a página de listagem completa com base no template canônico do starter kit:
+Use a skill @[skills/frontend-tabela-listagem] para gerar a página de listagem completa com base no template canônico do starter kit:
 
 - **Entidade:** [Ex: Fornecedor / Fornecedores]
 - **Título da Página:** [Ex: Gestão de Fornecedores]
@@ -45,27 +45,27 @@ Use a skill @[skills/tabela-listagem] para gerar a página de listagem completa 
 ```markdown
 /table Usuarios
 
-Use a skill @[skills/tabela-listagem] para gerar a página de listagem completa com base no template canônico do starter kit:
+Use a skill @[skills/frontend-tabela-listagem] para gerar a página de listagem completa com base no template canônico do starter kit:
 
 - **Entidade:** Usuário / Usuários
 - **Título da Página:** Gestão de Usuários
 - **Menu na Sidebar:** Usuários (ícone: Users)
-- **Descrição:** Controle os usuários, perfis de acesso e departamentos do sistema.
+- **Descrição:** Controle os usuários, serviços vinculados e acessos do sistema.
 - **Botão Principal:** "Cadastrar"
 
 - **Colunas da Tabela:**
     - Nome Completo (ordenável: sim)
     - E-mail (ordenável: sim)
-    - Perfil / Cargo (ordenável: sim)
-    - Departamento (ordenável: sim)
-    - Status (badge colorido)
+    - Serviços (ordenável: sim)
+    - Status (badge colorido, ordenável: sim)
+    - Ações (ordenável: sim)
 
 - **Abas de Status (com contagem e cores de tema):**
     - Todos (primary), Ativos (success), Pendentes (warning), Inativos (destructive)
 
 - **Filtros Secundários em Grid:**
-    - Departamento: [Engenharia, Comercial, RH, Financeiro]
-    - Perfil: [Administrador, Gestor, Operador]
+    - Serviços: [COHAB, Sede JHE, Habisocial, Habinova II]
+    - Nível de Acesso: [Administrador, Comprador, Usuário Padrão]
 
 - **Pesquisa Rápida:**
     - Filtrar por: nome ou e-mail
