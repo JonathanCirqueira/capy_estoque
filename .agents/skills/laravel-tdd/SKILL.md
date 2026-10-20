@@ -1,27 +1,27 @@
 ---
 name: laravel-tdd
-description: Test-Driven Development (TDD) in Laravel 13 using Pest v4, Inertia assertions, model factories, HTTP tests, authorization, and fakes. Use when writing tests test-first or building features with TDD.
+description: Desenvolvimento Orientado a Testes (TDD) no Laravel 13 usando Pest v4, asserções Inertia, model factories, testes HTTP, autorização e fakes. Use ao escrever testes test-first ou construir funcionalidades orientadas por testes.
 metadata:
   origin: ECC
 ---
 
-# Laravel Testing with TDD (Pest v4)
+# Testes no Laravel com TDD (Pest v4)
 
-Test-Driven Development (TDD) workflow for Laravel 13 and Inertia.js v3 using Pest PHP v4, factories, and Laravel testing helpers.
-
----
-
-## When to Activate
-
-- Driving new features or bug fixes test-first (RED -> GREEN -> REFACTOR).
-- Writing feature tests for Inertia pages, FormRequests, and Controllers.
-- Testing Eloquent models, relationships, scopes, and Backed Enum casts.
-- Testing authorization boundaries (`Gate`, `Policy`, guest redirects).
-- Mocking asynchronous jobs, mail, notifications, and external HTTP calls.
+Fluxo de trabalho de Desenvolvimento Orientado a Testes (TDD) para **Laravel 13** e **Inertia.js v3** utilizando Pest PHP v4, factories e helpers nativos de teste do Laravel.
 
 ---
 
-## The TDD Workflow (Red-Green-Refactor)
+## Quando Ativar
+
+- Construção de novas funcionalidades ou correção de bugs no modelo test-first (RED -> GREEN -> REFACTOR).
+- Escrita de testes de Feature para páginas Inertia, FormRequests e Controllers.
+- Testes de Models Eloquent, relacionamentos, escopos e casts para Backed Enums.
+- Testes de limites de autorização (`Gate`, `Policy`, redirecionamentos de convidados).
+- Mocking de jobs assíncronos, e-mails, notificações e chamadas HTTP externas.
+
+---
+
+## O Fluxo de TDD (Red-Green-Refactor)
 
 ```mermaid
 flowchart LR
@@ -31,7 +31,7 @@ flowchart LR
 ```
 
 ### 1. 🔴 RED — Escrever o Teste Primeiro
-Crie o arquivo de teste em `tests/Feature/...` antes de criar a controller ou action. Execute o teste para confirmar que ele falha com a razão esperada (ex: rota 404 ou validação ausente).
+Crie o arquivo de teste em `tests/Feature/...` antes de criar a controller ou action. Execute o teste para confirmar que ele falha pela razão esperada (ex: rota 404 ou validação ausente).
 
 ```php
 declare(strict_types=1);
@@ -68,7 +68,7 @@ php artisan test --filter "cliente autenticado pode criar um pedido"
 ---
 
 ### 2. 🟢 GREEN — Código Mínimo para Passar
-Implemente apenas a rota, controller e action necessários para que o teste passe.
+Implemente apenas a rota, controller e action estritamente necessários para que o teste passe.
 
 ---
 
@@ -271,7 +271,7 @@ composer verify
 
 ## Padrões DO / DON'T no TDD
 
-| ✅ DO | ❌ DON'T |
+| ✅ FAZER (DO) | ❌ NÃO FAZER (DON'T) |
 | :--- | :--- |
 | Use factories (`Model::factory()->create()`) para preparar cenários | Não insira dados com `DB::table()->insert()` nos testes |
 | Use `expect($valor)->toBe(...)` para asserções legíveis no Pest | Não use assertions legadas do PHPUnit quando desnecessário |

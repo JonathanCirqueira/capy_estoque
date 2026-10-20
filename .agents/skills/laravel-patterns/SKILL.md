@@ -1,70 +1,70 @@
 ---
 name: laravel-patterns
-description: Laravel 13 architecture patterns, routing/controllers, Eloquent ORM, Action classes, queues, events, caching, and API resources for production apps. Use when building or reviewing Laravel apps — controllers, Eloquent, service/action layers, queues, or API resources.
+description: Padrões de arquitetura do Laravel 13, rotas/controllers, Eloquent ORM, Action classes, filas, eventos, cache e API resources para aplicações de produção. Use ao criar ou revisar código Laravel — controllers, Eloquent, camadas de actions, filas ou resources de API.
 metadata:
   origin: ECC
 ---
 
-# Laravel Development Patterns
+# Padrões de Desenvolvimento Laravel 13
 
-Production-grade Laravel 13 (PHP 8.3) architecture patterns for scalable, maintainable applications adhering to Starter Kit conventions.
+Padrões de arquitetura prontos para produção em **Laravel 13 (PHP 8.3)** para aplicações escaláveis, sustentáveis e aderentes às convenções do Starter Kit.
 
-## When to Use
+## Quando Usar
 
-- Building Laravel web applications with Inertia.js v3 or REST APIs.
-- Structuring controllers, Action classes, and domain logic.
-- Working with Eloquent models, relationships, and scopes.
-- Designing APIs with Eloquent API Resources.
-- Implementing background jobs, queues, events, and caching.
-
----
-
-## Core Architecture Principles
-
-1. **Clear Layer Boundaries**:
-   - **Controllers**: Thin (< 10 lines per method), HTTP orchestration only.
-   - **FormRequests**: Single source of truth for validation and input sanitization (`prepareForValidation`).
-   - **Actions**: `final readonly class` with single public executor (`execute()` or `handle()`) wrapped in `DB::transaction()` for mutations.
-   - **Models**: Explicit casts (`casts(): array`), relationships, and reusable scopes.
-2. **Zero Strings Mágicas**: Always use PHP Backed Enums (`app/Enums/`) for statuses, types, roles, and categories.
-3. **Raw Data Only**: Backend returns raw, unformatted data (monetary values in integer cents, ISO 8601 dates, booleans). Presentation formatting belongs exclusively to the frontend.
-4. **Wayfinder Compatibility**: Use standard named routes (`name('users.index')`) and Eloquent route model binding.
+- Construção de aplicações web Laravel com Inertia.js v3 ou APIs REST.
+- Estruturação de controllers, classes de Action e lógica de domínio.
+- Modelagem de dados com Eloquent, relacionamentos e escopos (`scopes`).
+- Criação de APIs com Eloquent API Resources.
+- Implementação de jobs em segundo plano, filas, eventos e estratégias de cache.
 
 ---
 
-## Recommended Project Structure
+## Princípios Fundamentais de Arquitetura
+
+1. **Fronteiras Claras entre Camadas**:
+   - **Controllers**: Enxutos (< 10 linhas por método), focados apenas na orquestração HTTP.
+   - **FormRequests**: Única fonte de verdade para validação e sanitização de dados de entrada (`prepareForValidation`).
+   - **Actions**: Declaradas como `final readonly class` com único método executor público (`execute()` ou `handle()`), encapsuladas em `DB::transaction()` para mutações.
+   - **Models**: Casts explícitos (`casts(): array`), relacionamentos tipados e escopos reutilizáveis.
+2. **Zero Strings Mágicas**: Uso obrigatório de PHP Backed Enums (`app/Enums/`) para status, tipos, perfis e categorias.
+3. **Raw Data Only (Apenas Dados Brutos)**: O backend retorna exclusivamente dados brutos e sem formatação de apresentação (valores monetários em centavos inteiros, datas no formato ISO 8601, booleanos). A formatação de exibição é responsabilidade exclusiva do frontend.
+4. **Compatibilidade com Wayfinder**: Uso de rotas nomeadas padronizadas (`name('users.index')`) e Route Model Binding do Eloquent.
+
+---
+
+## Estrutura Recomendada do Projeto
 
 ```
 app/
-├── Actions/            # Single-purpose transactional domain actions
-├── Enums/              # PHP Backed Enums (Strict typing, no magic strings)
-├── Events/             # Domain events for asynchronous side-effects
+├── Actions/            # Ações de domínio transacionais de propósito único
+├── Enums/              # PHP Backed Enums (Tipagem estrita, sem strings mágicas)
+├── Events/             # Eventos de domínio para efeitos colaterais assíncronos
 ├── Http/
-│   ├── Controllers/    # Thin HTTP controllers (< 10 lines per action)
+│   ├── Controllers/    # Controllers HTTP enxutos (< 10 linhas por ação)
 │   ├── Middleware/
 │   ├── Requests/       # Form requests (prepareForValidation, rules)
 │   └── Resources/      # Eloquent API Resources
-├── Jobs/               # Asynchronous queue jobs (ShouldQueue)
-├── Models/             # Eloquent models with casts(): array and relations
-├── Policies/           # Authorization policies
+├── Jobs/               # Processamento em fila assíncrona (ShouldQueue)
+├── Models/             # Models Eloquent com casts(): array e relacionamentos
+├── Policies/           # Políticas de autorização
 └── Providers/
 database/
-├── factories/          # Model factories for testing and seeding
-├── migrations/         # Schema evolution (up() method only)
-└── seeders/            # Database seeders
+├── factories/          # Model factories para testes e seeders
+├── migrations/         # Evolução do schema (apenas método up())
+└── seeders/            # Seeders do banco de dados
 routes/
 ├── api.php
 ├── console.php
-└── web.php             # Inertia & application web routes
+└── web.php             # Rotas web da aplicação e Inertia
 ```
 
 ---
 
-## Architectural Patterns
+## Padrões Arquiteturais
 
 ### 1. Controllers -> Actions -> Models (Thin Controllers)
 
-Keep controllers lean and focused on HTTP orchestration. Delegate business logic and mutations to transactional Action classes.
+Mantenha controllers enxutos e dedicados apenas à orquestração HTTP. Delegue regras de negócio e mutações no banco de dados para classes de Action transacionais.
 
 ```php
 declare(strict_types=1);
@@ -88,7 +88,7 @@ final readonly class CreateOrderAction
                 'total_cents' => $data['total_cents'],
             ]);
 
-            // Side-effects or child creation
+            // Efeitos colaterais ou criação de itens filhos
             return $order;
         });
     }
@@ -122,10 +122,10 @@ final class OrderController extends Controller
 
 ---
 
-### 2. FormRequests & Validation
+### 2. FormRequests & Validação
 
-- Normalização e limpeza de máscaras são feitas em `prepareForValidation()`.
-- O método `authorize()` é omitido quando gerenciado por Gates/Policies de rota.
+- A normalização e limpeza de máscaras são feitas no método `prepareForValidation()`.
+- O método `authorize()` é omitido quando a autorização é gerenciada por Gates/Policies de rota.
 - Zero verificações redundantes no Controller ou Action após o FormRequest validar os dados.
 
 ```php
@@ -165,9 +165,9 @@ final class StoreOrderRequest extends FormRequest
 
 ---
 
-### 3. Eloquent Models: Casts Modernos & Enums
+### 3. Models Eloquent: Casts Modernos & Enums
 
-- Utilize o método `casts(): array` (padrão moderno Laravel 11/12/13).
+- Utilize o método `casts(): array` (padrão moderno do Laravel).
 - Utilize PHP Backed Enums para todos os campos com valores discretos.
 
 ```php
@@ -222,7 +222,7 @@ final class Order extends Model
 ### 4. Consultas Otimizadas & Prevenção de N+1
 
 - Sempre pré-carregue relacionamentos via `with(['relacao'])`.
-- Na listagem com abas de status, reutilize a query base clonada para calcular contadores sem N+1:
+- Na listagem com abas de status, reutilize a query base clonada para calcular contadores sem incorrer em N+1:
 
 ```php
 $queryBase = Order::query()
@@ -302,10 +302,10 @@ return new class extends Migration
 
 ---
 
-### 7. Jobs Assíncronos & Side-Effects
+### 7. Jobs Assíncronos & Efeitos Colaterais
 
 Para operações pesadas (envio de emails, integração com APIs externas, processamento de arquivos):
-- Implemente `ShouldQueue`.
+- Implemente a interface `ShouldQueue`.
 - Chame `$this->afterCommit()` no construtor para garantir que o job só rode após o commit da transação do banco de dados.
 
 ```php
