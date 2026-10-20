@@ -37,12 +37,17 @@ Specialist AI personas for different domains.
 | `orchestrator`           | Multi-agent coordination   | parallel-agents, behavioral-modes, intelligent-routing   |
 | `project-planner`        | Discovery, task planning   | brainstorming, plan-writing, architecture                |
 | `frontend-specialist`    | Web UI/UX (Inertia/React)  | frontend-design, inertia-react-development, tailwind-patterns, wayfinder-development, shadcn, frontend-listagem, frontend-cadastro |
-| `backend-specialist`     | Laravel API, logic, DB     | laravel-best-practices, fortify-development, pest-testing, wayfinder-development, debug-using-debugbar, api-patterns, database-design, backend-cadastro, backend-listagem |
+| `backend-specialist`     | Laravel API, logic, DB     | laravel-best-practices, laravel-patterns, fortify-development, pest-testing, wayfinder-development, debug-using-debugbar, api-patterns, database-design, backend-cadastro, backend-listagem |
 | `database-architect`     | Schema, SQL, Migrations    | database-design, laravel-best-practices                 |
-| `test-engineer`          | Testing strategies (Pest)  | pest-testing, testing-patterns, tdd-workflow             |
+| `test-engineer`          | Testing strategies (Pest)  | pest-testing, laravel-tdd, testing-patterns, tdd-workflow |
 | `debugger`               | Root cause analysis        | systematic-debugging, debug-using-debugbar              |
 | `performance-optimizer`  | Speed, Web Vitals, Queries | performance-profiling, debug-using-debugbar, laravel-best-practices |
 | `security-auditor`       | Security compliance        | vulnerability-scanner, clean-code                        |
+| `code-reviewer`          | Code quality, security, git diffs | clean-code, code-review-checklist, laravel-best-practices, testing-patterns |
+| `php-reviewer`           | PHP 8.3 & Laravel 13 review | laravel-best-practices, laravel-patterns, clean-code, pest-testing, database-design, backend-cadastro, backend-listagem |
+| `react-reviewer`         | React 19 & Inertia v3 review | inertia-react-development, frontend-design, shadcn, tailwindcss-development, frontend-cadastro, frontend-listagem, clean-code |
+| `typescript-reviewer`    | TypeScript type safety & patterns | clean-code, inertia-react-development, wayfinder-development |
+| `code-simplifier`        | Code clarity, simplification | clean-code, laravel-best-practices, inertia-react-development, pest-testing |
 | `qa-automation-engineer` | E2E testing, CI pipelines  | webapp-testing, pest-testing                             |
 | `code-archaeologist`     | Legacy code, refactoring   | clean-code, code-review-checklist                        |
 | `documentation-writer`   | Manuals, docs              | documentation-templates                                  |
@@ -50,7 +55,7 @@ Specialist AI personas for different domains.
 
 ---
 
-## 🧩 Skills (39)
+## 🧩 Skills (41)
 
 Modular knowledge domains that agents can load on-demand based on task context.
 
@@ -59,6 +64,7 @@ Modular knowledge domains that agents can load on-demand based on task context.
 | Skill                   | Description                                                                     |
 | ----------------------- | ------------------------------------------------------------------------------- |
 | `laravel-best-practices`| Regras essenciais de Eloquent, actions, routing, migrations, queries e mail     |
+| `laravel-patterns`      | Padrões arquiteturais Laravel 13, thin controllers, Action classes e queues    |
 | `backend-cadastro`      | Padrão para criação/cadastro de recursos no backend com FormRequests e Actions  |
 | `backend-listagem`      | Listagem, filtros reativos e contadores de abas sem N+1                         |
 | `fortify-development`   | Autenticação completa, 2FA, login, registro e profile com Laravel Fortify       |
@@ -85,6 +91,7 @@ Modular knowledge domains that agents can load on-demand based on task context.
 | Skill                   | Description                                                |
 | ----------------------- | ---------------------------------------------------------- |
 | `pest-testing`          | Testes automatizados Pest PHP v4, datasets e asserções     |
+| `laravel-tdd`           | Ciclo TDD no Laravel 13 com Pest v4, Inertia e Fakes       |
 | `testing-patterns`      | Padrões de teste unitário, integração e mocking            |
 | `webapp-testing`        | Testes E2E e Playwright para validação de fluxos completos  |
 | `tdd-workflow`          | Ciclo Red-Green-Refactor                                   |

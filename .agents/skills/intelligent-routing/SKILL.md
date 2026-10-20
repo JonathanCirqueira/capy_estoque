@@ -43,6 +43,11 @@ graph TD
 | **API Endpoint**    | "endpoint", "route", "API", "POST", "GET"  | `backend-specialist`                        | ✅ YES       |
 | **Database**        | "schema", "migration", "query", "table"    | `database-architect` + `backend-specialist` | ✅ YES       |
 | **Bug Fix**         | "error", "bug", "not working", "broken"    | `debugger`                                  | ✅ YES       |
+| **Code Review**     | "review", "revise", "code review", "analise o código", "audite o diff", "audite o commit" | `code-reviewer`                             | ✅ YES       |
+| **PHP Review**      | "php review", "revise php", "analise o php", "laravel review" | `php-reviewer`                              | ✅ YES       |
+| **React Review**    | "react review", "revise o react", "analise o front", "frontend review", "revisar tsx" | `react-reviewer`                            | ✅ YES       |
+| **TypeScript Review** | "typescript review", "revise typescript", "analise tipos", "ts review", "tipagem" | `typescript-reviewer`                       | ✅ YES       |
+| **Code Simplification** | "simplifique", "simplificar", "clareza", "simplifier", "limpar código" | `code-simplifier`                           | ✅ YES       |
 | **Test**            | "test", "coverage", "unit", "e2e"          | `test-engineer`                             | ✅ YES       |
 | **Deployment**      | "deploy", "production", "CI/CD", "docker"  | `devops-engineer`                           | ✅ YES       |
 | **Security Review** | "security", "vulnerability", "exploit"     | `security-auditor` + `penetration-tester`   | ✅ YES       |
