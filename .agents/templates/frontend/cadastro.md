@@ -49,7 +49,7 @@ Antes de gerar qualquer interface de cadastro, conte a quantidade total de campo
 3. **Criação vs Edição Diferenciadas:** 
    - Criação: `post(url)`
    - Edição: `put(url)` (injeta ID na rota, permitindo `Rule::unique()->ignore($id)` no backend).
-4. **Precognition & Validação em Tempo Real:** Limpeza de erro no `onChange` (`clearErrors(campo)`).
+4. **Precognition Obrigatório (PROIBIDO `validarCampos` manual):** É terminantemente proibido criar funções manuais de validação no cliente (como `const validarCampos = (): boolean => { ... }`, regex manuais ou chamadas manuais a `setError`). O formulário integra nativamente com o Laravel Precognition no `useForm`, disparando validações em tempo real via `onBlur={() => validate('campo')}` e limpando erros no `onChange` (`clearErrors('campo')`). As mensagens de erro exibidas na UI vêm 100% das regras e mensagens do FormRequest do backend.
 5. **Componente `Botao` Oficial:** Texto SEMPRE estático (`Salvar`). Nunca alterar texto para "Salvando...". Apenas o ícone roda via prop `loading`.
 6. **Página Completa - Botões Fora do Card:** O rodapé sticky fica estritamente FORA do container `bg-card` e SEM borda superior (`border-t`).
 7. **Anti-Duplicação de Layout:** Definir layout via propriedade estática `.layout = { breadcrumbs: [...] }`.
@@ -101,7 +101,7 @@ export function ModalCadastroEntidade({
 }: ModalCadastroProps) {
     const isEdit = Boolean(item?.id);
 
-    const { data, setData, post, put, processing, errors, clearErrors, reset } = useForm<EntidadeFormData>({
+    const { data, setData, post, put, processing, errors, clearErrors, reset, validate } = useForm<EntidadeFormData>({
         nome: item?.nome ?? '',
         email: item?.email ?? '',
         cargo_id: item?.cargo_id ?? '',
@@ -181,6 +181,7 @@ export function ModalCadastroEntidade({
                                         setData('nome', e.target.value);
                                         if (errors.nome) clearErrors('nome');
                                     }}
+                                    onBlur={() => validate('nome')}
                                     placeholder="Ex: Carlos Silva"
                                 />
                                 {errors.nome && <p className="text-xs font-medium text-destructive mt-1">{errors.nome}</p>}
@@ -199,6 +200,7 @@ export function ModalCadastroEntidade({
                                         setData('email', e.target.value);
                                         if (errors.email) clearErrors('email');
                                     }}
+                                    onBlur={() => validate('email')}
                                     placeholder="carlos@empresa.com.br"
                                 />
                                 {errors.email && <p className="text-xs font-medium text-destructive mt-1">{errors.email}</p>}
@@ -260,7 +262,7 @@ interface PageCadastroProps {
 export default function CadastrarPatrimonioPage({ item = null }: PageCadastroProps) {
     const isEdit = Boolean(item?.id);
 
-    const { data, setData, post, put, processing, errors, clearErrors } = useForm({
+    const { data, setData, post, put, processing, errors, clearErrors, validate } = useForm({
         codigo: item?.codigo ?? '',
         nome: item?.nome ?? '',
         categoria_id: item?.categoria_id ?? '',

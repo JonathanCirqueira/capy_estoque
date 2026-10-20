@@ -63,8 +63,8 @@ Antes de gerar ou refatorar qualquer código de cadastro no backend, inspecione 
     }
     ```
   - **ZERO STRINGS MÁGICAS NO FRONTEND:** É terminantemente proibido o uso de unions literais cruas (ex: `'ADMINISTRADOR' | 'COMPRADOR'`) ou strings soltas em cards de `Selector`, opções de `Combobox`, `MultiSelect`, `StatusTabs` e no estado do `useForm`. O frontend deve importar e usar `NivelAcesso.Administrador`, `NivelAcesso.Comprador`, etc.
-  - **Validação Pré-Envio no Cadastro:** No formulário de cadastro, a validação de cliente deve verificar a conformidade com o Enum via `Object.values(NomeEnum).includes(data.campo as NomeEnum)`, evitando envio de payloads corrompidos.
-  - **Validação no Backend:** No FormRequest, valide com `Rule::enum(NomeEnum::class)`.
+  - **ZERO VALIDAÇÃO MANUAL NO FRONTEND (`validarCampos` PROIBIDO):** É terminantemente proibido criar funções manuais como `const validarCampos = (): boolean => { ... }` com regex ou checagens manuais no frontend. Toda a validação de formato, obrigatoriedade, unicidade e regras de negócio pertence exclusivamente ao **FormRequest do Backend** e é executada em tempo real no frontend via **Laravel Precognition** (`onBlur={() => form.validate('campo')}`).
+  - **Validação no Backend:** No FormRequest, declare regras completas e valide enums com `Rule::enum(NomeEnum::class)`.
   - **Funções de Resolução:** Funções auxiliares (ex: `resolverNivelAcesso`) devem sempre ter tipagem estrita de retorno com o Enum TypeScript (`: NivelAcesso`).
 
 ---
@@ -118,6 +118,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 - **Arquivo:** `app/Http/Requests/Salvar[Entidade]Request.php`
 - **Validação:** 100% da validação aqui. O Controller e a Action confiam totalmente no Request validado.
+- **Motor Único para Precognition (Zero Duplicação no Frontend):** O FormRequest é a única fonte de regras de validação. O frontend não implementa `validarCampos` manuais; ele consome o FormRequest em tempo real via Laravel Precognition (`onBlur={() => form.validate('campo')}`). Defina sempre `attributes()` em português e mensagens customizadas em `messages()` para garantir feedback claro e amigável na UI.
 - **Sem `authorize()` Redundante:** Como a autorização é realizada de forma centralizada pelo Controller via `Gate::authorize()`, não há necessidade de declarar `public function authorize(): bool { return true; }`.
 - **Diferenciação Crítica: Criação (POST) vs Edição (PUT/PATCH):**
   - **Campos Únicos (ex: `email`, `cpf`, `codigo`):** Na edição, OBRIGATORIAMENTE ignore o ID do registro atual via `Rule::unique('tabela', 'coluna')->ignore($id)`.

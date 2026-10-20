@@ -128,15 +128,11 @@ Antes de gerar qualquer tela ou componente de cadastro, conte a quantidade total
   - Os nomes das propriedades no `data` do `useForm` **DEVEM ser exatamente os mesmos esperados pelo FormRequest do backend** (ex: sempre `nome`, **NUNCA** `nomeCompleto` ou nomes duplos).
   - É **TERMINANTEMENTE PROIBIDO** manter chaves redundantes no `useForm` (como `nome` e `nomeCompleto` no mesmo formulário).
   - Rótulos visuais de UI (Labels e cabeçalhos de tabela) podem ser descritivos (ex: `"NOME COMPLETO"`), mas o identificador de dados e estado deve ser estritamente `nome`.
-- **PADRÃO CANÔNICO E MINIMALISTA DE ENVIO (WAYFINDER + ONERROR):**
+- **PADRÃO CANÔNICO E MINIMALISTA DE ENVIO (WAYFINDER + PRECOGNITION + ONERROR):**
+  - **PROIBIDO `validarCampos` MANUAL:** Não crie funções manuais de validação no cliente. A validação ocorre campo a campo via Laravel Precognition (`onBlur={() => form.validate('campo')}`) e no submit através do FormRequest.
   ```tsx
   const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-
-      if (!validarCampos()) {
-          toast.error('Preencha os campos obrigatórios corretamente.');
-          return;
-      }
 
       const url = isEdit && item?.id
           ? itemRoutes.update.url(Number(item.id))
@@ -205,15 +201,12 @@ Antes de gerar qualquer tela ou componente de cadastro, conte a quantidade total
         return NivelAcesso.UsuarioPadrao;
     }
     ```
-  - **Validação Pré-Envio no Cadastro (`validarCampos`):**
-    Valide o campo do formulário verificando se o valor está presente nos valores do Enum:
+  - **Validação em Tempo Real com Laravel Precognition (PROIBIDO `validarCampos` manual):**
+    Não crie validações manuais de Enums nem funções de `validarCampos`. O `useForm` com Precognition e o `Rule::enum()` do FormRequest cuidam da validação no backend e em tempo real no frontend:
     ```typescript
-    if (!Object.values(NivelAcesso).includes(data.nivelAcesso)) {
-        setError('nivelAcesso', 'Selecione um nível de acesso válido.');
-        valido = false;
-    }
+    onBlur={() => validate('nivel_acesso')}
     ```
-  - **No `useForm`:** O campo deve ser tipado com o Enum (`nivelAcesso: NivelAcesso`), garantindo sincronia total com o backend e sem risco de inconsistências ou typos.
+  - **No `useForm`:** O campo deve ser tipado com o Enum (`nivel_acesso: NivelAcesso`), garantindo sincronia total com o backend e sem risco de inconsistências ou typos.
 
 ### 5. Skeleton Loaders para Opções Assíncronas
 - Quando os selects dependerem de dados do backend:
@@ -221,7 +214,6 @@ Antes de gerar qualquer tela ou componente de cadastro, conte a quantidade total
 
 ### 6. Notificações com Sonner Toast e Contrato de Erros do Backend
 - Importar `toast` de `sonner`.
-- Validação prévia local: `toast.error('Preencha os campos obrigatórios corretamente.')`.
 - **Tratamento de Erros da API / Backend (`onError`):**
   - **PROIBIDO:** Exibir mensagens de erro genéricas e estáticas como `toast.error('Ocorreu um erro')` quando a validação do backend falhar (ex: unicidade de e-mail, código duplicado).
   - Sempre capturar e exibir a primeira mensagem retornada pelo backend:

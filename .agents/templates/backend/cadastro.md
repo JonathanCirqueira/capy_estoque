@@ -7,7 +7,7 @@
 ## ⚡ Regras de Ouro Inegociáveis
 
 1. **Actions Transacionais (`DB::transaction`):** Toda persistência ou alteração de dados no banco ocorre exclusivamente dentro de uma Action imutável (`final readonly class`) envolvida por transação.
-2. **Form Request com Precognition:** Toda validação é isolada no FormRequest. O Controller e a Action confiam cegamente nos dados validados (`$request->validated()`).
+2. **Form Request com Precognition e Zero Validação Manual no Frontend:** Toda validação do sistema reside 100% no FormRequest do backend. É **TERMINANTEMENTE PROIBIDO** criar funções manuais de validação no frontend (como `const validarCampos = () => { ... }`, regex manuais de email ou checagens com `setError`). O frontend deve consumir o FormRequest via **Laravel Precognition** no `useForm`, disparando a validação em tempo real via `form.validate(field)` no `onBlur` e exibindo as mensagens retornadas pelo backend. O Controller e a Action confiam cegamente nos dados validados (`$request->validated()`).
 3. **Sem Método `authorize()` Redundante:** A autorização pertence ao Controller através de `Gate::authorize(...)` ou Policy. Não declare `public function authorize(): bool { return true; }` no FormRequest.
 4. **Sem Validações ou Conversões Redundantes na Action:** Nunca faça checagens manuais redundantes (`if ($data->has('...'))`), ternários desnecessários ou `instanceof BackedEnum ? ... : BackedEnum::from(...)`. O Eloquent já cuida do cast nativo do Enum via `casts(): array` na Model.
 5. **Diferenciação Criação (POST) vs Edição (PUT/PATCH):**

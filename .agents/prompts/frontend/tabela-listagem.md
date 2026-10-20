@@ -58,7 +58,7 @@ Use a skill @[skills/frontend-listagem] para gerar a página de listagem complet
     - E-mail (ordenável: sim)
     - Serviços (ordenável: sim)
     - Status (badge colorido, ordenável: sim)
-    - Ações (ordenável: sim)
+    - Ações
 
 - **Abas de Status (com contagem e cores de tema):**
     - Todos (primary), Ativos (success), Pendentes (warning), Inativos (destructive)
