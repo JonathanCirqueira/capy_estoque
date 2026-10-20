@@ -13,7 +13,7 @@ Copie e envie o prompt abaixo para cadastros rápidos ou convites:
 ```markdown
 /form Usuario
 
-Use a skill @[skills/frontend-formulario-cadastro] para gerar o componente de cadastro em Modal com base no template canônico e nos componentes do sistema:
+Use a skill @[skills/frontend-cadastro] para gerar o componente de cadastro em Modal com base no template canônico e nos componentes do sistema:
 
 - **Entidade:** Usuário / Convite de Usuário
 - **Tipo de Cadastro:** Modal (até 8 campos)
@@ -53,7 +53,7 @@ Copie e envie o prompt abaixo para cadastros extensos ou corporativos em etapa �
 ```markdown
 /form Usuario
 
-Use a skill @[skills/frontend-formulario-cadastro] para gerar a página de cadastro completa em etapa única com base no template canônico:
+Use a skill @[skills/frontend-cadastro] para gerar a página de cadastro completa em etapa única com base no template canônico:
 
 - **Entidade:** Usuário / Colaborador
 - **Tipo de Cadastro:** Página Completa (Formulário Contínuo / Etapa Única)

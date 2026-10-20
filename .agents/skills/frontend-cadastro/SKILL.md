@@ -1,5 +1,5 @@
 ---
-name: frontend-formulario-cadastro
+name: frontend-cadastro
 description: Padronização e geração de formulários e telas de cadastro no Starter Kit com React 19, Inertia.js v3, Tailwind CSS v4, espelhamento de Enums em TypeScript, com decisão arquitetural automática entre Modal (até 8 campos) e Página Completa (mais de 8 campos).
 allowed-tools: Read, Write, Edit
 version: 1.2
@@ -9,7 +9,7 @@ priority: HIGH
 # Formulário de Cadastro - Padrão Canônico de Engenharia
 
 > **MANDATÓRIO PARA CRIAÇÃO E EDIÇÃO DE ENTIDADES:**
-> Todo novo formulário de cadastro, criação ou edição no sistema **DEVE** seguir estritamente o padrão canônico estabelecido em `resources/js/templates/form-cadastro/`.
+> Todo novo formulário de cadastro, criação ou edição no sistema **DEVE** seguir estritamente o blueprint canônico em `.agents/templates/frontend/cadastro.md`.
 
 ---
 
@@ -17,19 +17,18 @@ priority: HIGH
 
 Antes de gerar qualquer tela ou componente de cadastro, conte a quantidade total de campos do formulário:
 
-| Quantidade de Campos | Abordagem Obrigatória | Arquivo Base do Template | Como Acionar na Listagem |
+| Quantidade de Campos | Abordagem Obrigatória | Blueprint Canônico | Como Acionar na Listagem |
 | :--- | :--- | :--- | :--- |
-| **Até 8 Campos (`<= 8`)** | **MODAL (Dialog)** | `resources/js/templates/form-cadastro/modal-template.tsx` | `<PageHeader action={{ label: 'Cadastrar', onClick: () => setModalAberto(true) }} />` |
-| **Mais de 8 Campos (`> 8`)** | **PÁGINA COMPLETA CONTÍNUA** | `resources/js/templates/form-cadastro/page-template.tsx` | `<PageHeader action={{ label: 'Cadastrar', href: '/[entidade]/cadastrar' }} />` |
+| **Até 8 Campos (`<= 8`)** | **MODAL (`Dialog`)** | `.agents/templates/frontend/cadastro.md` (Skeleton 1) | `<PageHeader action={{ label: 'Cadastrar', onClick: () => setModalAberto(true) }} />` |
+| **Mais de 8 Campos (`> 8`)** | **PÁGINA COMPLETA CONTÍNUA** | `.agents/templates/frontend/cadastro.md` (Skeleton 2) | `<PageHeader action={{ label: 'Cadastrar', href: '/[entidade]/cadastrar' }} />` |
 
 ---
 
-## 📁 Arquivos de Referência do Template
+## 📁 Arquivo de Referência do Blueprint
 
-1. **Tipos e Interfaces:** `resources/js/templates/form-cadastro/types.ts`
-2. **Template Modal (`<= 8` campos):** `resources/js/templates/form-cadastro/modal-template.tsx`
-3. **Template Página Completa (`> 8` campos):** `resources/js/templates/form-cadastro/page-template.tsx`
-4. **Exportações:** `resources/js/templates/form-cadastro/index.ts`
+1. **Blueprint Canônico de Cadastro Frontend:** `.agents/templates/frontend/cadastro.md`
+2. **Cabeçalho Compartilhado:** `resources/js/components/page-header.tsx`
+3. **Botão Padronizado:** `resources/js/components/botao.tsx`
 
 ---
 
@@ -351,7 +350,7 @@ Antes de gerar qualquer tela ou componente de cadastro, conte a quantidade total
 
 ---
 
-## 🔌 Como Integrar com a Página de Listagem (`frontend-tabela-listagem`)
+## 🔌 Como Integrar com a Página de Listagem (`frontend-listagem`)
 
 ### Caso 1: Cadastro via Modal (`<= 8` campos)
 No arquivo `resources/js/pages/[modulo]/index.tsx`:

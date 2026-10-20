@@ -9,36 +9,31 @@ priority: HIGH
 # Backend: Cadastro de Recursos (Store / Create Flow)
 
 > **MANDATÓRIO PARA CRIAÇÃO E PERSISTÊNCIA NO BACKEND:**
-> Todo novo fluxo de cadastro no backend **DEVE** seguir estritamente as diretrizes de `app/backend-rules.md`, `laravel-best-practices` e os blueprints canônicos presentes na pasta `app/Templates/`.
+> Todo novo fluxo de cadastro no backend **DEVE** seguir estritamente as diretrizes de `app/backend-rules.md`, `laravel-best-practices` e os blueprints canônicos presentes na pasta `.agents/templates/backend/`.
 
 ---
 
-## 📁 Arquivos de Referência do Template (`app/Templates/`)
+## 📁 Arquivo de Referência do Template
 
-Antes de gerar ou refatorar qualquer código de cadastro no backend, inspecione diretamente os arquivos de template:
+Antes de gerar ou refatorar qualquer código de cadastro no backend, inspecione diretamente o blueprint canônico:
 
-1. **Controller Canônico:** `app/Templates/ControllerTemplate.php` (Seção `store()`)
-2. **Action Canônica:** `app/Templates/ActionTemplate.php` (Padrão 1: `Salvar[Entidade]Action`)
-3. **Form Request Canônico:** `app/Templates/RequestTemplate.php` (Cenário 3: Validação, Sanitização e Precognition)
-4. **Policy Canônica (RBAC):** `app/Templates/PolicyTemplate.php` (Método `create()`)
-5. **Enum Tipado:** `app/Templates/EnumTemplate.php` (Backed Enums com `options()` e `label()`)
-6. **Mails Assíncronos:** `app/Templates/MailTemplate.php` (Caso o cadastro envie convite/notificação com `afterCommit()`)
+- **Blueprint Canônico de Cadastro Backend:** `.agents/templates/backend/cadastro.md`
 
 ---
 
 ## 🎯 Arquitetura e Regras de Ouro
 
-| Camada | Arquivo de Destino | Responsabilidade Exclusiva | Template de Origem |
+| Camada | Arquivo de Destino | Responsabilidade Exclusiva | Blueprint de Origem |
 | :--- | :--- | :--- | :--- |
-| **Enum Tipado (Backend)** | `app/Enums/[Nome]Enum.php` | **ZERO STRINGS MÁGICAS**: Status, perfis, tipos e categorias devem ser Backed Enums com `options()` e `label()` | `app/Templates/EnumTemplate.php` |
+| **Enum Tipado (Backend)** | `app/Enums/[Nome]Enum.php` | **ZERO STRINGS MÁGICAS**: Status, perfis, tipos e categorias devem ser Backed Enums com `options()` e `label()` | `.agents/templates/backend/cadastro.md` |
 | **Enum Tipado (Frontend)** | `resources/js/pages/[modulo]/types.ts` ou `resources/js/types/` | **ESPELHAMENTO 1:1**: Enum TypeScript espelhado do backend, eliminando strings mágicas no React | N/A |
 | **Migration** | `database/migrations/...` | Criação/alteração de tabelas e colunas em português. Sem método `down()` para evitar acidentes de rollback | N/A |
 | **Rota** | `routes/web.php` | Registro direto de POST/Resource sob middleware `auth`, `verified` | N/A |
-| **Form Request** | `app/Http/Requests/Salvar[Entidade]Request.php` | 100% da validação com `Rule::enum()`, sanitização no `prepareForValidation()` com API Fluente, sem `authorize` redundante, Precognition | `app/Templates/RequestTemplate.php` |
-| **Policy** | `app/Policies/[Entidade]Policy.php` | Regras de autorização RBAC e permissões no método `create()` | `app/Templates/PolicyTemplate.php` |
-| **Action** | `app/Actions/Criar[Entidade]Action.php` | Único ponto de escrita no banco via `DB::transaction()`. Usa Enums para status/tipos. Retorna a Model | `app/Templates/ActionTemplate.php` |
-| **Thin Controller** | `app/Http/Controllers/[Entidade]Controller.php` | Orquestra HTTP: `Gate::authorize`, invoca Action e redireciona (< 10 linhas) | `app/Templates/ControllerTemplate.php` |
-| **Mailable (Opcional)**| `app/Mail/[Fluxo]Mail.php` | Envio em fila (`ShouldQueue`) com trava anti-race condition `$this->afterCommit()` | `app/Templates/MailTemplate.php` |
+| **Form Request** | `app/Http/Requests/Salvar[Entidade]Request.php` | 100% da validação com `Rule::enum()`, sanitização no `prepareForValidation()` com API Fluente, sem `authorize` redundante, Precognition | `.agents/templates/backend/cadastro.md` |
+| **Policy** | `app/Policies/[Entidade]Policy.php` | Regras de autorização RBAC e permissões no método `create()` | `.agents/templates/backend/cadastro.md` |
+| **Action** | `app/Actions/Criar[Entidade]Action.php` | Único ponto de escrita no banco via `DB::transaction()`. Usa Enums para status/tipos. Retorna a Model | `.agents/templates/backend/cadastro.md` |
+| **Thin Controller** | `app/Http/Controllers/[Entidade]Controller.php` | Orquestra HTTP: `Gate::authorize`, invoca Action e redireciona (< 10 linhas) | `.agents/templates/backend/cadastro.md` |
+| **Mailable (Opcional)**| `app/Mail/[Fluxo]Mail.php` | Envio em fila (`ShouldQueue`) com trava anti-race condition `$this->afterCommit()` | `.agents/templates/backend/cadastro.md` |
 
 ---
 
@@ -119,7 +114,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 ---
 
 ### Passo 3: Form Request com Precognition e Suporte a Criação vs Edição
-> 📖 **Basear-se em:** `app/Templates/RequestTemplate.php` (Cenário 3)
+> 📖 **Basear-se em:** `.agents/templates/backend/cadastro.md` (Seção FormRequest)
 
 - **Arquivo:** `app/Http/Requests/Salvar[Entidade]Request.php`
 - **Validação:** 100% da validação aqui. O Controller e a Action confiam totalmente no Request validado.
@@ -239,7 +234,7 @@ final class SalvarItemRequest extends FormRequest
 ---
 
 ### Passo 4: Actions de Criação e Atualização
-> 📖 **Basear-se em:** `app/Templates/ActionTemplate.php` (Padrão 1)
+> 📖 **Basear-se em:** `.agents/templates/backend/cadastro.md` (Seção Action)
 
 - **Arquivos:**
   - `app/Actions/Criar[Entidade]Action.php`
@@ -345,7 +340,7 @@ final readonly class AtualizarItemAction
 ---
 
 ### Passo 5: Thin Controller
-> 📖 **Basear-se em:** `app/Templates/ControllerTemplate.php` (Métodos `store()` e `update()`)
+> 📖 **Basear-se em:** `.agents/templates/backend/cadastro.md` (Seção Thin Controller)
 
 - **Arquivo:** `app/Http/Controllers/[Entidade]Controller.php`
 - **Constructor Promotion:** Injeta as Actions no construtor via PHP 8.3 (`private readonly CriarItemAction $criarItemAction`, `private readonly AtualizarItemAction $atualizarItemAction`).
@@ -396,7 +391,7 @@ final class GestaoItemController extends Controller
 ---
 
 ### Passo 6: Policy de Segurança RBAC
-> 📖 **Basear-se em:** `app/Templates/PolicyTemplate.php`
+> 📖 **Basear-se em:** `.agents/templates/backend/cadastro.md` (Seção Policy)
 
 - **Arquivo:** `app/Policies/[Entidade]Policy.php`
 
@@ -427,7 +422,7 @@ final class ItemPolicy
 ---
 
 ### Passo 7: Efeitos Colaterais (Disparo de E-mails / Convites - Opcional)
-> 📖 **Basear-se em:** `app/Templates/MailTemplate.php`
+> 📖 **Basear-se em:** `.agents/templates/backend/cadastro.md` (Seção Mailable Assíncrono)
 
 - **Arquivo:** `app/Mail/[NomeDoFluxo]Mail.php`
 - Implementa `ShouldQueue` com `$tries`, `$backoff` e timeouts adequados.
@@ -489,14 +484,14 @@ Ao concluir uma implementação de cadastro backend, confirme:
 - [ ] **Fluxo de Edição / Atualização (PUT/PATCH):** Rotas `POST` e `PUT` definidas, FormRequest ignora o ID do registro atual em regras `Rule::unique()->ignore($id)`, e regras sensíveis a criação (como senha) são ajustadas condicionalmente.
 - [ ] Se o caso de uso requereu e-mail: implementou `ShouldQueue` com `$this->afterCommit()`. Se NÃO requereu: Action limpa sem chamadas de Mail.
 - [ ] Rotas diretas sem prefixos redundantes em `routes/web.php`.
-- [ ] **ZERO STRINGS MÁGICAS & ESPELHAMENTO DE ENUMS (BACKEND -> FRONTEND):** Status, perfis e tipos possuem Enum em `app/Enums/` (baseado em `app/Templates/EnumTemplate.php`), validados via `Rule::enum()` e espelhados como TypeScript `enum` no frontend (`types.ts`), eliminando strings mágicas no `useForm`, seletores e validações.
+- [ ] **ZERO STRINGS MÁGICAS & ESPELHAMENTO DE ENUMS (BACKEND -> FRONTEND):** Status, perfis e tipos possuem Enum em `app/Enums/` (baseado em `.agents/templates/backend/cadastro.md`), validados via `Rule::enum()` e espelhados como TypeScript `enum` no frontend (`types.ts`), eliminando strings mágicas no `useForm`, seletores e validações.
 - [ ] **Schema Canônico (Single Source of Truth):** Segue estritamente as colunas canônicas da tabela e da Model (ex: em `users`, usa-se apenas `name` sem redundância de colunas).
-- [ ] Baseou-se no `app/Templates/RequestTemplate.php` com `prepareForValidation()` para limpeza de dados direta sem ternários e recuperação segura do ID para regras `Rule::unique()->ignore(...)`.
+- [ ] Baseou-se no `.agents/templates/backend/cadastro.md` com `prepareForValidation()` para limpeza de dados direta sem ternários e recuperação segura do ID para regras `Rule::unique()->ignore(...)`.
 - [ ] Sem getters customizados no Request (`$request->getItem()` proibido).
-- [ ] Baseou-se no `app/Templates/ActionTemplate.php` com `final readonly class` e `DB::transaction()` para `Criar[Entidade]Action` e `Atualizar[Entidade]Action`.
+- [ ] Baseou-se no `.agents/templates/backend/cadastro.md` com `final readonly class` e `DB::transaction()` para `Criar[Entidade]Action` e `Atualizar[Entidade]Action`.
 - [ ] **Sem Validações ou Conversões Redundantes na Action:** Action mapeia diretamente `$dados->get('campo')` sem ternários, sem `instanceof BackedEnum ? ... : BackedEnum::from(...)` e sem variáveis temporárias desnecessárias, confiando no FormRequest e nos casts nativos do Eloquent.
-- [ ] Baseou-se no `app/Templates/ControllerTemplate.php` com menos de 10 linhas nos métodos `store` e `update`.
-- [ ] Baseou-se no `app/Templates/PolicyTemplate.php` com autorização via `Gate::authorize('create', ...)` e `Gate::authorize('update', ...)`.
+- [ ] Baseou-se no `.agents/templates/backend/cadastro.md` com menos de 10 linhas nos métodos `store` e `update`.
+- [ ] Baseou-se no `.agents/templates/backend/cadastro.md` com autorização via `Gate::authorize('create', ...)` e `Gate::authorize('update', ...)`.
 - [ ] Código formatado com `vendor/bin/pint --dirty --format agent` e verificado via `php artisan test --compact`.
 
 

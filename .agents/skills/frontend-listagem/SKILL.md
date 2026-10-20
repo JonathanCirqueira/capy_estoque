@@ -1,5 +1,5 @@
 ---
-name: frontend-tabela-listagem
+name: frontend-listagem
 description: Padronização e geração de páginas e tabelas de listagem completas no Starter Kit com React 19, Inertia.js v3, Tailwind CSS v4, StatusTabs, busca, grid de filtros dinâmico, ordenação, exportação e cards mobile agnósticos.
 allowed-tools: Read, Write, Edit
 version: 1.2
@@ -9,19 +9,17 @@ priority: HIGH
 # Tabela de Listagem - Padrão de Engenharia de Listagens
 
 > **MANDATÓRIO PARA TELAS DE LISTAGEM:**
-> Toda nova tela de listagem, consulta ou gestão tabular **DEVE** seguir estritamente o template canônico em `resources/js/templates/data-table/`.
+> Toda nova tela de listagem, consulta ou gestão tabular **DEVE** seguir estritamente o blueprint canônico em `.agents/templates/frontend/listagem.md`.
 
 ---
 
-## 🎯 Arquivos de Referência do Template
+## 🎯 Arquivos de Referência do Blueprint
 
 Antes de gerar ou alterar qualquer listagem, inspecione:
 
-1. **Página Principal:** `resources/js/templates/data-table/page-template.tsx`
-2. **Componente de Tabela:** `resources/js/templates/data-table/table-template.tsx`
-3. **Tipos e Interfaces:** `resources/js/templates/data-table/types.ts`
-4. **Cabeçalho Compartilhado:** `resources/js/components/page-header.tsx`
-5. **Cabeçalho Ordenável:** `resources/js/components/ui/sortable-table-head.tsx`
+1. **Blueprint Canônico de Listagem:** `.agents/templates/frontend/listagem.md`
+2. **Cabeçalho Compartilhado:** `resources/js/components/page-header.tsx`
+3. **Cabeçalho Ordenável:** `resources/js/components/ui/sortable-table-head.tsx`
 
 ---
 

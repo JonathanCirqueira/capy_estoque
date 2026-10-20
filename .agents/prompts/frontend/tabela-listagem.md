@@ -6,12 +6,12 @@ Use os modelos deste arquivo para solicitar a criação de telas completas de li
 
 ## 🎯 Modelo Canônico (Copie, Preencha e Envie no Chat)
 
-> **Dica:** Não é necessário especificar paginação, cards mobile ou detalhes de layout. A skill `@[skills/frontend-tabela-listagem]` já aplica toda a arquitetura visual canônica automaticamente.
+> **Dica:** Não é necessário especificar paginação, cards mobile ou detalhes de layout. A skill `@[skills/frontend-listagem]` já aplica toda a arquitetura visual canônica automaticamente.
 
 ```markdown
 /table [Nome da Entidade]
 
-Use a skill @[skills/frontend-tabela-listagem] para gerar a página de listagem completa com base no template canônico do starter kit:
+Use a skill @[skills/frontend-listagem] para gerar a página de listagem completa com base no template canônico do starter kit:
 
 - **Entidade:** [Ex: Fornecedor / Fornecedores]
 - **Título da Página:** [Ex: Gestão de Fornecedores]
@@ -45,7 +45,7 @@ Use a skill @[skills/frontend-tabela-listagem] para gerar a página de listagem 
 ```markdown
 /table Usuarios
 
-Use a skill @[skills/frontend-tabela-listagem] para gerar a página de listagem completa com base no template canônico do starter kit:
+Use a skill @[skills/frontend-listagem] para gerar a página de listagem completa com base no template canônico do starter kit:
 
 - **Entidade:** Usuário / Usuários
 - **Título da Página:** Gestão de Usuários

@@ -9,35 +9,29 @@ priority: HIGH
 # Backend: Listagem e Consulta de Recursos (Index / Filter Flow)
 
 > **MANDATÓRIO PARA TELAS DE LISTAGEM NO BACKEND:**
-> Todo novo fluxo de listagem e filtragem no backend **DEVE** seguir estritamente as diretrizes de `app/backend-rules.md`, `laravel-best-practices` e os blueprints canônicos presentes na pasta `app/Templates/`.
+> Todo novo fluxo de listagem e filtragem no backend **DEVE** seguir estritamente as diretrizes de `app/backend-rules.md`, `laravel-best-practices` e os blueprints canônicos presentes na pasta `.agents/templates/backend/`.
 
 ---
 
-## 📁 Arquivos de Referência do Template (`app/Templates/`)
+## 📁 Arquivo de Referência do Template
 
-Antes de gerar ou refatorar qualquer código de listagem no backend, inspecione diretamente os arquivos de template:
+Antes de gerar ou refatorar qualquer código de listagem no backend, inspecione diretamente o blueprint canônico:
 
-1. **Controller Canônico:** `app/Templates/ControllerTemplate.php` (Seção `index()` e `exportar()`)
-2. **Action Canônica de Filtragem:** `app/Templates/ActionTemplate.php` (Padrão 2: `Filtrar[Entidades]Action`)
-3. **Form Request Canônico:** `app/Templates/RequestTemplate.php` (Cenário 1: Listagem, Filtros, Aba e Ordenação)
-4. **Policy Canônica (RBAC):** `app/Templates/PolicyTemplate.php` (Métodos `viewAny()` e `export()`)
-5. **Enum Tipado:** `app/Templates/EnumTemplate.php` (Para abas de status e filtros com `options()`)
-6. **Exportação Streaming (CSV):** `app/Templates/ExportTemplate.php` (Para o botão de exportar dos 3 pontinhos na listagem)
-7. **Auditoria / Histórico Polimórfico:** `app/Templates/AuditTemplate.php` (Caso haja histórico de alterações do registro)
+- **Blueprint Canônico de Listagem Backend:** `.agents/templates/backend/listagem.md`
 
 ---
 
 ## 🎯 Arquitetura e Regras de Ouro
 
-| Camada | Arquivo de Destino | Responsabilidade Exclusiva | Template de Origem |
+| Camada | Arquivo de Destino | Responsabilidade Exclusiva | Blueprint de Origem |
 | :--- | :--- | :--- | :--- |
-| **Enum Tipado** | `app/Enums/[Nome]Enum.php` | **ZERO STRINGS MÁGICAS**: Abas de status, perfis e filtros devem ser Backed Enums com `options()` e `badgeVariant()` | `app/Templates/EnumTemplate.php` |
+| **Enum Tipado** | `app/Enums/[Nome]Enum.php` | **ZERO STRINGS MÁGICAS**: Abas de status, perfis e filtros devem ser Backed Enums com `options()` e `badgeVariant()` | `.agents/templates/backend/listagem.md` |
 | **Rota** | `routes/web.php` | Registro direto de GET nomeada (ex: `itens.index`) sob `auth`, `verified` | N/A |
-| **Form Request** | `app/Http/Requests/Listar[Entidades]Request.php` | Validação de query string, termo de busca, grid de filtros e default da aba | `app/Templates/RequestTemplate.php` |
-| **Policy** | `app/Policies/[Entidade]Policy.php` | Regras de autorização no método `viewAny()` | `app/Templates/PolicyTemplate.php` |
-| **Action** | `app/Actions/Filtrar[Entidades]Action.php` | Query Builder com `when()`, eager loading (`with()`) anti-N+1 e escopo de abas usando cases do Enum | `app/Templates/ActionTemplate.php` |
-| **Thin Controller** | `app/Http/Controllers/[Entidade]Controller.php` | Contadores de abas via `clone $queryBase` comparando com constantes do Enum, paginação com `withQueryString()` | `app/Templates/ControllerTemplate.php` |
-| **Exportação** | `app/Http/Controllers/Exportar[Entidades]Controller.php` | Streaming em lote com `$query->cursor()` O(1) de RAM e BOM UTF-8 PT-BR | `app/Templates/ExportTemplate.php` |
+| **Form Request** | `app/Http/Requests/Listar[Entidades]Request.php` | Validação de query string, termo de busca, grid de filtros e default da aba | `.agents/templates/backend/listagem.md` |
+| **Policy** | `app/Policies/[Entidade]Policy.php` | Regras de autorização no método `viewAny()` | `.agents/templates/backend/listagem.md` |
+| **Action** | `app/Actions/Filtrar[Entidades]Action.php` | Query Builder com `when()`, eager loading (`with()`) anti-N+1 e escopo de abas usando cases do Enum | `.agents/templates/backend/listagem.md` |
+| **Thin Controller** | `app/Http/Controllers/[Entidade]Controller.php` | Contadores de abas via `clone $queryBase` comparando com constantes do Enum, paginação com `withQueryString()` | `.agents/templates/backend/listagem.md` |
+| **Exportação** | `app/Http/Controllers/Exportar[Entidades]Controller.php` | Streaming em lote com `$query->cursor()` O(1) de RAM e BOM UTF-8 PT-BR | `.agents/templates/backend/listagem.md` |
 
 ---
 
@@ -79,7 +73,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 ---
 
 ### Passo 2: Form Request de Listagem
-> 📖 **Basear-se em:** `app/Templates/RequestTemplate.php` (Cenário 1)
+> 📖 **Basear-se em:** `.agents/templates/backend/listagem.md` (Seção FormRequest)
 
 - **Arquivo:** `app/Http/Requests/Listar[Entidades]Request.php`
 - **Validação Segura:** Sanitiza o termo de busca no `prepareForValidation()`.
@@ -130,7 +124,7 @@ final class ListarItensRequest extends FormRequest
 ---
 
 ### Passo 3: Action de Filtragem e Consulta
-> 📖 **Basear-se em:** `app/Templates/ActionTemplate.php` (Padrão 2: `executeQuery` e `aplicarFiltroAba`)
+> 📖 **Basear-se em:** `.agents/templates/backend/listagem.md` (Seção Action)
 
 - **Arquivo:** `app/Actions/Filtrar[Entidades]Action.php`
 - **Eager Loading Anti-N+1:** Incluir relacionamentos Eloquent declarados no Model que serão exibidos na tabela via `with(['categoria'])`. **Atenção:** Jamais incluir colunas JSON nativas no `with()`.
@@ -204,7 +198,7 @@ final readonly class FiltrarItensAction
 ---
 
 ### Passo 4: Thin Controller (Index e Contadores de Abas)
-> 📖 **Basear-se em:** `app/Templates/ControllerTemplate.php` (Método `index()`)
+> 📖 **Basear-se em:** `.agents/templates/backend/listagem.md` (Seção Thin Controller)
 
 - **Arquivo:** `app/Http/Controllers/[Entidade]Controller.php`
 - **Contadores Consistentes:** Usa `(clone $queryBase)->count()` para calcular a quantidade de cada aba respeitando os termos de busca e filtros secundários ativos.
@@ -268,7 +262,7 @@ final class GestaoItemController extends Controller
 ---
 
 ### Passo 5: Policy de Segurança RBAC
-> 📖 **Basear-se em:** `app/Templates/PolicyTemplate.php`
+> 📖 **Basear-se em:** `.agents/templates/backend/listagem.md` (Seção Policy)
 
 - **Arquivo:** `app/Policies/[Entidade]Policy.php`
 
@@ -298,7 +292,7 @@ final class ItemPolicy
 ---
 
 ### Passo 6 (Opcional): Exportação em Lote via Streaming
-> 📖 **Basear-se em:** `app/Templates/ExportTemplate.php` e `app/Templates/ControllerTemplate.php` (Método `exportar()`)
+> 📖 **Basear-se em:** `.agents/templates/backend/listagem.md` (Seção Exportação Streaming CSV)
 
 - Usa LazyCollection (`$query->cursor()`) para consumo constante de RAM $O(1)$.
 - Adiciona BOM UTF-8 (`\xEF\xBB\xBF`) e delimitador `;` para total compatibilidade com Excel no Brasil.
@@ -311,10 +305,10 @@ Ao concluir uma listagem backend, confirme:
 - [ ] **Schema First:** Inspecionou o Model (`app/Models/[Entidade].php`), migrations e Enums antes de codificar, garantindo que todos os campos, enums e relações existem fisicamente no projeto (sem inventar tabelas como `departamentos`).
 - [ ] Rota GET nomeada registrada em `routes/web.php`.
 - [ ] **ZERO STRINGS MÁGICAS:** Status, abas e perfis possuem Enums tipados em `app/Enums/` e não utilizam strings soltas nas queries/filtros.
-- [ ] Baseou-se no `app/Templates/RequestTemplate.php` garantindo sanitização e default de `'aba' => 'todos'`.
-- [ ] Baseou-se no `app/Templates/ActionTemplate.php` separando `executeQuery` de `aplicarFiltroAba`.
+- [ ] Baseou-se no `.agents/templates/backend/listagem.md` garantindo sanitização e default de `'aba' => 'todos'`.
+- [ ] Baseou-se no `.agents/templates/backend/listagem.md` separando `executeQuery` de `aplicarFiltroAba`.
 - [ ] **Eager Loading Válido:** O `with()` contém apenas métodos de relacionamentos Eloquent verdadeiros (`belongsTo`, `hasMany`, `belongsToMany`), nunca colunas JSON/array nativas.
-- [ ] Baseou-se no `app/Templates/ControllerTemplate.php` usando `clone $queryBase` comparando com o Enum para os contadores das abas.
+- [ ] Baseou-se no `.agents/templates/backend/listagem.md` usando `clone $queryBase` comparando com o Enum para os contadores das abas.
 - [ ] Paginação encadeada com `->withQueryString()`.
-- [ ] Se houver exportação CSV, seguiu o blueprint de streaming do `app/Templates/ExportTemplate.php`.
+- [ ] Se houver exportação CSV, seguiu o blueprint de streaming do `.agents/templates/backend/listagem.md`.
 - [ ] Código formatado com `vendor/bin/pint --dirty --format agent` e verificado via `php artisan test --compact`.

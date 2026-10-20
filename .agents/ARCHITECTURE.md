@@ -36,7 +36,7 @@ Specialist AI personas for different domains.
 | ------------------------ | -------------------------- | -------------------------------------------------------- |
 | `orchestrator`           | Multi-agent coordination   | parallel-agents, behavioral-modes, intelligent-routing   |
 | `project-planner`        | Discovery, task planning   | brainstorming, plan-writing, architecture                |
-| `frontend-specialist`    | Web UI/UX (Inertia/React)  | frontend-design, inertia-react-development, tailwind-patterns, wayfinder-development, shadcn, frontend-tabela-listagem, frontend-formulario-cadastro |
+| `frontend-specialist`    | Web UI/UX (Inertia/React)  | frontend-design, inertia-react-development, tailwind-patterns, wayfinder-development, shadcn, frontend-listagem, frontend-cadastro |
 | `backend-specialist`     | Laravel API, logic, DB     | laravel-best-practices, fortify-development, pest-testing, wayfinder-development, debug-using-debugbar, api-patterns, database-design, backend-cadastro, backend-listagem |
 | `database-architect`     | Schema, SQL, Migrations    | database-design, laravel-best-practices                 |
 | `test-engineer`          | Testing strategies (Pest)  | pest-testing, testing-patterns, tdd-workflow             |
@@ -73,8 +73,8 @@ Modular knowledge domains that agents can load on-demand based on task context.
 | `inertia-react-development`     | Aplicações client-side com Inertia.js v3 e React 19                   |
 | `wayfinder-development`         | Integração tipada TypeScript para rotas e actions do Laravel          |
 | `frontend-design`               | Design thinking, UI/UX, acessibilidade e sistemas de design          |
-| `frontend-formulario-cadastro`  | Formulários padronizados, Precognition, decisão Modal vs Página       |
-| `frontend-tabela-listagem`      | Tabelas completas, StatusTabs, filtros dinâmicos e exportação         |
+| `frontend-cadastro`         | Formulários padronizados, Precognition, decisão Modal vs Página       |
+| `frontend-listagem`         | Tabelas completas, StatusTabs, filtros dinâmicos e exportação         |
 | `tailwind-patterns`             | Princípios e arquitetura de design tokens com Tailwind CSS v4         |
 | `tailwindcss-development`       | Utilitários e responsividade Tailwind CSS para componentes JSX        |
 | `shadcn`                        | Catálogo, composição e estilização de componentes shadcn/ui           |

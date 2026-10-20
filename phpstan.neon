@@ -6,9 +6,6 @@ parameters:
         - routes/
         - tests/
 
-    excludePaths:
-        - app/Templates/*
-
     # Level 9 is the highest level
     level: max
 
