@@ -50,9 +50,11 @@ Antes de gerar qualquer interface de cadastro, conte a quantidade total de campo
    - Criação: `post(url)`
    - Edição: `put(url)` (injeta ID na rota, permitindo `Rule::unique()->ignore($id)` no backend).
 4. **Precognition Obrigatório (PROIBIDO `validarCampos` manual):** É terminantemente proibido criar funções manuais de validação no cliente (como `const validarCampos = (): boolean => { ... }`, regex manuais ou chamadas manuais a `setError`). O formulário integra nativamente com o Laravel Precognition no `useForm`, disparando validações em tempo real via `onBlur={() => validate('campo')}` e limpando erros no `onChange` (`clearErrors('campo')`). As mensagens de erro exibidas na UI vêm 100% das regras e mensagens do FormRequest do backend.
-5. **Componente `Botao` Oficial:** Texto SEMPRE estático (`Salvar`). Nunca alterar texto para "Salvando...". Apenas o ícone roda via prop `loading`.
+5. **Componente `Botao` Oficial:** Texto SEMPRE estático (`Salvar`). Nunca alterar texto para "Salvando...". Apenas o ícone roda via prop `loading`. Rodapé no modal usa `justify-between` com botão Voltar (`ArrowLeft` com `DialogClose asChild`) na esquerda e Salvar (`Check`) na direita.
 6. **Página Completa - Botões Fora do Card:** O rodapé sticky fica estritamente FORA do container `bg-card` e SEM borda superior (`border-t`).
 7. **Anti-Duplicação de Layout:** Definir layout via propriedade estática `.layout = { breadcrumbs: [...] }`.
+8. **Selects e Dropdowns Oficiais (Sempre `Combobox`):** Todo seletor (incluindo Status e Foreign Keys) DEVE usar o componente `<Combobox>` (`@/components/ui/combobox`). É terminantemente proibido o uso de `@/components/ui/select` (Radix) em formulários de entidades.
+9. **Zero Duplicação de Mensagens de Erro:** Para evitar duplicação textual (já que `<Input>` renderiza erro se receber string), passe SEMPRE `error={Boolean(errors.campo)}` nos componentes de entrada e use `<InputError message={errors.campo} />` logo abaixo. Proibido `error={errors.campo}` com `<InputError />`.
 
 ---
 
@@ -74,16 +76,22 @@ import {
     DialogClose,
 } from '@/components/ui/dialog';
 import { Botao } from '@/components/botao';
+import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Combobox } from '@/components/ui/combobox';
+
+export enum StatusUsuario {
+    Ativo = 'ativo',
+    Inativo = 'inativo',
+}
 
 export interface EntidadeFormData {
     nome: string;
     email: string;
     cargo_id: string;
     departamento_id: string;
-    status: string;
+    status: StatusUsuario;
 }
 
 interface ModalCadastroProps {
@@ -106,8 +114,13 @@ export function ModalCadastroEntidade({
         email: item?.email ?? '',
         cargo_id: item?.cargo_id ?? '',
         departamento_id: item?.departamento_id ?? '',
-        status: item?.status ?? 'ativo',
+        status: item?.status ?? StatusUsuario.Ativo,
     });
+
+    const statusOptions = [
+        { value: StatusUsuario.Ativo, label: 'Ativo' },
+        { value: StatusUsuario.Inativo, label: 'Inativo' },
+    ];
 
     useEffect(() => {
         if (item) {
@@ -116,7 +129,7 @@ export function ModalCadastroEntidade({
                 email: item.email ?? '',
                 cargo_id: item.cargo_id ?? '',
                 departamento_id: item.departamento_id ?? '',
-                status: item.status ?? 'ativo',
+                status: item.status ?? StatusUsuario.Ativo,
             });
             clearErrors();
         } else {
@@ -182,9 +195,10 @@ export function ModalCadastroEntidade({
                                         if (errors.nome) clearErrors('nome');
                                     }}
                                     onBlur={() => validate('nome')}
+                                    error={Boolean(errors.nome)}
                                     placeholder="Ex: Carlos Silva"
                                 />
-                                {errors.nome && <p className="text-xs font-medium text-destructive mt-1">{errors.nome}</p>}
+                                <InputError message={errors.nome} />
                             </div>
 
                             {/* Email */}
@@ -201,9 +215,30 @@ export function ModalCadastroEntidade({
                                         if (errors.email) clearErrors('email');
                                     }}
                                     onBlur={() => validate('email')}
+                                    error={Boolean(errors.email)}
                                     placeholder="carlos@empresa.com.br"
                                 />
-                                {errors.email && <p className="text-xs font-medium text-destructive mt-1">{errors.email}</p>}
+                                <InputError message={errors.email} />
+                            </div>
+
+                            {/* Status */}
+                            <div className="space-y-1.5 sm:col-span-2">
+                                <Label htmlFor="status" className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+                                    STATUS <span className="text-destructive">*</span>
+                                </Label>
+                                <Combobox
+                                    options={statusOptions}
+                                    value={data.status}
+                                    onChange={(val) => {
+                                        setData('status', val as StatusUsuario);
+                                        if (errors.status) clearErrors('status');
+                                        validate('status');
+                                    }}
+                                    placeholder="Selecione o status..."
+                                    searchPlaceholder="Buscar status..."
+                                    error={Boolean(errors.status)}
+                                />
+                                <InputError message={errors.status} />
                             </div>
                         </div>
                     </div>
@@ -216,7 +251,7 @@ export function ModalCadastroEntidade({
                             </Botao>
                         </DialogClose>
                         <Botao type="submit" loading={processing} icon={<Check className="size-4" strokeWidth={2.5} />}>
-                            Salvar
+                            {isEdit ? 'Salvar Alterações' : 'Salvar'}
                         </Botao>
                     </DialogFooter>
                 </form>

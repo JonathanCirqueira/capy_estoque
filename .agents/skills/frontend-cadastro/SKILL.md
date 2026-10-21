@@ -102,12 +102,26 @@ Antes de gerar qualquer tela ou componente de cadastro, conte a quantidade total
       if (errors.nome) clearErrors('nome');
   }}
   ```
-- **Exibição Canônica de Erros:** Exibir mensagem logo abaixo do input:
-  ```tsx
-  {errors.nome && (
-      <p className="text-xs font-medium text-destructive mt-1">{errors.nome}</p>
-  )}
-  ```
+- **Exibição Canônica de Erros & Prevenção de Mensagens Duplicadas:**
+  - O componente `<Input>` de `@/components/ui/input` renderiza internamente uma tag `<span className="text-xs text-destructive">{error}</span>` quando `typeof error === 'string'`.
+  - Se passarmos a string do erro para o `<Input>` e também renderizarmos `<InputError message={errors.campo} />` (ou parágrafo com a mensagem), a mensagem será exibida **DUAS VEZES** na UI.
+  - **PADRÃO OBRIGATÓRIO:**
+    - Passe **exclusivamente um valor booleano** para a prop `error` dos componentes de input e select: `error={Boolean(errors.campo)}`. Isso aplica as classes de borda vermelha e foco sem emitir texto duplicado.
+    - Utilize o componente oficial `<InputError message={errors.campo} />` logo abaixo do campo para exibir a mensagem vinda do Precognition / FormRequest:
+      ```tsx
+      <Input
+          id="nome"
+          value={data.nome}
+          onChange={(e) => {
+              setData('nome', e.target.value);
+              if (errors.nome) clearErrors('nome');
+          }}
+          onBlur={() => validate('nome')}
+          error={Boolean(errors.nome)}
+          placeholder="Ex: Carlos Silva"
+      />
+      <InputError message={errors.nome} />
+      ```
 
 ### 4.1 Envio Diferenciado no `handleSubmit`: Criação (`POST`) vs Edição (`PUT`)
 - **REGRA DE OURO - ZERO FALSOS POSITIVOS DE UNICIDADE:**
@@ -207,6 +221,31 @@ Antes de gerar qualquer tela ou componente de cadastro, conte a quantidade total
     onBlur={() => validate('nivel_acesso')}
     ```
   - **No `useForm`:** O campo deve ser tipado com o Enum (`nivel_acesso: NivelAcesso`), garantindo sincronia total com o backend e sem risco de inconsistências ou typos.
+
+### 4.4 Selects e Dropdowns Canônicos: Sempre `Combobox` (PROIBIDO Radix Select)
+- **REGRA INEGOCIÁVEL:** Todos os campos de seleção do formulário (Status, Foreign Keys, Categorias, Tipos, etc.) **DEVEM** utilizar o componente `<Combobox>` (`import { Combobox } from '@/components/ui/combobox'`).
+- **TERMINANTEMENTE PROIBIDO:** Usar `@/components/ui/select` (Radix `Select`, `SelectTrigger`, `SelectContent`, `SelectItem`) para campos de formulário de entidades. Ele não possui busca, não segue a identidade visual dos formulários e quebra o padrão canônico do Starter Kit.
+- **Estrutura Canônica com Precognition e Tratamento de Erro:**
+  ```tsx
+  <div className="space-y-1.5 sm:col-span-2">
+      <Label htmlFor="status" className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+          STATUS <span className="text-destructive">*</span>
+      </Label>
+      <Combobox
+          options={statusOptions}
+          value={data.status}
+          onChange={(val) => {
+              setData('status', val as StatusEntidade);
+              if (errors.status) clearErrors('status');
+              validate('status');
+          }}
+          placeholder="Selecione o status..."
+          searchPlaceholder="Buscar status..."
+          error={Boolean(errors.status)}
+      />
+      <InputError message={errors.status} />
+  </div>
+  ```
 
 ### 5. Skeleton Loaders para Opções Assíncronas
 - Quando os selects dependerem de dados do backend:
