@@ -97,3 +97,33 @@ public function after(): array
     ];
 }
 ```
+
+---
+
+### 6. Evitar `prepareForValidation()` Redundante
+
+> **Regra:** Não use `prepareForValidation()` para operações que o framework já executa automaticamente ou para setar valores default que pertencem ao Controller ou à Action.
+> - O Laravel já aplica globalmente os middlewares `TrimStrings` e `ConvertEmptyStringsToNull`. Fazer `$this->string('campo')->trim()->toString()` ou converter string vazia para `null` é redundante.
+> - Valores default (como `'aba' => 'todos'` ou ordenação) devem ser lidos com defaults no Controller (`$request->input('aba', 'todos')`) ou na Action, mantendo o FormRequest focado apenas na validação das regras.
+
+❌ **Incorreto (Boilerplate redundante no FormRequest):**
+```php
+protected function prepareForValidation(): void
+{
+    $this->merge([
+        'termo' => $this->filled('termo') ? $this->string('termo')->trim()->toString() : null,
+        'aba' => $this->input('aba', 'todos'),
+    ]);
+}
+```
+
+✅ **Correto (FormRequest limpo, confiando no middleware e regras):**
+```php
+public function rules(): array
+{
+    return [
+        'termo' => ['nullable', 'string', 'max:100'],
+        'aba' => ['nullable', 'string', 'in:todos,ativos,pendentes,inativos'],
+    ];
+}
+```

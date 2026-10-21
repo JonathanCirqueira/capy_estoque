@@ -45,9 +45,12 @@ As seguintes regras têm prioridade absoluta sobre qualquer outra instrução e 
 - As migrations do projeto focam exclusivamente na evolução do schema através do método `up()`.
 - O método `down()` é **desnecessário** e deve ser omitido nas migrations.
 
-### 6. 🚫 Zero Validações Redundantes
+### 6. 🚫 Zero Validações e Mutações Redundantes
 - O Controller e as Actions confiam plenamente nos dados validados pelo FormRequest.
 - **Proibido** realizar checagens manuais redundantes (como `if ($request->campo !== null)` ou `is_string(...)`) nas Actions ou Controllers após a validação do FormRequest.
+- **Proibido** criar métodos `prepareForValidation()` redundantes nos FormRequests para operações que o framework já executa automaticamente:
+  - O Laravel já executa globalmente os middlewares `TrimStrings` e `ConvertEmptyStringsToNull`, tornando chamadas como `$this->string('campo')->trim()->toString()` ou conversões de string vazia em `null` 100% desnecessárias.
+  - Valores padrão (defaults como `'aba' => 'todos'` ou ordenação) devem ser tratados diretamente no Controller (`$request->input('aba', 'todos')`) ou na Action, mantendo o FormRequest focado **exclusivamente em validar regras**.
 
 ### 7. 🔄 Padronização de Nomenclatura Frontend ↔ Backend
 - O frontend DEVE enviar os campos nos formulários e requisições **exatamente com os mesmos nomes esperados pelo backend** (`snake_case` padrão das colunas do banco/model).

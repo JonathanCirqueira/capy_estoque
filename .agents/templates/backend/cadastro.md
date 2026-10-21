@@ -9,12 +9,13 @@
 1. **Actions Transacionais (`DB::transaction`):** Toda persistência ou alteração de dados no banco ocorre exclusivamente dentro de uma Action imutável (`final readonly class`) envolvida por transação.
 2. **Form Request com Precognition e Zero Validação Manual no Frontend:** Toda validação do sistema reside 100% no FormRequest do backend. É **TERMINANTEMENTE PROIBIDO** criar funções manuais de validação no frontend (como `const validarCampos = () => { ... }`, regex manuais de email ou checagens com `setError`). O frontend deve consumir o FormRequest via **Laravel Precognition** no `useForm`, disparando a validação em tempo real via `form.validate(field)` no `onBlur` e exibindo as mensagens retornadas pelo backend. O Controller e a Action confiam cegamente nos dados validados (`$request->validated()`).
 3. **Sem Método `authorize()` Redundante:** A autorização pertence ao Controller através de `Gate::authorize(...)` ou Policy. Não declare `public function authorize(): bool { return true; }` no FormRequest.
-4. **Sem Validações ou Conversões Redundantes na Action:** Nunca faça checagens manuais redundantes (`if ($data->has('...'))`), ternários desnecessários ou `instanceof BackedEnum ? ... : BackedEnum::from(...)`. O Eloquent já cuida do cast nativo do Enum via `casts(): array` na Model.
-5. **Diferenciação Criação (POST) vs Edição (PUT/PATCH):**
+4. **Sem `prepareForValidation()` Redundante:** O Laravel já executa globalmente `TrimStrings` e `ConvertEmptyStringsToNull`. Não utilize `prepareForValidation()` para `trim()`, converter string vazia para `null` ou fazer casting óbvio de tipos.
+5. **Sem Validações ou Conversões Redundantes na Action:** Nunca faça checagens manuais redundantes (`if ($data->has('...'))`), ternários desnecessários ou `instanceof BackedEnum ? ... : BackedEnum::from(...)`. O Eloquent já cuida do cast nativo do Enum via `casts(): array` na Model.
+6. **Diferenciação Criação (POST) vs Edição (PUT/PATCH):**
    - Na edição, obrigatoriamente ignore o ID do registro atual com `Rule::unique('tabela', 'coluna')->ignore($id)`.
    - Campos condicionais (como senha) devem ser `required` na criação e `nullable` na edição.
-6. **Thin Controller (< 10 linhas):** Os métodos `store` e `update` apenas invocam `Gate::authorize`, delegam para a Action e retornam `redirect()->back()` (ou `redirect()->route(...)`).
-7. **Mails Assíncronos Resilientes:** Se o cadastro dispara e-mail ou convite, a classe Mailable DEVE implementar `ShouldQueue` e chamar `$this->afterCommit()` no construtor para evitar race condition antes do commit do banco.
+7. **Thin Controller (< 10 linhas):** Os métodos `store` e `update` apenas invocam `Gate::authorize`, delegam para a Action e retornam `redirect()->back()` (ou `redirect()->route(...)`).
+8. **Mails Assíncronos Resilientes:** Se o cadastro dispara e-mail ou convite, a classe Mailable DEVE implementar `ShouldQueue` e chamar `$this->afterCommit()` no construtor para evitar race condition antes do commit do banco.
 
 ---
 
@@ -23,7 +24,7 @@
 | Camada | Arquivo Canônico | Responsabilidade |
 | :--- | :--- | :--- |
 | **Enum** | `app/Enums/[Nome]Enum.php` | Backed Enum tipado para status, perfis e categorias |
-| **Form Request** | `app/Http/Requests/Salvar[Entidade]Request.php` | Validação, sanitização via `prepareForValidation()`, Precognition |
+| **Form Request** | `app/Http/Requests/Salvar[Entidade]Request.php` | Validação de regras e Precognition (sem `prepareForValidation` redundante) |
 | **Action Criar** | `app/Actions/Criar[Entidade]Action.php` | Persistência transacional com `DB::transaction()` |
 | **Action Atualizar** | `app/Actions/Atualizar[Entidade]Action.php` | Atualização transacional de campos ou relacionamentos |
 | **Thin Controller** | `app/Http/Controllers/[Entidade]Controller.php` | Injeção das Actions no construtor, Gate e redirect |
@@ -70,14 +71,6 @@ final class Salvar[Entidade]Request extends FormRequest
             'categoria_id' => ['required', 'integer', Rule::exists('categorias', 'id')],
             'senha' => [$isUpdate ? 'nullable' : 'required', 'string', 'min:8'],
         ];
-    }
-
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'nome' => $this->filled('nome') ? $this->string('nome')->trim()->toString() : $this->input('nome'),
-            'email' => $this->filled('email') ? $this->string('email')->trim()->lower()->toString() : $this->input('email'),
-        ]);
     }
 
     public function attributes(): array

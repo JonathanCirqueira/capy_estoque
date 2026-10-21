@@ -93,20 +93,13 @@ final class Listar[Entidades]Request extends FormRequest
     public function rules(): array
     {
         return [
+            'aba' => ['nullable', 'string'],
             'termo' => ['nullable', 'string', 'max:255'],
             'filtro_id' => ['nullable', 'integer'],
-            'aba' => ['required', 'string'],
             'ordem_campo' => ['nullable', 'string'],
             'ordem_direcao' => ['nullable', 'string', 'in:asc,desc'],
+            'por_pagina' => ['nullable', 'integer', 'min:5', 'max:100'],
         ];
-    }
-
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'termo' => $this->filled('termo') ? $this->string('termo')->trim()->toString() : null,
-            'aba' => $this->input('aba', 'todos'),
-        ]);
     }
 }
 ```

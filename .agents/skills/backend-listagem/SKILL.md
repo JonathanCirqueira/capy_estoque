@@ -27,7 +27,7 @@ Antes de gerar ou refatorar qualquer código de listagem no backend, inspecione 
 | :--- | :--- | :--- | :--- |
 | **Enum Tipado** | `app/Enums/[Nome]Enum.php` | **ZERO STRINGS MÁGICAS**: Abas de status, perfis e filtros devem ser Backed Enums com `options()` e `badgeVariant()` | `.agents/templates/backend/listagem.md` |
 | **Rota** | `routes/web.php` | Registro direto de GET nomeada (ex: `itens.index`) sob `auth`, `verified` | N/A |
-| **Form Request** | `app/Http/Requests/Listar[Entidades]Request.php` | Validação de query string, termo de busca, grid de filtros e default da aba | `.agents/templates/backend/listagem.md` |
+| **Form Request** | `app/Http/Requests/Listar[Entidades]Request.php` | Validação de query string, termo de busca e filtros (sem `prepareForValidation` redundante) | `.agents/templates/backend/listagem.md` |
 | **Policy** | `app/Policies/[Entidade]Policy.php` | Regras de autorização no método `viewAny()` | `.agents/templates/backend/listagem.md` |
 | **Action** | `app/Actions/Filtrar[Entidades]Action.php` | Query Builder com `when()`, eager loading (`with()`) anti-N+1 e escopo de abas usando cases do Enum | `.agents/templates/backend/listagem.md` |
 | **Thin Controller** | `app/Http/Controllers/[Entidade]Controller.php` | Contadores de abas via `clone $queryBase` comparando com constantes do Enum, paginação com `withQueryString()` | `.agents/templates/backend/listagem.md` |
@@ -76,9 +76,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 > 📖 **Basear-se em:** `.agents/templates/backend/listagem.md` (Seção FormRequest)
 
 - **Arquivo:** `app/Http/Requests/Listar[Entidades]Request.php`
-- **Validação Segura:** Sanitiza o termo de busca no `prepareForValidation()`.
-- **Aba Padrão:** Garante `'aba' => $this->input('aba', 'todos')` por padrão caso não seja informada.
-- **Autorização:** Checa permissão de visualização via `$this->user()?->can('viewAny', Item::class)`.
+- **Validação Segura:** Focado exclusivamente em declarar regras para query params.
+- **🚫 Sem `prepareForValidation()` Redundante:** O Laravel já faz `trim` de strings e converte strings vazias para `null` globalmente. Defaults de aba (`'todos'`) e ordenação devem ser lidos no Controller (`$filtros->get('aba', 'todos')`) ou na Action, eliminando código duplicado.
 
 ```php
 <?php
@@ -94,25 +93,23 @@ use Illuminate\Validation\Rule;
 
 final class ListarItensRequest extends FormRequest
 {
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'aba' => $this->input('aba', 'todos'),
-            'termo' => $this->filled('termo')
-                ? $this->string('termo')->trim()->toString()
-                : null,
-        ]);
-    }
-
     /**
      * @return array<string, array<int, mixed>>
      */
     public function rules(): array
     {
         return [
+            'aba' => ['nullable', 'string', 'in:todos,ativos,pendentes,inativos'],
             'termo' => ['nullable', 'string', 'max:255'],
             'categoria_id' => ['nullable', 'integer', Rule::exists('categorias', 'id')],
             'status' => ['nullable', Rule::enum(StatusItem::class)],
+            'ordem_campo' => ['nullable', 'string'],
+            'ordem_direcao' => ['nullable', 'string', 'in:asc,desc'],
+            'por_pagina' => ['nullable', 'integer', 'min:5', 'max:100'],
+        ];
+    }
+}
+```
             'aba' => ['required', 'string', 'in:todos,ativos,pendentes,inativos'],
             'ordem_campo' => ['nullable', 'string', 'in:nome,codigo,created_at'],
             'ordem_direcao' => ['nullable', 'string', 'in:asc,desc'],

@@ -29,7 +29,7 @@ Antes de gerar ou refatorar qualquer código de cadastro no backend, inspecione 
 | **Enum Tipado (Frontend)** | `resources/js/pages/[modulo]/types.ts` ou `resources/js/types/` | **ESPELHAMENTO 1:1**: Enum TypeScript espelhado do backend, eliminando strings mágicas no React | N/A |
 | **Migration** | `database/migrations/...` | Criação/alteração de tabelas e colunas em português. Sem método `down()` para evitar acidentes de rollback | N/A |
 | **Rota** | `routes/web.php` | Registro direto de POST/Resource sob middleware `auth`, `verified` | N/A |
-| **Form Request** | `app/Http/Requests/Salvar[Entidade]Request.php` | 100% da validação com `Rule::enum()`, sanitização no `prepareForValidation()` com API Fluente, sem `authorize` redundante, Precognition | `.agents/templates/backend/cadastro.md` |
+| **Form Request** | `app/Http/Requests/Salvar[Entidade]Request.php` | 100% da validação com `Rule::enum()`, sem `prepareForValidation` redundante (o framework já faz trim e null), sem `authorize` redundante, Precognition | `.agents/templates/backend/cadastro.md` |
 | **Policy** | `app/Policies/[Entidade]Policy.php` | Regras de autorização RBAC e permissões no método `create()` | `.agents/templates/backend/cadastro.md` |
 | **Action** | `app/Actions/Criar[Entidade]Action.php` | Único ponto de escrita no banco via `DB::transaction()`. Usa Enums para status/tipos. Retorna a Model | `.agents/templates/backend/cadastro.md` |
 | **Thin Controller** | `app/Http/Controllers/[Entidade]Controller.php` | Orquestra HTTP: `Gate::authorize`, invoca Action e redireciona (< 10 linhas) | `.agents/templates/backend/cadastro.md` |
@@ -132,8 +132,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     - Na criação: Senha ou credencial provisória pode ser obrigatória ou gerada automaticamente.
     - Na edição: Senha deve ser `['nullable', 'string', 'min:8']`, nunca forçando redefinição quando o usuário apenas altera dados cadastrais.
 - **Padronização Estrita de Nomes (Frontend = Backend):** Como o frontend e o backend convivem no mesmo projeto, os nomes dos campos no frontend (`useForm`, payload de envio) **DEVEM ser exatamente os mesmos do backend**. Nunca mantenha nomes divergentes (ex: `nomeCompleto` no front e `nome` no back). Se houver divergência, padronize no frontend para casar diretamente com o backend.
-- **Proibição de Ternários Redundantes no `prepareForValidation()`:** Não faça verificações redundantes como `$this->filled('campo') ? ... : ...` ou mapeamentos alternativos. Faça a limpeza ou casting direto usando a API Fluente do Laravel (`$this->string('campo')->trim()->toString()`) ou `$this->boolean('campo')` diretamente dentro de `$this->merge([...])`.
-- **Sanitização Limpa com API Fluente:** Feita no método `prepareForValidation()`. É PROIBIDO usar funções nativas soltas como `trim()` ou `mb_strtolower()`. Use OBRIGATORIAMENTE a API Fluente de Strings do Laravel (`$this->string('campo')->trim()->lower()->toString()`) ou `$this->boolean('campo')` e Helpers Globais (`clean_digits`, `clean_moeda`, `clean_placa`).
+- **🚫 Proibido `prepareForValidation()` Redundante:** 
+  - O Laravel já executa globalmente os middlewares `TrimStrings` e `ConvertEmptyStringsToNull`. Por isso, é **terminantemente proibido** criar métodos `prepareForValidation()` apenas para fazer `trim()`, converter string vazia para `null` ou fazer casting óbvio de tipos.
+  - Utilize `prepareForValidation()` **exclusivamente quando houver transformação de formato de negócio real** (ex: sanitizar dígitos de documento com `clean_digits()`, normalizar caixa alta de placa com `clean_placa()` ou remover formatação de moeda com `clean_moeda()`).
+  - Nunca use ternários redundantes como `$this->filled('campo') ? ... : ...`.
 - **Nomenclatura Padrão do Sistema:** Nomenclatura estrita em português, snake_case e foreign keys no padrão `tabela_singular_id` (ex: `perfil_id`, `servico_ids`, `nome`).
 - **PROIBIDO:** Não crie métodos getters auxiliares no Request (ex: `$request->getItem()`).
 
@@ -152,17 +154,10 @@ use Illuminate\Validation\Rule;
 final class SalvarItemRequest extends FormRequest
 {
     /**
-     * Prepara os dados do request para validação (sem ternários ou validações redundantes).
+     * @return array<string, array<int, mixed>>
      */
-    protected function prepareForValidation(): void
+    public function rules(): array
     {
-        $this->merge([
-            'nome' => $this->string('nome')->trim()->toString(),
-            'codigo' => $this->string('codigo')->upper()->trim()->toString(),
-        ]);
-    }
-
-    /**
      * @return array<string, array<int, mixed>>
      */
     public function rules(): array
