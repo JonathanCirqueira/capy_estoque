@@ -296,16 +296,42 @@ final class ItemPolicy
 
 ---
 
-## 🛡️ Checklist de Verificação da Skill
+## 🔍 REGRA DE AUDITORIA E VERIFICAÇÃO FINAL OBRIGATÓRIA (Fase de Conclusão)
 
-Ao concluir uma listagem backend, confirme:
-- [ ] **Schema First:** Inspecionou o Model (`app/Models/[Entidade].php`), migrations e Enums antes de codificar, garantindo que todos os campos, enums e relações existem fisicamente no projeto (sem inventar tabelas como `departamentos`).
-- [ ] Rota GET nomeada registrada em `routes/web.php`.
-- [ ] **ZERO STRINGS MÁGICAS:** Status, abas e perfis possuem Enums tipados em `app/Enums/` e não utilizam strings soltas nas queries/filtros.
-- [ ] Baseou-se no `.agents/templates/backend/listagem.md` garantindo sanitização e default de `'aba' => 'todos'`.
-- [ ] Baseou-se no `.agents/templates/backend/listagem.md` separando `executeQuery` de `aplicarFiltroAba`.
-- [ ] **Eager Loading Válido:** O `with()` contém apenas métodos de relacionamentos Eloquent verdadeiros (`belongsTo`, `hasMany`, `belongsToMany`), nunca colunas JSON/array nativas.
-- [ ] Baseou-se no `.agents/templates/backend/listagem.md` usando `clone $queryBase` comparando com o Enum para os contadores das abas.
-- [ ] Paginação encadeada com `->withQueryString()`.
-- [ ] Se houver exportação CSV, seguiu o blueprint de streaming do `.agents/templates/backend/listagem.md`.
-- [ ] Código formatado com `vendor/bin/pint --dirty --format agent` e verificado via `php artisan test --compact`.
+> ⚠️ **MANDATÓRIO ANTES DE CONCLUIR QUALQUER TAREFA DESTA SKILL:**
+> Todo final de tarefa ou prompt em que esta skill for invocada DEVE obrigatoriamente submeter o código implementado a uma verificação estrita em 4 pilares antes de considerar a entrega finalizada:
+
+### 1. Verificação contra o Blueprint Canônico (`.agents/templates/backend/listagem.md`)
+- [ ] **Schema First:** Model (`app/Models/[Entidade].php`), migrations e Enums inspecionados previamente. Relacionamentos em `with()` são métodos Eloquent reais (`belongsTo`, `hasMany`), nunca colunas JSON/array nativas.
+- [ ] **Enum Tipado:** Enums de status e filtros presentes em `app/Enums/` com `options()`, `label()` e `badgeVariant()`. Zero strings soltas para filtros de abas.
+- [ ] **FormRequest de Listagem:** Valida busca, filtros e default de `'aba' => 'todos'` sem `prepareForValidation` redundante.
+- [ ] **Action de Filtragem Estruturada:** Separação canônica entre `executeQuery()` (busca textual e filtros em grid) e `aplicarFiltroAba()` (filtro específico da aba).
+- [ ] **Contadores de Abas Otimizados via Clone:** Os contadores usam `(clone $queryBase)->count()`, garantindo que respeitem os filtros e termos de busca aplicados.
+- [ ] **Thin Controller:** Método `index` com menos de 10 linhas, autorização com `Gate::authorize('viewAny', ...)` e retorno via `Inertia::render()`.
+- [ ] **Paginação Preservando Parâmetros:** Uso obrigatório de `->paginate(10)->withQueryString()`.
+- [ ] **Exportação via Streaming (se houver):** Controller invokable dedicado usando `$query->cursor()`, BOM UTF-8 e delimitador `;`.
+
+### 2. Verificação contra as Diretrizes do Backend (`app/backend-rules.md`)
+- [ ] **A Regra da Fronteira (PT-BR Obrigatório):** Todas as colunas, queries, filtros, controllers e actions customizados nomeados em Português.
+- [ ] **Segregação Absoluta:** O Controller não processa queries diretamente; a lógica de filtragem é delegada à Action de filtragem.
+- [ ] **Single Action Controllers (Invokable):** Ações fora do CRUD padrão (ex: `Exportar[Entidade]Controller`) implementadas com `__invoke`.
+- [ ] **Objetos e Coleções vs Arrays Brutos:** Paginação e dados alimentados diretamente no `Inertia::render()` como Models/Coleções, sem transformações manuais intermediárias em array.
+- [ ] **Zero Strings Mágicas:** Status e abas consultados e comparados exclusivamente via Enums tipados (ex: `StatusItem::Ativo`).
+- [ ] **Raw Data Only:** Backend retorna apenas dados puros (centavos, ISO dates, booleans, enums). Máscaras e formatações de data/moeda são exclusivas da UI.
+
+### 3. Verificação contra as Boas Práticas Laravel (`.agents/skills/laravel-best-practices`)
+- [ ] **Strict Types:** `declare(strict_types=1);` no topo de todos os arquivos PHP.
+- [ ] **Advanced Queries & Anti-N+1:** Prevenção estrita de N+1 via eager loading (`with(...)`) das relações necessárias na listagem.
+- [ ] **Constructor Property Promotion:** Injeção tipada de dependências no construtor do Controller.
+- [ ] **Rotas RESTful:** Rota `GET` registrada sob middleware de autenticação (`auth`, `verified`).
+
+### 4. Execução de Pipeline de Qualidade e Comandos Obrigatórios
+Antes de responder ao usuário, execute os seguintes comandos no terminal:
+```bash
+# 1. Formatar código PHP modificado
+vendor/bin/pint --dirty --format agent
+
+# 2. Executar a suíte de verificação integrada (Oxlint, Rector, PHPStan max e Pest)
+composer verify
+```
+⚠️ Se qualquer teste ou verificação falhar, corrija a inconsistência imediatamente antes de declarar a tarefa como concluída.

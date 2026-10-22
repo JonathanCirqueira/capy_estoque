@@ -243,3 +243,48 @@ Ao criar uma nova listagem a partir de um prompt:
    - Adicionar a rota em `routes/web.php`.
    - Registrar imediatamente o link no `AppSidebar` (`resources/js/components/app-sidebar.tsx`) com o nome e ícone apropriados.
 5. **Validação:** Rodar `npm run build` e verificar integridade.
+
+---
+
+## 🔍 REGRA DE AUDITORIA E VERIFICAÇÃO FINAL OBRIGATÓRIA (Fase de Conclusão)
+
+> ⚠️ **MANDATÓRIO ANTES DE CONCLUIR QUALQUER TAREFA DESTA SKILL:**
+> Todo final de tarefa ou prompt em que esta skill for invocada DEVE obrigatoriamente auditar a tela de listagem gerada contra os 4 pilares de conformidade antes de considerar o trabalho concluído:
+
+### 1. Verificação contra o Blueprint Canônico (`.agents/templates/frontend/listagem.md`)
+- [ ] **`<PageHeader>` Canônico:** Importado exclusivamente de `@/components/page-header`. É terminantemente proibido montar tags `<h1>` ou divs manuais para o cabeçalho da página. O botão "Novo" ou "Cadastrar" deve ser configurado via prop `action`.
+- [ ] **Card Container Único:** A área de listagem inteira (abas, filtros, tabela e paginação) deve estar contida em um único elemento com as classes:
+  `bg-card border-border/50 rounded-2xl md:rounded-3xl overflow-hidden`.
+- [ ] **`<StatusTabs>` Integrado ao Card:** Posicionado no topo do card, sem padding externo, encostado nas bordas e com estilo sutil (`bg-muted/30 border-b border-border/50`).
+- [ ] **Linhas Canônicas de Filtros:**
+  - **Linha 1:** Input de busca com ícone de lupa (`Search`) ocupando `flex-1` + botão de 3 pontinhos (`MoreHorizontal`) estilo ghost para ações secundárias como "Exportar CSV".
+  - **Linha 2:** Grid dinâmico e responsivo (`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3`) utilizando componentes `<Combobox>`.
+- [ ] **Responsividade Agnóstica (Desktop vs Mobile):**
+  - **Desktop (`hidden md:block`):** Tabela estruturada com cabeçalhos ordenáveis em UPPERCASE e badges com cores do tema.
+  - **Mobile (`md:hidden`):** Cards mobile limpos, objetivos, sem ícones de domínio inventados ou arbitrários.
+- [ ] **Paginação Canônica:** Componente `<Paginacao>` importado de `@/components/paginacao`, alinhado de borda a borda no rodapé do card e consumindo diretamente os metadados de paginação do Laravel.
+
+### 2. Verificação de Regras da Stack & Starter Kit
+- [ ] **Zero Strings Mágicas:** Abas de status, colunas e opções de filtros utilizam Enums TypeScript espelhados 1:1 com os Backed Enums do backend (`types.ts`). Proibido strings cruas ou unions literais.
+- [ ] **Rotas Tipadas do Wayfinder:** Navegação, filtros e links de ações utilizam funções tipadas do Wayfinder (`@/actions` ou `@/routes`). Proibido URLs hardcoded como strings soltas.
+- [ ] **Anti-Duplicação de Layout (Inertia v3):** A página NÃO é envolvida por `<AppLayout>` ou `<AppSidebarLayout>`. Breadcrumbs são definidos exclusivamente na propriedade estática `MinhaPagina.layout`.
+- [ ] **Registro Obrigatório na Sidebar e Rotas:**
+  - Rota declarada no grupo autenticado de `routes/web.php`.
+  - Item adicionado no array `mainNavItems` de `resources/js/components/app-sidebar.tsx` com ícone semântico do `lucide-react`.
+
+### 3. Alinhamento com as Regras de Backend (`app/backend-rules.md` e `laravel-best-practices`)
+- [ ] **Raw Data Only do Backend:** A listagem consome os dados brutos recebidos da Action/Controller. Formatações de moeda (`R$ 0,00`), datas com `Intl.DateTimeFormat` e formatação de badges pertencem exclusivamente à UI React.
+
+### 4. Execução de Pipeline de Qualidade e Comandos Obrigatórios
+Antes de responder ao usuário, execute as verificações de integridade:
+```bash
+# 1. Checagem estática de tipos TypeScript
+npm run types:check
+
+# 2. Linter do frontend
+npm run lint
+
+# 3. Verificação geral do projeto (caso tenha havido alteração no backend)
+composer verify
+```
+⚠️ Corrija qualquer erro de lint, tipos ou formatação antes de dar a tarefa por encerrada.

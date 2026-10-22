@@ -245,3 +245,58 @@ Gere o módulo completo de "[Nome do Módulo]" (Frontend + Backend):
   - Remoção: apenas inativar logicamente (nunca deletar do banco)
   - Menu na sidebar com ícone apropriado
 ```
+
+---
+
+## 🔍 REGRA DE AUDITORIA E VERIFICAÇÃO FINAL OBRIGATÓRIA (Fase de Conclusão)
+
+> ⚠️ **MANDATÓRIO ANTES DE CONCLUIR QUALQUER TAREFA DESTE ORQUESTRADOR:**
+> Ao finalizar a implementação de um novo módulo de ponta a ponta, é ESTRITAMENTE OBRIGATÓRIO executar uma auditoria completa cruzando o código contra os templates canônicos, as diretrizes de backend e as regras de frontend:
+
+### 1. Auditoria do Backend contra Templates e Diretrizes (`app/backend-rules.md` e `laravel-best-practices`)
+- [ ] **A Regra da Fronteira (PT-BR):** Todas as tabelas, colunas, models, controllers, actions, enums e métodos estão em Português.
+- [ ] **Remoção Lógica (Nunca Deletar do Banco):** Ação de exclusão implementada como inativação lógica (`Inativar[Entidade]Action` ou `SoftDeletes`). Proibido `$model->delete()` físico definitivo.
+- [ ] **Zero Strings Mágicas:** Status, perfis e categorias usam PHP Backed Enums em `app/Enums/` com casts na Model.
+- [ ] **Thin Controller (< 10 linhas):** Métodos de controller atuam apenas como orquestradores HTTP com `Gate::authorize()` e delegação a Actions.
+- [ ] **Actions Transacionais:** Imutáveis (`final readonly class`), mutações em `DB::transaction()`, sem conversões redundantes de enum.
+- [ ] **FormRequest Limpo:** Regras completas de validação, `Rule::enum()`, ID ignorado em regras unique na edição. Sem método `authorize()` redundante e sem `prepareForValidation()` para trim/null.
+- [ ] **Prevenção de N+1 e Contadores de Abas:** `with()` com relações Eloquent reais e contadores calculados via `(clone $queryBase)->count()`.
+- [ ] **Raw Data Only:** Backend retorna dados puros (centavos, ISO dates, booleans), delegando formatação ao frontend.
+- [ ] **Conformidade com os Blueprints:** Código segue `.agents/templates/backend/cadastro.md` e `.agents/templates/backend/listagem.md`.
+
+### 2. Auditoria do Frontend contra Templates e Regras de UI
+- [ ] **Divisor dos 8 Campos Respeitado:**
+  - `<= 8` campos: Implementado em **Modal (`Dialog`)**, com `<DialogFooter>` fixo (`justify-between`), botão Voltar e Salvar.
+  - `> 8` campos: Implementado em **Página Completa Contínua** (sem steppers), com seções temáticas (10px uppercase), card envolvendo apenas campos e rodapé sticky posicionado **FORA DO CARD**.
+- [ ] **Zero Strings Mágicas no React:** Enums TypeScript espelhados 1:1 com os Enums do backend em `types.ts`.
+- [ ] **Laravel Precognition Obrigatório:** Validação em tempo real no `onBlur` com `clearErrors` no `onChange`. Proibido funções manuais de validação (`validarCampos`).
+- [ ] **Nomenclatura Paritária:** Chaves do formulário em `snake_case` idênticas às colunas e FormRequest.
+- [ ] **Componentes Canônicos do Sistema:**
+  - `<Botao>` oficial com texto fixo ("Salvar") e prop `loading={processing}`.
+  - `<Combobox>` exclusivo para todos os campos de seleção (Radix Select é proibido).
+  - `<PageHeader>` oficial importado de `@/components/page-header`.
+  - Card container único na listagem com `<StatusTabs>` encostado no topo sem padding externo.
+  - Tabela desktop com colunas UPPERCASE e cards mobile sem ícones de domínio inventados.
+  - `<Paginacao>` canônica alinhada de borda a borda.
+- [ ] **Navegação e Rotas:**
+  - Inclusão imediata no menu lateral `AppSidebar` (`resources/js/components/app-sidebar.tsx`) com ícone apropriado.
+  - Uso estrito de rotas tipadas do Wayfinder (`@/actions` ou `@/routes`). Proibido URLs hardcoded.
+  - Anti-duplicação de layout (breadcrumbs em `MinhaPagina.layout`).
+- [ ] **Conformidade com os Blueprints:** Código segue `.agents/templates/frontend/cadastro.md` e `.agents/templates/frontend/listagem.md`.
+
+### 3. Pipeline de Execução e Verificação Obrigatória
+Antes de entregar a resposta final ao usuário, execute sequencialmente:
+```bash
+# 1. Regenerar rotas tipadas do Wayfinder com suporte a formulários
+php artisan wayfinder:generate --with-form
+
+# 2. Formatar código PHP modificado
+vendor/bin/pint --dirty --format agent
+
+# 3. Checagem estática de tipos TypeScript
+npm run types:check
+
+# 4. Executar a suíte completa de verificação (Oxlint, Rector, PHPStan max e Pest Tests)
+composer verify
+```
+⚠️ Se houver qualquer falha ou apontamento nos comandos acima, corrija imediatamente antes de considerar o módulo finalizado.

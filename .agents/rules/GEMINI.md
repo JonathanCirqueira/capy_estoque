@@ -80,9 +80,9 @@ As seguintes regras têm prioridade absoluta sobre qualquer outra instrução e 
 3. **Tarefas Complexas / Fullstack**: `orchestrator` (coordena backend e frontend).
 4. **Debug & Resolução de Erros**: `debugger` (Skills: `systematic-debugging`, `debug-using-debugbar`).
 5. **Testes & Qualidade**: `test-engineer` (Skills: `pest-testing`, `laravel-tdd`, `tdd-workflow`).
-6. **Code Review & Auditoria de Código**: `code-reviewer` (Skills: `code-review-checklist`, `clean-code`, `laravel-best-practices`).
+6. **Code Review & Auditoria de Código**: `code-reviewer` (Skills: `code-review-checklist`, `clean-code`, `laravel-best-practices`, `wayfinder-development`).
 7. **Revisão Especializada PHP/Laravel**: `php-reviewer` (Skills: `laravel-best-practices`, `laravel-patterns`, `clean-code`, `pest-testing`, `backend-cadastro`, `backend-listagem`).
-8. **Revisão Especializada React/Inertia**: `react-reviewer` (Skills: `inertia-react-development`, `frontend-design`, `shadcn`, `tailwindcss-development`, `frontend-cadastro`, `frontend-listagem`).
+8. **Revisão Especializada React/Inertia**: `react-reviewer` (Skills: `inertia-react-development`, `frontend-design`, `shadcn`, `tailwindcss-development`, `frontend-cadastro`, `frontend-listagem`, `wayfinder-development`).
 9. **Revisão Especializada TypeScript**: `typescript-reviewer` (Skills: `clean-code`, `inertia-react-development`, `wayfinder-development`).
 10. **Simplificação & Clareza de Código**: `code-simplifier` (Skills: `clean-code`, `laravel-best-practices`, `inertia-react-development`).
 

@@ -431,3 +431,52 @@ Na rota `routes/web.php`:
 ```php
 Route::inertia('gestao-usuarios/cadastrar', 'gestao-usuarios/cadastrar')->name('gestao-usuarios.cadastrar');
 ```
+
+---
+
+## 🔍 REGRA DE AUDITORIA E VERIFICAÇÃO FINAL OBRIGATÓRIA (Fase de Conclusão)
+
+> ⚠️ **MANDATÓRIO ANTES DE CONCLUIR QUALQUER TAREFA DESTA SKILL:**
+> Todo final de tarefa ou prompt em que esta skill for invocada DEVE obrigatoriamente auditar a interface gerada contra os 4 pilares de conformidade antes de considerar o trabalho concluído:
+
+### 1. Verificação contra o Blueprint Canônico (`.agents/templates/frontend/cadastro.md`)
+- [ ] **Divisor dos 8 Campos Respeitado:**
+  - **Até 8 campos (`<= 8`):** Implementado exclusivamente como **Modal (`Dialog`)**, com `<DialogHeader>`, grid responsivo com scroll e `<DialogFooter>` fixo (`justify-between`) contendo botão Voltar à esquerda e Salvar à direita.
+  - **Mais de 8 campos (`> 8`):** Implementado como **Página Completa Contínua** (SEM steppers/etapas), com seções temáticas (títulos de 10px em uppercase tracking-wider), card envolvendo apenas os campos e rodapé sticky posicionado **FORA DO CARD** (`sticky bottom-0`).
+- [ ] **Componente `<Botao>` Oficial do Sistema:**
+  - Importado exclusivamente de `@/components/botao`.
+  - O texto do botão permanece SEMPRE estático (ex: `Salvar`). É **terminantemente proibido** alterar dinamicamente o texto para "Salvando..." ou "Carregando...".
+  - O indicador de carregamento é controlado exclusivamente via prop `loading={processing}`.
+- [ ] **Selects e Dropdowns Exclusivos com `<Combobox>`:**
+  - Todos os campos de seleção utilizam `<Combobox>` (`@/components/ui/combobox`).
+  - É **terminantemente proibido** utilizar componentes Radix Select (`@/components/ui/select`).
+- [ ] **Tratamento Canônico de Erros de Input:**
+  - Inputs com `error={Boolean(errors.campo)}` e `<InputError message={errors.campo} />` renderizado abaixo do campo.
+
+### 2. Verificação de Regras da Stack & Starter Kit
+- [ ] **Zero Strings Mágicas no Frontend:** Todos os status, categorias e perfis utilizam Enums TypeScript espelhados 1:1 com os Backed Enums do backend (`resources/js/pages/[modulo]/types.ts` ou `resources/js/types/`). Proibido strings cruas ou unions literais.
+- [ ] **Nomenclatura Paritária (Frontend = Backend):** Chaves no estado do `useForm` utilizam estritamente a nomenclatura `snake_case` esperada pelo backend e pelas colunas do banco.
+- [ ] **Laravel Precognition Obrigatório:**
+  - Validação em tempo real disparada via `onBlur={() => validate('campo')}`.
+  - Limpeza de erro no `onChange` de cada campo (`clearErrors('campo')`).
+  - **PROIBIDO** criar funções manuais de validação no cliente (`validarCampos = () => ...`).
+- [ ] **Rotas Tipadas do Wayfinder:** Navegação e submissões utilizam exclusivamente funções tipadas geradas pelo Wayfinder (`@/actions` ou `@/routes`). Proibido URLs hardcoded.
+- [ ] **Anti-Duplicação de Layout:** Páginas completas não envolvem o JSX com `<AppLayout>` ou `<AppSidebarLayout>`. O layout é definido via propriedade estática `MinhaPagina.layout`.
+
+### 3. Alinhamento com as Regras de Backend (`app/backend-rules.md` e `laravel-best-practices`)
+- [ ] **Formatação Exclusiva na UI:** O frontend é quem aplica máscaras de exibição, formata moedas (centavos para `R$`) e datas ISO para o padrão brasileiro. O backend envia e recebe dados brutos.
+- [ ] **Tratamento de Payload:** Valores vazios ou de formatação são tratados respeitando os tipos esperados pelo FormRequest (`prepareForValidation`).
+
+### 4. Execução de Pipeline de Qualidade e Comandos Obrigatórios
+Antes de responder ao usuário, execute as verificações de integridade:
+```bash
+# 1. Checagem estática de tipos TypeScript
+npm run types:check
+
+# 2. Linter do frontend
+npm run lint
+
+# 3. Verificação geral do projeto (caso tenha havido alteração no backend)
+composer verify
+```
+⚠️ Corrija qualquer erro de lint, tipos ou formatação antes de dar a tarefa por encerrada.

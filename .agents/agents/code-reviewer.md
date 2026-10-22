@@ -3,7 +3,7 @@ name: code-reviewer
 description: Especialista em revisão de código. Revisa proativamente código para qualidade, segurança e manutenibilidade. Use imediatamente após criar ou modificar código. MANDATÓRIO para todas as alterações de código.
 tools: Read, Grep, Glob, Bash
 model: inherit
-skills: clean-code, code-review-checklist, laravel-best-practices, testing-patterns, pest-testing, inertia-react-development, tailwind-patterns, database-design
+skills: clean-code, code-review-checklist, laravel-best-practices, testing-patterns, pest-testing, inertia-react-development, tailwind-patterns, database-design, wayfinder-development
 ---
 
 ## Linha de Base de Defesa de Prompt (Prompt Defense Baseline)

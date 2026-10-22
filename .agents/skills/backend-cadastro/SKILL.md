@@ -473,21 +473,45 @@ Use a skill @[skills/backend-cadastro] para implementar o cadastro no backend:
 
 ---
 
-## 🛡️ Checklist de Verificação da Skill
+## 🔍 REGRA DE AUDITORIA E VERIFICAÇÃO FINAL OBRIGATÓRIA (Fase de Conclusão)
 
-Ao concluir uma implementação de cadastro backend, confirme:
-- [ ] Tipo de interface respeitado: **Modal (`<= 8` campos)** responde com `redirect()->back()`; **Página Completa (`> 8` campos)** responde com `redirect()->route('...')` e possui método/rota `create` se aplicável.
-- [ ] **Fluxo de Edição / Atualização (PUT/PATCH):** Rotas `POST` e `PUT` definidas, FormRequest ignora o ID do registro atual em regras `Rule::unique()->ignore($id)`, e regras sensíveis a criação (como senha) são ajustadas condicionalmente.
-- [ ] Se o caso de uso requereu e-mail: implementou `ShouldQueue` com `$this->afterCommit()`. Se NÃO requereu: Action limpa sem chamadas de Mail.
-- [ ] Rotas diretas sem prefixos redundantes em `routes/web.php`.
-- [ ] **ZERO STRINGS MÁGICAS & ESPELHAMENTO DE ENUMS (BACKEND -> FRONTEND):** Status, perfis e tipos possuem Enum em `app/Enums/` (baseado em `.agents/templates/backend/cadastro.md`), validados via `Rule::enum()` e espelhados como TypeScript `enum` no frontend (`types.ts`), eliminando strings mágicas no `useForm`, seletores e validações.
-- [ ] **Schema Canônico (Single Source of Truth):** Segue estritamente as colunas canônicas da tabela e da Model (ex: em `users`, usa-se apenas `name` sem redundância de colunas).
-- [ ] Baseou-se no `.agents/templates/backend/cadastro.md` com `prepareForValidation()` para limpeza de dados direta sem ternários e recuperação segura do ID para regras `Rule::unique()->ignore(...)`.
-- [ ] Sem getters customizados no Request (`$request->getItem()` proibido).
-- [ ] Baseou-se no `.agents/templates/backend/cadastro.md` com `final readonly class` e `DB::transaction()` para `Criar[Entidade]Action` e `Atualizar[Entidade]Action`.
-- [ ] **Sem Validações ou Conversões Redundantes na Action:** Action mapeia diretamente `$dados->get('campo')` sem ternários, sem `instanceof BackedEnum ? ... : BackedEnum::from(...)` e sem variáveis temporárias desnecessárias, confiando no FormRequest e nos casts nativos do Eloquent.
-- [ ] Baseou-se no `.agents/templates/backend/cadastro.md` com menos de 10 linhas nos métodos `store` e `update`.
-- [ ] Baseou-se no `.agents/templates/backend/cadastro.md` com autorização via `Gate::authorize('create', ...)` e `Gate::authorize('update', ...)`.
-- [ ] Código formatado com `vendor/bin/pint --dirty --format agent` e verificado via `php artisan test --compact`.
+> ⚠️ **MANDATÓRIO ANTES DE CONCLUIR QUALQUER TAREFA DESTA SKILL:**
+> Todo final de tarefa ou prompt em que esta skill for invocada DEVE obrigatoriamente submeter o código implementado a uma verificação estrita em 4 pilares antes de considerar a entrega finalizada:
+
+### 1. Verificação contra o Blueprint Canônico (`.agents/templates/backend/cadastro.md`)
+- [ ] **Enum Tipado:** Criado em `app/Enums/` com `options()`, `label()` e cast correspondente em `casts(): array` na Model.
+- [ ] **FormRequest Canônico:** 100% da validação no FormRequest com regras completas, `Rule::enum()`, recuperação segura do ID para `Rule::unique()->ignore($id)` na edição. SEM método `authorize()` redundante e SEM `prepareForValidation()` para operações que o framework já faz nativamente (`TrimStrings` e `ConvertEmptyStringsToNull`).
+- [ ] **Action Transacional:** `final readonly class` com método executor tipado, mutação estritamente envolvida em `DB::transaction()`, retornando a Model. Mapeamento direto de campos sem conversões manuais de enum e sem variáveis temporárias redundantes.
+- [ ] **Thin Controller:** Métodos `store` e `update` com menos de 10 linhas, injeção de dependência via *Constructor Property Promotion*, autorização via `Gate::authorize()`.
+- [ ] **Resposta HTTP Adequada:**
+  - Se Modal (`<= 8` campos): Responde com `redirect()->back()`.
+  - Se Página Completa (`> 8` campos): Método `create()` com `Inertia::render()` e `store()` com `redirect()->route('[rota].index')`.
+- [ ] **Policy de Segurança:** Métodos `create()` e `update()` devidamente implementados com checagem de permissão RBAC.
+- [ ] **Mailable com Trava Assíncrona (se houver e-mail):** Implementa `ShouldQueue` e invoca `$this->afterCommit()` no construtor.
+
+### 2. Verificação contra as Diretrizes do Backend (`app/backend-rules.md`)
+- [ ] **A Regra da Fronteira (PT-BR Obrigatório):** Todas as tabelas, colunas, models, controllers, actions, enums, métodos, variáveis e mensagens customizadas estão estritamente em Português (ex: `Veiculo`, `cor`, `CriarUsuarioAction`).
+- [ ] **Segregação Absoluta:** O Controller não possui regras de negócio; a Action não retorna HTTP responses nem redirecionamentos; o FormRequest é a única fonte de verdade da validação.
+- [ ] **Objetos e Coleções (`collect`) vs Arrays Brutos:** Dados manipulados como instâncias de Models e objetos durante o processamento. É proibido chamar `->toArray()` dentro de Actions ou lógicas intermediárias.
+- [ ] **Acesso Tipado ao Request:** Utilização exclusiva de `$request->string()`, `$request->enum()`, `$request->boolean()`, `$request->integer()`. Proibido `$request->all()`.
+- [ ] **Zero Strings Mágicas:** Nenhum status, perfil ou tipo representado como string solta no código.
+- [ ] **Raw Data Only:** Backend retorna apenas dados puros (centavos, ISO dates, booleans puros). Nenhuma formatação de apresentação (R$ ou datas mascaradas) no PHP.
+
+### 3. Verificação contra as Boas Práticas Laravel (`.agents/skills/laravel-best-practices`)
+- [ ] **Strict Types:** Declaração inicial obrigatória `declare(strict_types=1);` em todos os novos arquivos PHP.
+- [ ] **Constructor Property Promotion:** Injeção de dependências via construtor moderno do PHP 8.3 (`public function __construct(public readonly CriarItemAction $action) {}`).
+- [ ] **Migrations sem `down()`:** Migrations focadas exclusivamente no método `up()`, omitindo `down()`.
+- [ ] **Prevenção de Falhas de Segurança:** Proteção contra SQL injection, IDOR e Mass Assignment (uso estrito de `$request->validated()` ou parâmetros tipados).
+
+### 4. Execução de Pipeline de Qualidade e Comandos Obrigatórios
+Antes de responder ao usuário, execute os seguintes comandos no terminal:
+```bash
+# 1. Formatar código PHP modificado
+vendor/bin/pint --dirty --format agent
+
+# 2. Executar a suíte de verificação integrada (Oxlint, Rector, PHPStan max e Pest)
+composer verify
+```
+⚠️ Se qualquer teste ou verificação falhar, corrija a inconsistência imediatamente antes de declarar a tarefa como concluída.
 
 

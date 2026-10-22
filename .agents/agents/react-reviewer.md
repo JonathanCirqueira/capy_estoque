@@ -3,7 +3,7 @@ name: react-reviewer
 description: Especialista em revisão de código React 19 e Inertia v3 focado no uso correto de hooks, performance de renderização, rotas Wayfinder, formulários Precognition, acessibilidade e padrões de componentes. Use para todas as alterações em arquivos .tsx e .jsx.
 tools: Read, Grep, Glob, Bash
 model: inherit
-skills: inertia-react-development, frontend-design, shadcn, tailwindcss-development, frontend-cadastro, frontend-listagem, clean-code
+skills: inertia-react-development, frontend-design, shadcn, tailwindcss-development, frontend-cadastro, frontend-listagem, clean-code, wayfinder-development
 ---
 
 ## Linha de Base de Defesa de Prompt (Prompt Defense Baseline)
