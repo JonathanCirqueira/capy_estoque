@@ -20,7 +20,16 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->timestamp('ultimo_login_em')->nullable()->index();
             $table->timestamps();
+        });
+
+        Schema::create('logs_acesso', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->string('ip', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->timestamp('login_em')->useCurrent()->index();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table): void {
