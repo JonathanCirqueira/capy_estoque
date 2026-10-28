@@ -106,14 +106,14 @@
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
     --radius: 0.625rem;
-    --sidebar: oklch(0.312 0.106 255.93);
-    --sidebar-foreground: oklch(0.985 0 0 / 0.85);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.312 0.106 255.93);
-    --sidebar-accent: oklch(0.985 0 0 / 0.12);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.985 0 0 / 0.12);
-    --sidebar-ring: oklch(0.87 0 0);
+    --sidebar: #061d43;
+    --sidebar-foreground: rgba(255, 255, 255, 0.85);
+    --sidebar-primary: #ffffff;
+    --sidebar-primary-foreground: #061d43;
+    --sidebar-accent: rgba(255, 255, 255, 0.12);
+    --sidebar-accent-foreground: #ffffff;
+    --sidebar-border: rgba(255, 255, 255, 0.1);
+    --sidebar-ring: rgba(255, 255, 255, 0.25);
 
     --success: oklch(0.801 0.188 137.47);
     --success-foreground: oklch(0.25 0.08 137.47);
@@ -158,14 +158,14 @@
     --chart-3: oklch(0.769 0.188 70.08);
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(18.839% 0.02635 253.994);
-    --sidebar-foreground: oklch(0.985 0 0 / 0.85);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.16 0.02 255.93);
-    --sidebar-accent: oklch(0.55 0.08 255.93 / 0.18);
-    --sidebar-accent-foreground: oklch(0.82 0.08 240);
-    --sidebar-border: oklch(0.55 0.08 255.93 / 0.15);
-    --sidebar-ring: oklch(0.439 0 0);
+    --sidebar: #061d43;
+    --sidebar-foreground: rgba(255, 255, 255, 0.85);
+    --sidebar-primary: #ffffff;
+    --sidebar-primary-foreground: #061d43;
+    --sidebar-accent: rgba(255, 255, 255, 0.12);
+    --sidebar-accent-foreground: #ffffff;
+    --sidebar-border: rgba(255, 255, 255, 0.1);
+    --sidebar-ring: rgba(255, 255, 255, 0.25);
     --success: oklch(0.75 0.15 137.47);
     --success-foreground: oklch(0.12 0.05 137.47);
     --warning: oklch(0.769 0.188 70.08);
@@ -230,4 +230,72 @@
             display: none !important;
         }
     }
+}
+
+/* Partículas Flutuantes da Sidebar */
+@keyframes floatParticle1 {
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(12px, -20px);
+    }
+}
+
+@keyframes floatParticle2 {
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(-15px, 15px);
+    }
+}
+
+@keyframes floatParticle3 {
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(18px, 12px);
+    }
+}
+
+@keyframes floatParticle4 {
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(-10px, -18px);
+    }
+}
+
+.particle-anim {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+.particle-1 {
+    animation-name: floatParticle1;
+    animation-duration: 14s;
+}
+
+.particle-2 {
+    animation-name: floatParticle2;
+    animation-duration: 18s;
+}
+
+.particle-3 {
+    animation-name: floatParticle3;
+    animation-duration: 16s;
+}
+
+.particle-4 {
+    animation-name: floatParticle4;
+    animation-duration: 12s;
 }

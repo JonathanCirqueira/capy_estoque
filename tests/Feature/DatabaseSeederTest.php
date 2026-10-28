@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Hash;
 test('database seeder creates standard admin user', function () {
     $this->seed(DatabaseSeeder::class);
 
-    $admin = User::where('email', 'admin@jhe.com.br')->firstOrFail();
+    $admin = User::where('email', 'admin@capy.com')->firstOrFail();
 
     expect($admin->name)->toBe('Admin')
-        ->and($admin->email)->toBe('admin@jhe.com.br')
+        ->and($admin->email)->toBe('admin@capy.com')
         ->and(Hash::check('password', $admin->password))->toBeTrue();
 });

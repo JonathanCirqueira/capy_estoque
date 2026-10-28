@@ -13,15 +13,15 @@ export default function AppLogo({ className, variant = 'dark' }: AppLogoProps) {
         <div className={cn('flex items-center justify-center transition-all duration-200 ease-linear', className)}>
             {variant !== 'dark' && (
                 <img
-                    src="/logo_jhe_light.png"
-                    alt="JHE Veículos"
+                    src="/capy_logo_light.png"
+                    alt="Capy"
                     className={cn(imgClassName, variant === 'auto' && 'dark:hidden')}
                 />
             )}
             {variant !== 'light' && (
                 <img
-                    src="/logo_jhe_dark.png"
-                    alt="JHE Veículos"
+                    src="/capy_logo_dark.png"
+                    alt="Capy"
                     className={cn(imgClassName, variant === 'auto' && 'hidden dark:block')}
                 />
             )}

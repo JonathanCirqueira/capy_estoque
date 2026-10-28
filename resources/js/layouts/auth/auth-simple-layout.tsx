@@ -11,14 +11,14 @@ export default function AuthSimpleLayout({ children, title, description }: AuthL
                         <Link href={home()} className="flex flex-col items-center gap-2 font-medium">
                             <div className="mb-2 flex items-center justify-center">
                                 <img
-                                    src="/logo_jhe_dark.png"
+                                    src="/capy_logo_dark.png"
                                     className="hidden h-24 w-auto object-contain dark:block"
-                                    alt="JHE Logo"
+                                    alt="Capy Logo"
                                 />
                                 <img
-                                    src="/logo_jhe_light.png"
+                                    src="/capy_logo_light.png"
                                     className="block h-24 w-auto object-contain dark:hidden"
-                                    alt="JHE Logo"
+                                    alt="Capy Logo"
                                 />
                             </div>
                             <span className="sr-only">{title}</span>
