@@ -67,6 +67,10 @@ As seguintes regras têm prioridade absoluta sobre qualquer outra instrução e 
   ```
 - O comando garante que o código passe com sucesso por **Oxlint**, **Rector**, **PHPStan** e **Pest Tests** antes de finalizar a resposta.
 
+### 10. 🧠 Consulta Obrigatória ao `MEMORY.md` e `CONTEXT.md`
+- Antes de iniciar qualquer desenvolvimento ou refatoração, a IA DEVE consultar o `MEMORY.md` para evitar repetir erros passados.
+- Ao construir um novo módulo ou funcionalidade, a IA DEVE seguir rigorosamente a sequência em 4 passos de `CONTEXT.md` (`passo1-schema-banco` -> `passo2-frontend-ui` -> `passo3-backend-api` -> `passo4-integracao-e2e`).
+
 ---
 
 ## 🤖 INTELLIGENT AGENT ROUTING
@@ -85,6 +89,10 @@ As seguintes regras têm prioridade absoluta sobre qualquer outra instrução e 
 8. **Revisão Especializada React/Inertia**: `react-reviewer` (Skills: `inertia-react-development`, `frontend-design`, `shadcn`, `tailwindcss-development`, `frontend-cadastro`, `frontend-listagem`, `wayfinder-development`).
 9. **Revisão Especializada TypeScript**: `typescript-reviewer` (Skills: `clean-code`, `inertia-react-development`, `wayfinder-development`).
 10. **Simplificação & Clareza de Código**: `code-simplifier` (Skills: `clean-code`, `laravel-best-practices`, `inertia-react-development`).
+11. **Passo 1 - Schema & Contratos**: `passo1-schema-banco` (Skills: `clean-code`, `database-design`, `laravel-best-practices`, `api-patterns`, `lint-and-validate`, `powershell-windows`).
+12. **Passo 2 - Frontend UI**: `passo2-frontend-ui` (Skills: `clean-code`, `frontend-design`, `frontend-cadastro`, `frontend-listagem`, `tailwindcss-development`, `shadcn`, `inertia-react-development`, `lint-and-validate`, `powershell-windows`).
+13. **Passo 3 - Backend API**: `passo3-backend-api` (Skills: `clean-code`, `laravel-best-practices`, `backend-cadastro`, `backend-listagem`, `pest-testing`, `api-patterns`, `lint-and-validate`, `powershell-windows`).
+14. **Passo 4 - Integração & Wire-up**: `passo4-integracao-e2e` (Skills: `clean-code`, `wayfinder-development`, `inertia-react-development`, `cadastro-listagem-completo`, `lint-and-validate`, `powershell-windows`).
 
 ### Formato de Resposta Mandatório
 
