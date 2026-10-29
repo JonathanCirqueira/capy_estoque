@@ -10,8 +10,9 @@
 2. **Zero Strings Mágicas:** Status, perfis, tipos e categorias devem ser Backed Enums (`string` ou `int`) em `app/Enums/`. Use `StatusEnum::Ativo->value` ou `StatusEnum::Ativo` diretamente.
 3. **Raw Data Only:** O backend entrega dados brutos (centavos, ISO dates, booleans). Formatação de apresentação pertence exclusivamente ao frontend React.
 4. **Anti-N+1 Estrito:** Relacionamentos exibidos na listagem devem ser carregados via `with(['relacionamento'])`. Nunca use `with()` em colunas JSON/array nativas.
-5. **Preservação de URL:** Sempre encadear `->paginate(10)->withQueryString()` para manter filtros e abas ao mudar de página.
-6. **Contadores Reativos via Clone:** Os contadores de abas devem usar `(clone $queryBase)->count()`, garantindo que respeitem a busca e filtros secundários ativos.
+5. **Reutilização com Local Scopes:** Filtros recorrentes e regras de status devem ser encapsulados em Local Scopes na própria Model (`scopePublicado()`, `scopeAtivo()`).
+6. **Preservação de URL:** Sempre encadear `->paginate(10)->withQueryString()` para manter filtros e abas ao mudar de página.
+7. **Contadores Reativos via Clone:** Os contadores de abas devem usar `(clone $queryBase)->count()`, garantindo que respeitem a busca e filtros secundários ativos.
 
 ---
 

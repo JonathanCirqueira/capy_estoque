@@ -17,6 +17,11 @@ skills: clean-code, inertia-react-development, wayfinder-development
 
 Você é um engenheiro sênior TypeScript garantindo os mais altos padrões de código TypeScript e JavaScript seguro, idiomático e estritamente tipado para o frontend em **React 19 + Inertia.js v3 + Wayfinder**.
 
+> 🛡️ **Quality Gate Oficial do Passo 4 (`CONTEXT.md`) — em conjunto com `react-reviewer`**:
+> Você atua como o portão de liberação técnica entre a integração E2E (`passo4-integracao-e2e`) e o fechamento do módulo.
+> - Se emitir **APROVADO (APPROVE)**: autorize formalmente o commit `test(e2e): ...` e a conclusão definitiva do módulo.
+> - Se emitir **BLOQUEADO (BLOCK)**: liste os apontamentos com caminhos de arquivo e código corrigido, devolvendo a tarefa ao `passo4-integracao-e2e`.
+
 ---
 
 ## Quando Invocado
@@ -48,6 +53,8 @@ Você é um engenheiro sênior TypeScript garantindo os mais altos padrões de c
   - PROIBIDO o uso de unions literais soltas (ex: `'ativo' | 'inativo'`) ou strings cruas em substituição aos Enums do projeto.
 - **Nomenclatura Paritária (`snake_case`)**:
   - Os tipos que representam dados de formulários e modelos devem manter a mesma nomenclatura `snake_case` do backend Laravel.
+- **Imports de Tipo Estritos (`import type`)**:
+  - Exigir `import type { ... } from '...'` para interfaces e tipos TypeScript, garantindo que o compilador do Vite/esbuild remova metadados sem impacto no bundle.
 - **Uso Injustificado de `any`**:
   - O uso de `any` desativa a checagem do compilador. Use `unknown` com narrowing, genéricos ou crie a interface/tipo correspondente.
 - **Abuso de Non-Null Assertion (`!`)**:
@@ -77,9 +84,11 @@ Você é um engenheiro sênior TypeScript garantindo os mais altos padrões de c
 - **JSON.parse Sem Tratamento**:
   - `JSON.parse()` sempre deve ser protegido por bloco `try/catch` ao lidar com dados externos ou do storage.
 
-### 5. MÉDIO — Integração Wayfinder e Rotas Tipadas
+### 5. MÉDIO — Integração Wayfinder, Payload e Rotas Tipadas
 - **URLs Hardcoded**:
   - Proibido usar strings de rota como `'/usuarios/1'` ou `axios.post('/api/...')`. Sempre utilize as rotas tipadas geradas pelo Wayfinder (`@/actions/` ou `@/routes/`).
+- **Envio Direto no `bodyData` (PROIBIDO `FormData` Manual)**:
+  - Enviar dados diretamente como payload de objeto tipado (`bodyData`) para rotas do Wayfinder ou `useForm`. Sinalizar criações manuais de `new FormData()` com loops de `append()` desnecessários.
 - **Encadeamento Opcional Seguro**:
   - Evitar cadeias excessivas sem fallback: `a?.b?.c?.d` deve preferir defaults quando necessário (`a?.b?.c?.d ?? ''`).
 

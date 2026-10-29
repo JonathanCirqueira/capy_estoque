@@ -90,6 +90,22 @@ Você é o Engenheiro de Integração e Fechamento E2E do sistema. Sua missão �
 
 ---
 
+## 🛡️ Submissão Obrigatória ao Quality Gate (`typescript-reviewer` & `react-reviewer`)
+
+Antes de realizar o commit ou dar a integração E2E como concluída, **é obrigatório submeter as alterações aos revisores especializados**:
+1. O **`typescript-reviewer`** auditará:
+   - Uso exclusivo de rotas tipadas do Wayfinder (`@/actions/` ou `@/routes/`) e zero URLs hardcoded em strings.
+   - Paridade 1:1 de nomes de campos em `snake_case` com as colunas do banco.
+   - Ausência de `any`, imports de tipo estritos (`import type`) e tipagem completa de props e responses.
+2. O **`react-reviewer`** auditará:
+   - Envio de dados simplificado diretamente no `bodyData` (zero `new FormData()` manual com loops).
+   - Validações em tempo real e limpeza de erros com Laravel Precognition (`onBlur`, `clearErrors`).
+   - Bloqueio de submissão duplicada (`form.processing`).
+3. Se qualquer revisor apontar apontamentos (`BLOQUEADO`), execute os ajustes antes de prosseguir.
+4. Somente após a aprovação formal de ambos os revisores e 100% de sucesso no `composer verify`, execute o commit.
+
+---
+
 ## 🧹 Varredura Final Anti-Redundância (Obrigatória Antes do Commit)
 
 Antes de executar o commit, verifique arquivo a arquivo:
@@ -99,6 +115,7 @@ Antes de executar o commit, verifique arquivo a arquivo:
 - [ ] **Ficou algum mock residual na tela ou prop não tipada?** (Remova todos os mocks).
 - [ ] **Ficou alguma URL hardcoded em string?** (Use rotas tipadas do Wayfinder).
 - [ ] **Há validações manuais no React duplicando regras do FormRequest?** (Remova, confie no Precognition e 422).
+- [ ] **Os revisores `typescript-reviewer` e `react-reviewer` aprovaram a integração?**
 - [ ] **Testou a funcionalidade de ponta a ponta sem quebras?**
 - [ ] **Executou `composer verify` com 100% de aprovação?**
 
@@ -106,7 +123,7 @@ Antes de executar o commit, verifique arquivo a arquivo:
 
 ## 📦 Commit da Tarefa (Obrigatório ao Concluir Tarefa do CONTEXT.md)
 
-Após aprovação total no checklist e no `composer verify`:
+Após aprovação total dos revisores, checklist e `composer verify`:
 
 1. Execute o commit da tarefa realizada com mensagem em português no padrão Conventional Commits (`feat(...)`, `refactor(...)`, `chore(...)`, `fix(...)`):
     ```bash

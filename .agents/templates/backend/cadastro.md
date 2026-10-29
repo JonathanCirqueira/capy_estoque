@@ -14,8 +14,9 @@
 6. **Diferenciação Criação (POST) vs Edição (PUT/PATCH):**
    - Na edição, obrigatoriamente ignore o ID do registro atual com `Rule::unique('tabela', 'coluna')->ignore($id)`.
    - Campos condicionais (como senha) devem ser `required` na criação e `nullable` na edição.
-7. **Thin Controller (< 10 linhas):** Os métodos `store` e `update` apenas invocam `Gate::authorize`, delegam para a Action e retornam `redirect()->back()` (ou `redirect()->route(...)`).
-8. **Mails Assíncronos Resilientes:** Se o cadastro dispara e-mail ou convite, a classe Mailable DEVE implementar `ShouldQueue` e chamar `$this->afterCommit()` no construtor para evitar race condition antes do commit do banco.
+7. **Thin Controller (< 10 linhas) e Dependency Injection (DI):** Os métodos `store` e `update` apenas invocam `Gate::authorize`, delegam para a Action e retornam `redirect()->back()` (ou `redirect()->route(...)`). Se múltiplos métodos usam a Action, ela deve ser injetada no `__construct()`; se for de uso único, injeta-se no método da rota.
+8. **Transferência Tipada (DTOs ou Collections Tipadas):** Evite arrays genéricos (`$request->all()`). Prefira DTOs `readonly` tipados com factory `fromRequest()` ou Collections tipadas.
+9. **Mails Assíncronos Resilientes:** Se o cadastro dispara e-mail ou convite, a classe Mailable DEVE implementar `ShouldQueue` e chamar `$this->afterCommit()` no construtor para evitar race condition antes do commit do banco.
 
 ---
 

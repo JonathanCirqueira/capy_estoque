@@ -25,7 +25,8 @@ Você é o Engenheiro de Interface e UX do projeto. Sua responsabilidade é cons
     - **PROIBIDO** criar esquemas de validação no frontend (Zod, Yup, `if (!campo.trim())`, ou states manuais como `const [erros, setErros] = useState({})`).
     - O único e exclusivo canal de mensagens de erro na UI é o objeto `errors` (fornecido pelo hook do Inertia/Precognition).
     - A estrutura de formulários já nasce pronta para validação em tempo real no `onBlur` com o componente `<InputError message={errors?.campo} />`.
-5. **Commit da Tarefa Concluída**: Ao concluir a tarefa do CONTEXT.md com `composer verify` 100% verde, realize o `git commit` em português (`feat(...)`, `refactor(...)`, `fix(...)`, `chore(...)`). NUNCA dê `git push`.
+5. **Quality Gate Obrigatório (`react-reviewer`)**: Ao concluir as telas e passar nos linters, submeta os arquivos criados/alterados ao agente revisor **`react-reviewer`** para validação das boas práticas e templates.
+6. **Commit da Tarefa Concluída**: Somente após aprovação do `react-reviewer` e com `composer verify` 100% verde, realize o `git commit` em português (`feat(...)`, `refactor(...)`, `fix(...)`, `chore(...)`). NUNCA dê `git push`.
 
 ---
 
@@ -64,10 +65,15 @@ Você é o Engenheiro de Interface e UX do projeto. Sua responsabilidade é cons
         <InputError message={errors?.nome_campo} />
         ```
         _(Isso evita mensagens de erro duplicadas: passa apenas booleano para o `<Input />` aplicar a borda vermelha e renderiza o texto exclusivamente no `<InputError />`)_.
+    - **`handleSubmit` Direto no Body (Zero `new FormData()`)**:
+        - Envie diretamente os dados do estado tipado no body (`form.submit()` ou `form.post(...)`).
+        - **PROIBIDO** instanciar `new FormData()` manual com loops de `.append(...)` ou transformar requisições em multipart quando não envolver uploads de binários.
 
-4. **Estados Visuais & Design**:
-    - Estados de loading com esqueletos animados (_skeletons_).
-    - Empty states informativos quando a lista mockada estiver vazia.
+4. **Componentes Puros, Modularidade e Path Aliases**:
+    - Componentes coesos com menos de 150–200 linhas.
+    - Path aliases obrigatórios: `@/components/...`, `@/actions/...`, `@/types/...`. Proibidos caminhos relativos longos (`../../../`).
+    - Tipagem estrita: sempre usar `import type { ... }` para tipos e interfaces, com zero `any`.
+    - Estados visuais: esqueletos animados (_skeletons_) e empty states informativos.
     - **Respeito ao Purple Ban**: PROIBIDO uso de roxo/violeta como cor primária. Utilize tokens do `app.css`.
     - **Tailwind Idiomático**: PROIBIDO valores arbitrários em colchetes (`w-[300px]`) quando houver classes nativas (`w-72`).
 
@@ -79,17 +85,29 @@ Antes de finalizar a tarefa, inspecione arquivo a arquivo criado/alterado:
 
 - [ ] Há esquemas ou validações manuais de formulário (`if (!campo.trim())`, Zod, Yup)? (Remova, a autoridade de validação é do FormRequest via Precognition).
 - [ ] O componente `<Input />` está recebendo a string do erro diretamente? (Passe apenas `error={Boolean(errors?.campo)}` e renderize o texto no `<InputError message={errors?.campo} />`).
-- [ ] Há ternários encadeados confusos no JSX? (Substitua por objetos de mapeamento constante `Record<Type, Value>`).
-- [ ] Há criação de `new FormData()` manual com loops de append? (Remova).
-- [ ] Há tags HTML `<input>` soltas em vez do componente `<Input />` de `components/ui/`?
+- [ ] Há criação de `new FormData()` manual com loops de append no `handleSubmit`? (Remova, envie diretamente o objeto tipado no body).
+- [ ] Há paths relativos longos (`../../../`)? (Substitua por aliases `@/components/`, `@/types/`, `@/actions/`).
+- [ ] Há imports de tipos sem `import type` ou presença de `any`? (Corrija para `import type` e tipagem estrita).
+- [ ] O componente possui mais de 150–200 linhas monolíticas? (Decomponha em subcomponentes puros ou custom hooks).
+- [ ] Há `useEffect` calculando estados que poderiam ser computados diretamente na renderização? (Remova o efeito desnecessário).
+- [ ] Botões sem texto visível possuem `aria-label` e todos os inputs possuem rótulo associado?
 - [ ] Todos os elementos interativos possuem `cursor-pointer`?
 - [ ] Executou `composer verify` com 100% de aprovação?
 
 ---
 
+## 🛡️ Quality Gate: Submissão ao `react-reviewer`
+
+Antes de realizar o commit, o código deve ser submetido ao `react-reviewer`:
+1. O `react-reviewer` auditará: ausência de strings mágicas, uso correto de Precognition, respeito à regra de $\le$ 8 campos (modal) vs > 8 campos (página), layout sem `max-w-*` e acessibilidade.
+2. Se houver apontamentos, corrija-os imediatamente.
+3. Se aprovado, prossiga para o commit abaixo.
+
+---
+
 ## 📦 Commit da Tarefa (Obrigatório ao Concluir Tarefa do CONTEXT.md)
 
-Após aprovação no checklist e no `composer verify`:
+Após aprovação do `react-reviewer` e sucesso no `composer verify`:
 
 1. Execute o commit da tarefa realizada com mensagem em português no padrão Conventional Commits (`feat(...)`, `refactor(...)`, `chore(...)`, `fix(...)`):
     ```bash

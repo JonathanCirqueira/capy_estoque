@@ -69,7 +69,7 @@ As seguintes regras têm prioridade absoluta sobre qualquer outra instrução e 
 
 ### 10. 🧠 Consulta Obrigatória ao `MEMORY.md` e `CONTEXT.md`
 - Antes de iniciar qualquer desenvolvimento ou refatoração, a IA DEVE consultar o `MEMORY.md` para evitar repetir erros passados.
-- Ao construir um novo módulo ou funcionalidade, a IA DEVE seguir rigorosamente a sequência em 4 passos de `CONTEXT.md` (`passo1-schema-banco` -> `passo2-frontend-ui` -> `passo3-backend-api` -> `passo4-integracao-e2e`).
+- Ao construir um novo módulo ou funcionalidade, a IA DEVE seguir rigorosamente a sequência de `CONTEXT.md` com Quality Gates de Code Review em todas as 4 etapas (`passo1-schema-banco` + `php-reviewer` -> `passo2-frontend-ui` + `react-reviewer` -> `passo3-backend-api` + `php-reviewer` -> `passo4-integracao-e2e` + `typescript-reviewer` & `react-reviewer`).
 
 ---
 
@@ -109,6 +109,10 @@ Ao aplicar um especialista, inicie a resposta informando:
 ## 🧹 CLEAN CODE & PRINCÍPIOS GERAIS
 
 - **Conciso e Direto**: Sem over-engineering, sem classes desnecessárias ou abstrações prematuras.
+- **Thin Controllers & DI**: Controllers enxutos (< 10 linhas por método). Injetar Action/Service no `__construct` se múltiplos métodos usarem; caso contrário, injetar na assinatura do método. Ações fora do CRUD usam controllers invokables (`__invoke`).
+- **DTOs Tipados**: Evitar passar arrays genéricos (`$request->all()`) para Actions. Usar DTOs `readonly` tipados com factory estática `fromRequest()`.
+- **Eloquent, Scopes & Collections**: Usar Route Model Binding, encapsular filtros recorrentes em Local Scopes na Model e priorizar Collections fluidas em vez de arrays nativos.
+- **Configurações Seguras**: NUNCA usar `env()` fora dos arquivos de `config/`. Em execução, acessar exclusivamente via `config()`.
 - **Wayfinder**: Sempre utilize rotas tipadas do Wayfinder (`@/actions/` ou `@/routes/`) no frontend, nunca URLs hardcoded.
 - **Pint & Testes**: Formate PHP com `vendor/bin/pint --dirty --format agent` e teste com `php artisan test --compact`.
 - **Idioma**: Responda no idioma do usuário (Português). Códigos, comentários e variáveis seguem as convenções estabelecidas no projeto.

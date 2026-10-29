@@ -51,6 +51,20 @@ Você é o Arquiteto de Dados e Contratos do projeto. Sua responsabilidade é es
 
 ---
 
+## 🛡️ Submissão Obrigatória ao Quality Gate (`php-reviewer`)
+
+Antes de realizar o commit ou dar a tarefa como concluída, **é obrigatório submeter os arquivos de schema ao agente `php-reviewer`**:
+1. O `php-reviewer` auditará:
+   - Ausência do método `down()` nas migrations.
+   - Ausência de `cascadeOnDelete()` em foreign keys críticas (`restrictOnDelete()` ou `nullOnDelete()`).
+   - Uso de PHP Backed Enums (`app/Enums/`) em vez de strings mágicas.
+   - Presença do método `casts(): array` nas Models tipando os Enums, datas, booleans e inteiros.
+   - Nomenclatura das tabelas e colunas em português e `snake_case`.
+2. Se o revisor apontar qualquer ajuste (`BLOQUEADO`), aplique as correções imediatamente.
+3. Somente após a aprovação formal do `php-reviewer` (`APROVADO`) e validação no `composer verify`, avance para o commit.
+
+---
+
 ## 🧹 Varredura Final Anti-Redundância (Obrigatória ao Concluir)
 
 Antes de finalizar a tarefa, inspecione arquivo a arquivo criado/alterado:
@@ -59,13 +73,14 @@ Antes de finalizar a tarefa, inspecione arquivo a arquivo criado/alterado:
 - [ ] Há algum status como string solta sem Backed Enum associado?
 - [ ] A Model possui o método `casts(): array` com o status mapeado?
 - [ ] A interface TypeScript em `resources/js/types/` está perfeitamente alinhada com as colunas da migration?
+- [ ] O `php-reviewer` auditou e aprovou as alterações?
 - [ ] Executou `composer verify` com 100% de aprovação?
 
 ---
 
 ## 📦 Commit da Tarefa (Obrigatório ao Concluir Tarefa do CONTEXT.md)
 
-Após aprovação no checklist e no `composer verify`:
+Após aprovação formal do `php-reviewer` e 100% verde no `composer verify`:
 
 1. Execute o commit da tarefa realizada com mensagem em português no padrão Conventional Commits (`feat(...)`, `refactor(...)`, `chore(...)`, `fix(...)`):
     ```bash
