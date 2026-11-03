@@ -8,7 +8,7 @@ Entidades Principais: User, Plano.
 ---
 
 🗄️ Passo 1: Schema, Enums & Banco (passo1-schema-banco)
-[ ] 1.1. Enums PHP & TypeScript:
+[x] 1.1. Enums PHP & TypeScript:
 
 - app/Enums/UserRole.php e resources/js/types/enums/user-role.ts (admin, usuario_padrao).
 - app/Enums/UserStatus.php e resources/js/types/enums/user-status.ts (pendente, ativo, inativo).
@@ -16,23 +16,23 @@ Entidades Principais: User, Plano.
 - app/Enums/AssinaturaStatus.php e resources/js/types/enums/assinatura-status.ts (active, past_due, canceled, trialing, incomplete).
 - app/Enums/AssinaturaOrigem.php e resources/js/types/enums/assinatura-origem.ts (manual, stripe).
 
-[ ] 1.2. Migrations:
+[x] 1.2. Migrations:
 
 - Migration de planos: `planos` com `nome`, `ciclo`, `preco_centavos` (unsignedInteger), `stripe_price_id` (apenas método up(), sem down()).
 - Migration evolutiva em users: adiciona `role`, `status`, `convite_token`, `convite_expira_em`, `plano_id` (FK `restrictOnDelete()` ou `nullOnDelete()`), `assinatura_status`, `assinatura_origem`, `data_inicio`, `data_vencimento`, `cancel_at_period_end`, `stripe_customer_id`, `stripe_subscription_id`, `stripe_price_id`, e torna `password` nullable (apenas método up(), sem down()).
 
-[ ] 1.3. Models & Casts:
+[x] 1.3. Models & Casts:
 
 - Atualizar app/Models/User.php com $fillable completo, relacionamento `belongsTo(Plano::class)` e `casts(): array` tipados.
 - Criar app/Models/Plano.php com $fillable, `hasMany(User::class)` e `casts(): array` tipados.
 
-[ ] 1.4. Factories & Seeders:
+[x] 1.4. Factories & Seeders:
 
 - database/factories/PlanoFactory.php.
 - database/factories/UserFactory.php (atualizado para suportar planos e campos de assinatura).
 - database/seeders/PlanoSeeder.php provisionando os 4 planos fixos (Básico Mensal, Básico Anual, Pro Mensal, Pro Anual) com `preco_centavos`.
 
-[ ] 1.5. Quality Gate: Code Review de Schema & Banco (php-reviewer):
+[x] 1.5. Quality Gate: Code Review de Schema & Banco (php-reviewer):
 
 - Auditar ausência de método down().
 - Auditar ausência de cascadeOnDelete() em relacionamentos centrais.
@@ -40,9 +40,9 @@ Entidades Principais: User, Plano.
 - Auditar uso estrito de PHP 8.2+ Backed Enums.
 - Auditar presença do método casts(): array em todas as models.
 
-[ ] 1.6. Verificação de Integridade: Executar php artisan migrate, php artisan db:seed --class=PlanoSeeder e composer verify.
+[x] 1.6. Verificação de Integridade: Executar php artisan migrate, php artisan db:seed --class=PlanoSeeder e composer verify.
 
-[ ] 1.7. Commit: feat(database): criar migrations, models, enums e seeders de usuarios e planos.
+[x] 1.7. Commit: feat(database): criar migrations, models, enums e seeders de usuarios e planos.
 
 
 💻 Implementação dos Arquivos do Passo 1
