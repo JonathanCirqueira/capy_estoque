@@ -22,14 +22,18 @@ import { UserRole } from '@/types/enums/user-role';
 import { UserStatus } from '@/types/enums/user-status';
 import type { UsuariosPageProps, UsuarioListItem } from './types';
 
-export default function UsuariosIndex({ usuarios, contadores, filtros }: UsuariosPageProps) {
+export default function UsuariosIndex({
+    usuarios = { data: [], current_page: 1, last_page: 1, per_page: 10, total: 0, from: 0, to: 0, links: [] },
+    contadores = { todos: 0, ativo: 0, pendente: 0, inativo: 0 },
+    filtros = { busca: '', role: 'todos', aba: 'todos', ordem_campo: 'name', ordem_direcao: 'asc', per_page: 10 },
+}: UsuariosPageProps) {
     const [modalConvidarAberto, setModalConvidarAberto] = useState(false);
     const [usuarioInativar, setUsuarioInativar] = useState<UsuarioListItem | null>(null);
     const [usuarioReenviar, setUsuarioReenviar] = useState<UsuarioListItem | null>(null);
 
-    const [termoBusca, setTermoBusca] = useState(filtros.busca ?? '');
-    const [roleFiltro, setRoleFiltro] = useState(filtros.role ?? 'todos');
-    const [abaStatus, setAbaStatus] = useState(filtros.aba ?? 'todos');
+    const [termoBusca, setTermoBusca] = useState(filtros?.busca ?? '');
+    const [roleFiltro, setRoleFiltro] = useState(filtros?.role ?? 'todos');
+    const [abaStatus, setAbaStatus] = useState(filtros?.aba ?? 'todos');
 
     const statusTabs: StatusTabItem[] = useMemo(
         () => [
