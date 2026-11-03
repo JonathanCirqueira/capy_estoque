@@ -7,44 +7,46 @@
 
 ## 🚫 O que NUNCA Fazer (Lista Negra de Padrões)
 
-### Git & DevOps
+### 1. Git & Fluxo de Desenvolvimento
 
-- 🚫 **Commits fora dos Agentes & Pushes**: NUNCA executar `git commit` fora do fluxo dos 4 agentes de automação do `CONTEXT.md`. Os 4 agentes realizam git commit automaticamente a cada tarefa concluída (em português: feat, refactor, fix, chore). NUNCA executar `git push`.
-- 🚫 **GitLab SSH sem chave pública configurada**: NUNCA usar remote SSH (`git@gitlab.com:...`) quando a chave SSH do ambiente não estiver cadastrada. Utilizar HTTPS com Git Credential Manager.
+- 🚫 **Commits e Pushes Autônomos**: NUNCA executar `git push`. Commits são realizados exclusivamente pelos agentes por tarefa concluída em português (Conventional Commits: feat, refactor, fix, chore).
+- 🚫 **Avançar de Passo sem Pedido Explícito**: NUNCA avançar para etapas seguintes (ex: Passo 3 ou 4) na branch de UI (`feat/*-frontend-ui`) sem ordem expressa do usuário; branches de UI contêm estritamente frontend com dados mockados.
 
-### Backend (Laravel & PHP)
+### 2. Backend (Laravel & PHP)
 
-- 🚫 **Strings Mágicas**: NUNCA usar strings soltas para status, tipos ou perfis. Usar sempre PHP Backed Enums em `app/Enums/` com cast na Model.
-- 🚫 **Formatação no Backend**: NUNCA enviar valores monetários formatados, datas em string BR ou textos com máscara. Backend envia apenas dados brutos (centavos, ISO 8601, booleans).
-- 🚫 **`cascadeOnDelete` em Cadastros Centrais**: NUNCA colocar deleção em cascata apontando para `users` ou tabelas de negócio vitais. Usar `restrictOnDelete()` ou `nullOnDelete()`.
-- 🚫 **Injeção de Actions no `__construct`**: NUNCA injetar Actions no construtor do Controller. Injetar exclusivamente no método da rota que a executa.
-- 🚫 **Arquivos de Tradução Ausentes com `APP_LOCALE=pt_BR`**: NUNCA rodar aplicação sem arquivos em `lang/pt_BR/*.php`, evitando que chaves como `auth.failed` vazem cruas na UI.
-- 🚫 **Cadastro Público Aberto sem Requisito**: NUNCA manter `Features::registration()` ativo quando o domínio prevê cadastro exclusivo via convite administrativo.
-- 🚫 **Final de Arquivo sem Linha em Branco (Pint/PSR-12)**: NUNCA criar arquivos PHP sem quebra de linha final única (`single_blank_line_at_eof`), garantindo que o `vendor/bin/pint --test` passe sem falhas.
+- 🚫 **Strings Mágicas**: NUNCA usar strings soltas para status, tipos ou perfis. Usar SEMPRE PHP Backed Enums em `app/Enums/` com casts explícitos na Model e espelhamento em `resources/js/types/`.
+- 🚫 **Formatação de Apresentação no Backend**: NUNCA enviar valores formatados, datas em string BR ou máscaras. O backend envia apenas dados brutos (centavos em inteiro, ISO 8601, booleans).
+- 🚫 **Deleção em Cascata em Tabelas Vitais**: NUNCA usar `cascadeOnDelete()` apontando para `users` ou cadastros centrais. Usar `restrictOnDelete()` ou `nullOnDelete()`.
+- 🚫 **Injeção de Actions no `__construct`**: NUNCA injetar Actions no construtor do Controller; injetar exclusivamente na assinatura do método da rota ou usar controllers invokables (`__invoke`).
 
-### Frontend (React & Inertia)
+### 3. Frontend: Layout & Navegação Base
 
-- 🚫 **Layouts Duplicados no JSX**: NUNCA envolver páginas com `<AppLayout>` ou `<SettingsLayout>` no retorno JSX. O starter kit já os injeta globalmente via `app.tsx`. Use apenas `Component.layout = { breadcrumbs: [...] }` para evitar migalhas de pão e botão de tema duplicados.
-- 🚫 **Validação Manual na UI**: NUNCA criar checagens manuais (`if (!campo.trim())`) ou objetos de erro manuais. A validação pertence exclusivamente ao FormRequest via Precognition / Inertia errors.
-- 🚫 **`new FormData()` Manual**: NUNCA instanciar `FormData` artesanal com loops de `append`. Enviar objetos de payload puros via Inertia.
-- 🚫 **Strings Mágicas na UI**: NUNCA usar strings soltas para filtros e status. Usar Enums e tipos espelhados do TypeScript (`resources/js/types/`).
-- 🚫 **`wayfinder:generate` sem `--with-form`**: NUNCA rodar a geração do Wayfinder sem a flag `--with-form`, sob pena de causar `store.form is not a function` nos formulários.
-- 🚫 **Containers com `mx-auto` ou `max-w-*` nas Páginas**: NUNCA usar `mx-auto` ou `max-w-7xl`/`5xl`/`6xl` no container raiz da página. Usar largura fluida total (`flex flex-1 flex-col gap-6 p-4 md:p-6`) conforme as skills `frontend-listagem` e `frontend-cadastro` para evitar faixas laterais vazias em widescreen.
-- 🚫 **Recriar Componentes na Mão**: NUNCA criar cards de seleção, botões ou inputs artesanais no JSX sem antes verificar componentes existentes no projeto em `resources/js/components/` ou orientados nas skills (ex: `<Selector>`, `<MultiSelect>`, `<Botao>`).
-- 🚫 **Tom de Vermelho Destrutivo nos Modais**: Usar sempre a cor de identidade do projeto `#ce3765` para o botão e título de inativação/destrutivo no ConfirmationModal com o padrão de botões 'Voltar' (outline) e 'Inativar' (check com bg-[#ce3765]).
-- 🚫 **Filtros com Poucos Itens Quebrados em 2 Linhas**: NUNCA quebrar a barra de busca e combobox em 2 linhas separadas quando houver apenas 1 ou 2 filtros; mantê-los na mesma linha horizontal (`sm:flex-row sm:items-center`) alinhados à busca e ao menu de opções.
-- 🚫 **Modais com Cards de Seleção Estreitos Demais**: NUNCA usar `sm:max-w-lg` ou `sm:max-w-2xl` em modais com seletores em 3 colunas (como níveis de acesso), sob risco de truncamento; usar `sm:max-w-3xl` com botões no rodapé distribuídos nas extremidades (`justify-between sm:justify-between`).
-- 🚫 **Colunas de Dados com Cores ou Tipografia Desiguais**: NUNCA aplicar `text-muted-foreground` a colunas de dados comuns (como e-mail); padronizar todas as colunas com `text-sm font-normal text-foreground` para consistência e suporte ao tema (claro/escuro).
-- 🚫 **Indicador de Seleção no Selector/Nível de Acesso**: NUNCA usar indicador circular ('dot' / 'rounded-full') para seleção de nível de acesso; usar sempre checkbox semi-quadrado ('check' com 'rounded-md') e ativar preenchimento primário no ícone lateral quando selecionado.
-- 🚫 **Radix Popover/MultiSelect dentro de Dialog**: NUNCA usar 'modal={true}' ou portal sem container para Popover/MultiSelect dentro de Dialog; usar 'modal={false}', ancorar o Portal no container do Dialog via 'closest("[role=\'dialog\']")' e 'onKeyDown={(e) => e.stopPropagation()}' no input para evitar roubo de foco pelo FocusScope.
-- 🚫 **Troca de Senha na Gestão de Usuários**: NUNCA abrir modal com input de texto ou cópia de senha; usar sempre ConfirmationModal padrão confirmando o envio de e-mail com nova senha temporária para o usuário.
-- 🚫 **Item 'Início' nas Migalhas de Pão (Breadcrumbs)**: NUNCA incluir '{ title: "Início", href: "/dashboard" }' no array de breadcrumbs das páginas; iniciar diretamente com a seção do módulo atual (ex: 'Usuários' ou 'Reembolsos').
+- 🚫 **Layouts Duplicados e Containers Restritivos**: NUNCA envolver páginas com `<AppLayout>` no JSX (usar `Component.layout`) e NUNCA limitar com `mx-auto`/`max-w-*` na raiz da página (usar layout fluido `flex flex-1 flex-col gap-6 p-4 md:p-6`).
+- 🚫 **Cabeçalhos Artesanais e Migalhas com 'Início'**: NUNCA recriar cabeçalho manual (usar SEMPRE `<PageHeader>`) e NUNCA incluir 'Início' nos breadcrumbs; iniciar diretamente pelo módulo atual.
+- 🚫 **Alterações Mobile Quebrando Desktop**: NUNCA aplicar classes globais (como `w-full`) para atender pedidos mobile; manter ações em linha única no desktop (`sm:flex-nowrap sm:shrink-0`) e apenas centralizar/empilhar no mobile.
+- 🚫 **Cards Aninhados com Tabelas**: NUNCA envolver tabelas que já possuem bordas e containers próprios dentro de `<Card>` externo, evitando o efeito "card dentro de card".
 
----
+### 4. Frontend: Componentes de UI & Formulários
 
-## 💡 Lições Aprendidas & Ajustes Recentes
+- 🚫 **Sobrescrever Layout de Botões com `className`**: NUNCA injetar classes arbitrárias de layout via `className` no `<Button>` ou `<Botao>` (preservar padding e gaps nativos); em modais de confirmação, usar botões nas pontas (`sm:justify-between`) com `<Botao>`.
+- 🚫 **Cursor em Botões de Fechamento (X)**: O botão 'X' de fechar em modais e gavetas (`Dialog` e `Sheet`) deve conter SEMPRE `cursor-pointer` explícito.
+- 🚫 **Selects / Comboboxes sem Limpeza e Dependentes Soltos**: Iniciar selects sem valores pré-selecionados e com opção 'X' (`clearable`); selects dependentes iniciam desabilitados até a seleção do pai e opções mostram código e nome na mesma linha (`text-xs`).
+- 🚫 **Radix Popover / Combobox dentro de Dialog**: Usar sempre `modal={false}` no Popover dentro de Dialog, ancorar Portal no modal e acionar seleção no `onPointerDown` com `e.preventDefault()` e `e.stopPropagation()` no CommandItem.
+- 🚫 **Barra de Ações do Rodapé Solta**: Em formulários/revisões, usar container pai `flex-1` e barra `mt-auto sticky bottom-0 z-20 -mx-4 -mb-4 md:-mx-6 md:-mb-6 p-4 md:px-6 bg-background/95 backdrop-blur-sm` (com coluna no mobile para 3+ botões e lado a lado para 2 botões).
+- 🚫 **Inconsistência de Labels e Alturas em Despesas de KM**: No modal de despesas para quilometragem, manter 'Taxa de KM Vigente' com Label externo e Input de altura idêntica (h-10) aos demais campos, e usar estritamente 'Descrição da Despesa' para o campo de texto/trajeto.
 
-- **Identidade Visual e Branding**: Manter logos em `public/capy_logo_dark.png` e `public/capy_logo_light.png`. Sidebar configurada com gradiente Dark Navy (`bg-linear-to-b from-[#061d43] from-45% to-[#010d22]`) e partículas turquesas (`#36C2D2`).
-- **Autenticação Padrão**: Usuário padrão de acesso e seeder é `admin@capy.com` com senha `password`.
-- **Validação de Qualidade Obrigatória**: Todo commit ou conclusão de tarefa deve rodar `composer verify` e obter 100% de sucesso (Oxlint, Rector, PHPStan, Pint e Pest).
+### 5. Frontend: Listagens, Tabelas & Cards Mobile
 
+- 🚫 **Menu de Três Pontos (Ações)**: NUNCA colocar bordas no botão de 3 pontos (usar `variant="ghost"`), NUNCA incluir ações ad-hoc (usar ação uniforme 'Visualizar'), e em exclusões usar hover destrutivo explícito (`text-destructive hover:bg-destructive/10`).
+- 🚫 **Ações Soltas no Rodapé de Cards Mobile**: NUNCA colocar botões explícitos no rodapé de cards mobile em listagens; usar SEMPRE o menu de 3 pontos no cabeçalho do card com DropdownMenu idêntico ao desktop e status no rodapé.
+- 🚫 **Barra de Filtros e Busca no Mobile**: Manter busca e botão de 3 pontos na mesma linha no mobile (`grid grid-cols-[1fr_auto]`), combobox na linha inferior e linha horizontal única no desktop (`sm:flex sm:items-center`). Rótulo de exportação é sempre 'Exportar tabela'.
+- 🚫 **Tabs de Segmento e Status no Mobile**: Em seletores de abas com 2 opções no mobile, usar `grid grid-cols-2 w-full` (desktop `sm:flex sm:w-auto`), `min-w-0 px-2 py-2 gap-1.5`, textos truncados e badges `shrink-0`.
+
+### 6. Frontend: Módulo de Reembolso & Telas Específicas
+
+- 🚫 **Cards de Métricas do Dashboard**: Usar estritamente 'Aprovados', 'Em Aprovação' e 'Cancelados' nos títulos (sem repetir 'no Mês'), acompanhados pela descrição superior '📅 Métricas consolidadas referentes ao mês atual'; o 3º card é sempre 'Cancelados' (filtrando por Cancelado ao clicar).
+- 🚫 **Tabs de Escopo e Roteiro**: Título da página fixo como 'Listagem de Reembolsos'; abas 'Gestor' (1ª) e 'Meus Reembolsos' (2ª) com largura simétrica (`sm:w-48`). Em formulários de roteiro, usar estritamente 'Dados do roteiro' e 'Despesas do roteiro' (`sm:w-56`).
+- 🚫 **Rótulos Redundantes de Ação**: Usar estritamente 'Continuar' e 'Cancelar' nos menus e botões de roteiro, eliminando sufixos redundantes como 'Roteiro'.
+- 🚫 **Visualização de Detalhes e Fila de Aprovação**: A fila lateral é apenas atalho para detalhes; aprovar/reprovar ocorre exclusivamente nos detalhes (com botão 'Voltar' à esquerda e 'Aprovar'/'Reprovar' à direita). Cards de Rateio e Responsável usam mesma largura (`w-full max-w-lg`).
+- 🚫 **Visualização de Comprovantes em Detalhes**: Em tabelas/cards de despesas, exibir apenas ícone de olho (`Eye`, sem texto); na fase de UI, emite apenas `toast.info` avisando que a abertura será habilitada na integração com o backend (sem abrir nova aba ou criar arquivos em `public/anexos`).
+- 🚫 **Configurações de Reembolso (Tipos, Aprovadores e Tabs)**: Tipos de roteiro usam o mesmo padrão dos aprovadores (apenas nome e lixeira, com botão '+ Adicionar'); tabs usam 'Parâmetros' e 'Histórico' com larguras idênticas (`sm:w-40`) e sem badges numéricas.
