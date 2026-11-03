@@ -504,6 +504,12 @@ class PlanoSeeder extends Seeder
 
 ## 🎨 Passo 2: Frontend UI & Telas (passo2-frontend-ui)
 
+### 📌 Lista de Tarefas do Passo 2
+- [x] 2.1. Tipos e Contratos TypeScript (`resources/js/pages/usuarios/types.ts`)
+- [x] 2.2. Modal de Convite de Usuário (`resources/js/pages/usuarios/components/modal-convidar-usuario.tsx`)
+- [x] 2.3. Página Principal de Listagem (`resources/js/pages/usuarios/index.tsx`)
+- [x] 2.4. Quality Gate de UI (`react-reviewer`) & `composer verify`
+
 ### 📌 Checklist Pré-Execução (Auditoria `MEMORY.md`)
 
 - [x] **Anti-Duplicação de Layout:** NUNCA envolver a página em `<AppLayout>` no JSX retornado. Usar exclusivamente `UsuariosIndex.layout = { breadcrumbs: [{ title: 'Usuários', href: '/usuarios' }] }`.
