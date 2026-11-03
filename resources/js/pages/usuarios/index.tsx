@@ -53,6 +53,11 @@ export default function UsuariosIndex({ usuarios, contadores, filtros }: Usuario
         );
     };
 
+    const handleSort = (coluna: string) => {
+        const novaDirecao = filtros.ordem_campo === coluna && filtros.ordem_direcao === 'asc' ? 'desc' : 'asc';
+        handleFiltrar({ ordem_campo: coluna, ordem_direcao: novaDirecao });
+    };
+
     return (
         <>
             <Head title="Gestão de Usuários" />
@@ -138,40 +143,36 @@ export default function UsuariosIndex({ usuarios, contadores, filtros }: Usuario
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent">
                                     <SortableTableHead
-                                        field="name"
-                                        currentField={filtros.ordem_campo}
-                                        direction={filtros.ordem_direcao}
-                                        onSort={(f, d) => handleFiltrar({ ordem_campo: f, ordem_direcao: d })}
-                                    >
-                                        NOME
-                                    </SortableTableHead>
+                                        label="NOME"
+                                        coluna="name"
+                                        colunaAtiva={filtros.ordem_campo}
+                                        direcaoAtiva={filtros.ordem_direcao}
+                                        onSort={handleSort}
+                                    />
                                     <SortableTableHead
-                                        field="email"
-                                        currentField={filtros.ordem_campo}
-                                        direction={filtros.ordem_direcao}
-                                        onSort={(f, d) => handleFiltrar({ ordem_campo: f, ordem_direcao: d })}
-                                    >
-                                        E-MAIL
-                                    </SortableTableHead>
+                                        label="E-MAIL"
+                                        coluna="email"
+                                        colunaAtiva={filtros.ordem_campo}
+                                        direcaoAtiva={filtros.ordem_direcao}
+                                        onSort={handleSort}
+                                    />
                                     <SortableTableHead
-                                        field="role"
-                                        currentField={filtros.ordem_campo}
-                                        direction={filtros.ordem_direcao}
-                                        onSort={(f, d) => handleFiltrar({ ordem_campo: f, ordem_direcao: d })}
-                                    >
-                                        PERFIL
-                                    </SortableTableHead>
+                                        label="PERFIL"
+                                        coluna="role"
+                                        colunaAtiva={filtros.ordem_campo}
+                                        direcaoAtiva={filtros.ordem_direcao}
+                                        onSort={handleSort}
+                                    />
                                     <TableHead className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                                         PLANO
                                     </TableHead>
                                     <SortableTableHead
-                                        field="status"
-                                        currentField={filtros.ordem_campo}
-                                        direction={filtros.ordem_direcao}
-                                        onSort={(f, d) => handleFiltrar({ ordem_campo: f, ordem_direcao: d })}
-                                    >
-                                        STATUS
-                                    </SortableTableHead>
+                                        label="STATUS"
+                                        coluna="status"
+                                        colunaAtiva={filtros.ordem_campo}
+                                        direcaoAtiva={filtros.ordem_direcao}
+                                        onSort={handleSort}
+                                    />
                                     <TableHead className="w-16 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                                         AÇÕES
                                     </TableHead>
@@ -294,7 +295,16 @@ export default function UsuariosIndex({ usuarios, contadores, filtros }: Usuario
                         ))}
                     </div>
 
-                    <Paginacao links={usuarios.links} total={usuarios.total} de={usuarios.from} ate={usuarios.to} />
+                    <Paginacao
+                        paginaAtual={usuarios.current_page}
+                        totalPaginas={usuarios.last_page}
+                        aoMudarPagina={(p) => handleFiltrar({ page: p })}
+                        mostrarDe={usuarios.from}
+                        mostrarA={usuarios.to}
+                        mostrarTotal={usuarios.total}
+                        itensPorPagina={usuarios.per_page}
+                        aoMudarItensPorPagina={(itens) => handleFiltrar({ per_page: itens, page: 1 })}
+                    />
                 </div>
             </div>
 
@@ -308,7 +318,7 @@ export default function UsuariosIndex({ usuarios, contadores, filtros }: Usuario
                 description={`Tem certeza que deseja inativar o acesso de ${usuarioInativar?.name}? O colaborador não conseguirá mais entrar no sistema.`}
                 confirmText="Inativar"
                 cancelText="Voltar"
-                destructive
+                variant="destructive"
                 onConfirm={() => {
                     if (usuarioInativar) {
                         router.put(
@@ -331,6 +341,7 @@ export default function UsuariosIndex({ usuarios, contadores, filtros }: Usuario
                 description={`Deseja reenviar o e-mail de convite com link de definição de senha para ${usuarioReenviar?.email}?`}
                 confirmText="Enviar E-mail"
                 cancelText="Voltar"
+                variant="default"
                 onConfirm={() => {
                     if (usuarioReenviar) {
                         router.post(

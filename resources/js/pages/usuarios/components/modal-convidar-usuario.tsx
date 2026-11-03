@@ -24,7 +24,7 @@ interface ModalConvidarUsuarioProps {
 }
 
 export function ModalConvidarUsuario({ aberto, onAbertoAlterado }: ModalConvidarUsuarioProps) {
-    const { data, setData, post, processing, errors, reset, clearErrors, validate } = useForm<ConvidarUsuarioFormData>({
+    const { data, setData, post, processing, errors, reset, clearErrors } = useForm<ConvidarUsuarioFormData>({
         name: '',
         email: '',
         role: UserRole.UsuarioPadrao,
@@ -76,7 +76,6 @@ export function ModalConvidarUsuario({ aberto, onAbertoAlterado }: ModalConvidar
                                             setData('name', e.target.value);
                                             clearErrors('name');
                                         }}
-                                        onBlur={() => validate('name')}
                                         placeholder="Digite o nome completo..."
                                         error={Boolean(errors.name)}
                                         disabled={processing}
@@ -96,7 +95,6 @@ export function ModalConvidarUsuario({ aberto, onAbertoAlterado }: ModalConvidar
                                             setData('email', e.target.value);
                                             clearErrors('email');
                                         }}
-                                        onBlur={() => validate('email')}
                                         placeholder="Ex: colaborador@empresa.com.br"
                                         error={Boolean(errors.email)}
                                         disabled={processing}

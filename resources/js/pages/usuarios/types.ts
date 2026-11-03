@@ -50,6 +50,8 @@ export interface UsuariosPageProps {
         role?: string;
         ordem_campo?: string;
         ordem_direcao?: 'asc' | 'desc';
+        page?: number;
+        per_page?: number;
     };
 }
 
