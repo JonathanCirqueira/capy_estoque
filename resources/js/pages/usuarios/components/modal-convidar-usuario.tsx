@@ -23,10 +23,41 @@ interface ModalConvidarUsuarioProps {
     onAbertoAlterado: (aberto: boolean) => void;
 }
 
+const aplicarMascaraTelefone = (valor: string): string => {
+    const apenasDigitos = valor.replace(/\D/g, '').slice(0, 11);
+    if (apenasDigitos.length <= 10) {
+        return apenasDigitos
+            .replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3')
+            .trim()
+            .replace(/-$/, '');
+    }
+    return apenasDigitos
+        .replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3')
+        .trim()
+        .replace(/-$/, '');
+};
+
+const aplicarMascaraCpfCnpj = (valor: string): string => {
+    const apenasDigitos = valor.replace(/\D/g, '').slice(0, 14);
+    if (apenasDigitos.length <= 11) {
+        return apenasDigitos
+            .replace(/^(\d{3})(\d)/, '$1.$2')
+            .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+            .replace(/\.(\d{3})(\d)/, '.$1-$2');
+    }
+    return apenasDigitos
+        .replace(/^(\d{2})(\d)/, '$1.$2')
+        .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+        .replace(/\.(\d{3})(\d)/, '.$1/$2')
+        .replace(/(\d{4})(\d)/, '$1-$2');
+};
+
 export function ModalConvidarUsuario({ aberto, onAbertoAlterado }: ModalConvidarUsuarioProps) {
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm<ConvidarUsuarioFormData>({
         name: '',
         email: '',
+        telefone: '',
+        cpf_cnpj: '',
         role: UserRole.UsuarioPadrao,
     });
 
@@ -74,7 +105,7 @@ export function ModalConvidarUsuario({ aberto, onAbertoAlterado }: ModalConvidar
                                         value={data.name}
                                         onChange={(e) => {
                                             setData('name', e.target.value);
-                                            clearErrors('name');
+                                            if (errors.name) clearErrors('name');
                                         }}
                                         placeholder="Digite o nome completo..."
                                         error={Boolean(errors.name)}
@@ -93,13 +124,46 @@ export function ModalConvidarUsuario({ aberto, onAbertoAlterado }: ModalConvidar
                                         value={data.email}
                                         onChange={(e) => {
                                             setData('email', e.target.value);
-                                            clearErrors('email');
+                                            if (errors.email) clearErrors('email');
                                         }}
                                         placeholder="Ex: colaborador@empresa.com.br"
                                         error={Boolean(errors.email)}
                                         disabled={processing}
                                     />
                                     <InputError message={errors.email} />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="telefone">Telefone / WhatsApp</Label>
+                                    <Input
+                                        id="telefone"
+                                        type="tel"
+                                        value={data.telefone}
+                                        onChange={(e) => {
+                                            setData('telefone', aplicarMascaraTelefone(e.target.value));
+                                            if (errors.telefone) clearErrors('telefone');
+                                        }}
+                                        placeholder="Ex: (11) 99999-9999"
+                                        error={Boolean(errors.telefone)}
+                                        disabled={processing}
+                                    />
+                                    <InputError message={errors.telefone} />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="cpf_cnpj">CPF / CNPJ</Label>
+                                    <Input
+                                        id="cpf_cnpj"
+                                        value={data.cpf_cnpj}
+                                        onChange={(e) => {
+                                            setData('cpf_cnpj', aplicarMascaraCpfCnpj(e.target.value));
+                                            if (errors.cpf_cnpj) clearErrors('cpf_cnpj');
+                                        }}
+                                        placeholder="Ex: 000.000.000-00 ou 00.000.000/0001-00"
+                                        error={Boolean(errors.cpf_cnpj)}
+                                        disabled={processing}
+                                    />
+                                    <InputError message={errors.cpf_cnpj} />
                                 </div>
                             </div>
                         </div>
@@ -113,9 +177,9 @@ export function ModalConvidarUsuario({ aberto, onAbertoAlterado }: ModalConvidar
                                     value={data.role}
                                     onValueChange={(val) => {
                                         setData('role', val as UserRole);
-                                        clearErrors('role');
+                                        if (errors.role) clearErrors('role');
                                     }}
-                                    className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+                                    columns={2}
                                 >
                                     <SelectorItem
                                         value={UserRole.Admin}

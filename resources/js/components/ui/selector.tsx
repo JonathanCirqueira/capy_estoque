@@ -75,7 +75,7 @@ export function SelectorItem<T extends string = string>({
         >
             {children || (
                 <>
-                    <div className="flex items-center gap-3.5 min-w-0 pr-2">
+                    <div className="flex items-center gap-3.5 min-w-0 pr-2 flex-1">
                         {/* Icon Box */}
                         {OptionIcon && (
                             <div
@@ -86,17 +86,17 @@ export function SelectorItem<T extends string = string>({
                                         : 'bg-muted/70 text-muted-foreground border border-border/40'
                                 )}
                             >
-                                <OptionIcon className="size-4" />
+                                <OptionIcon className="size-4 shrink-0" />
                             </div>
                         )}
 
                         {/* Text Details */}
-                        <div className="flex flex-col min-w-0">
-                            <span className="truncate font-bold text-xs tracking-wide text-foreground uppercase">
+                        <div className="flex flex-col min-w-0 flex-1">
+                            <span className="font-bold text-xs tracking-wide text-foreground uppercase">
                                 {title}
                             </span>
                             {description && (
-                                <span className="truncate text-[11px] text-muted-foreground font-normal mt-0.5">
+                                <span className="text-[11px] text-muted-foreground font-normal mt-0.5 line-clamp-1">
                                     {description}
                                 </span>
                             )}
@@ -130,6 +130,7 @@ export interface SelectorProps<T extends string = string> {
     icon?: React.ComponentType<{ className?: string }>;
     className?: string;
     gridClassName?: string;
+    columns?: 1 | 2 | 3 | 4;
     disabled?: boolean;
     children?: React.ReactNode;
 }
@@ -143,6 +144,7 @@ export function SelectorRoot<T extends string = string>({
     icon: HeaderIcon,
     className,
     gridClassName,
+    columns,
     disabled = false,
     children,
 }: SelectorProps<T>) {
@@ -158,6 +160,15 @@ export function SelectorRoot<T extends string = string>({
         setSelectedValue(newValue);
         onValueChange?.(newValue as T);
     };
+
+    const gridColsClass =
+        columns === 1
+            ? 'grid-cols-1'
+            : columns === 2
+            ? 'grid-cols-1 sm:grid-cols-2'
+            : columns === 4
+            ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4'
+            : 'grid-cols-1 sm:grid-cols-3';
 
     return (
         <SelectorContext.Provider
@@ -181,7 +192,7 @@ export function SelectorRoot<T extends string = string>({
                 )}
 
                 {/* Grid container */}
-                <div className={cn('grid grid-cols-1 gap-3.5 sm:grid-cols-3', gridClassName)}>
+                <div className={cn('grid gap-3.5', gridColsClass, gridClassName)}>
                     {children ||
                         options?.map((option) => (
                             <SelectorItem
