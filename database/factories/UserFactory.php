@@ -31,6 +31,8 @@ final class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
+            'telefone' => null,
+            'cpf_cnpj' => null,
             'email_verified_at' => now(),
             'password' => self::$password ??= Hash::make('password'),
             'role' => UserRole::UsuarioPadrao,

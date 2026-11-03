@@ -20,6 +20,7 @@ Entidades Principais: User, Plano.
 
 - Migration de planos: `planos` com `nome`, `ciclo`, `preco_centavos` (unsignedInteger), `stripe_price_id` (apenas método up(), sem down()).
 - Migration evolutiva em users: adiciona `role`, `status`, `convite_token`, `convite_expira_em`, `plano_id` (FK `restrictOnDelete()` ou `nullOnDelete()`), `assinatura_status`, `assinatura_origem`, `data_inicio`, `data_vencimento`, `cancel_at_period_end`, `stripe_customer_id`, `stripe_subscription_id`, `stripe_price_id`, e torna `password` nullable (apenas método up(), sem down()).
+- Migration complementar em users: adiciona `telefone` e `cpf_cnpj` (apenas método up(), sem down()).
 
 [x] 1.3. Models & Casts:
 
