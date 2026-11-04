@@ -1,6 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import { Head, router } from '@inertiajs/react';
-import { Search, MoreHorizontal, Download, FolderOpen, RefreshCw, ShieldAlert, MoreVertical } from 'lucide-react';
+import {
+    Search,
+    MoreHorizontal,
+    Download,
+    FolderOpen,
+    RefreshCw,
+    ShieldAlert,
+    ShieldCheck,
+    MoreVertical,
+    Pencil,
+} from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,9 +28,41 @@ import {
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { Paginacao } from '@/components/paginacao';
 import { ModalConvidarUsuario } from './components/modal-convidar-usuario';
+import { ModalEditarUsuario } from './components/modal-editar-usuario';
 import { UserRole } from '@/types/enums/user-role';
 import { UserStatus } from '@/types/enums/user-status';
 import type { UsuariosPageProps, UsuarioListItem } from './types';
+
+const formatarTelefoneExibicao = (valor?: string | null): string => {
+    if (!valor) return '-';
+    const apenasDigitos = valor.replace(/\D/g, '').slice(0, 11);
+    if (apenasDigitos.length <= 10) {
+        return apenasDigitos
+            .replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3')
+            .trim()
+            .replace(/-$/, '');
+    }
+    return apenasDigitos
+        .replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3')
+        .trim()
+        .replace(/-$/, '');
+};
+
+const formatarCpfCnpjExibicao = (valor?: string | null): string => {
+    if (!valor) return '-';
+    const apenasDigitos = valor.replace(/\D/g, '').slice(0, 14);
+    if (apenasDigitos.length <= 11) {
+        return apenasDigitos
+            .replace(/^(\d{3})(\d)/, '$1.$2')
+            .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+            .replace(/\.(\d{3})(\d)/, '.$1-$2');
+    }
+    return apenasDigitos
+        .replace(/^(\d{2})(\d)/, '$1.$2')
+        .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+        .replace(/\.(\d{3})(\d)/, '.$1/$2')
+        .replace(/(\d{4})(\d)/, '$1-$2');
+};
 
 export default function UsuariosIndex({
     usuarios = { data: [], current_page: 1, last_page: 1, per_page: 10, total: 0, from: 0, to: 0, links: [] },
@@ -28,7 +70,9 @@ export default function UsuariosIndex({
     filtros = { busca: '', role: 'todos', aba: 'todos', ordem_campo: 'name', ordem_direcao: 'asc', per_page: 10 },
 }: UsuariosPageProps) {
     const [modalConvidarAberto, setModalConvidarAberto] = useState(false);
+    const [usuarioEditar, setUsuarioEditar] = useState<UsuarioListItem | null>(null);
     const [usuarioInativar, setUsuarioInativar] = useState<UsuarioListItem | null>(null);
+    const [usuarioAtivar, setUsuarioAtivar] = useState<UsuarioListItem | null>(null);
     const [usuarioReenviar, setUsuarioReenviar] = useState<UsuarioListItem | null>(null);
 
     const [termoBusca, setTermoBusca] = useState(filtros?.busca ?? '');
@@ -86,11 +130,10 @@ export default function UsuariosIndex({
                         }}
                     />
 
-                    {/* Filtros em linha única alinhados horizontalmente */}
+                    {/* Barra de Filtros */}
                     <div className="p-4 md:p-6">
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                            <div className="relative flex-1">
-                                <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                        <div className="flex flex-wrap items-center gap-3 sm:flex-nowrap">
+                            <div className="order-1 min-w-0 flex-1">
                                 <Input
                                     value={termoBusca}
                                     onChange={(e) => {
@@ -98,11 +141,39 @@ export default function UsuariosIndex({
                                         handleFiltrar({ busca: e.target.value });
                                     }}
                                     placeholder="Filtrar por nome ou e-mail..."
-                                    className="pl-9"
+                                    leftIcon={<Search className="size-4 text-muted-foreground/60" />}
+                                    clearable={Boolean(termoBusca)}
+                                    onClear={() => {
+                                        setTermoBusca('');
+                                        handleFiltrar({ busca: '' });
+                                    }}
                                 />
                             </div>
 
-                            <div className="w-full sm:w-56">
+                            <div className="order-2 shrink-0 sm:order-3">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="cursor-pointer text-muted-foreground"
+                                        >
+                                            <MoreHorizontal className="size-4" />
+                                            <span className="sr-only">Opções da Listagem</span>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem
+                                            onClick={() => window.open('/usuarios/exportar', '_blank')}
+                                            className="cursor-pointer"
+                                        >
+                                            <Download className="mr-2 size-4" /> Exportar CSV
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+
+                            <div className="order-3 w-full sm:order-2 sm:w-56">
                                 <Combobox
                                     value={roleFiltro}
                                     onChange={(val) => {
@@ -117,27 +188,6 @@ export default function UsuariosIndex({
                                     placeholder="Perfil de Acesso"
                                 />
                             </div>
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="shrink-0 cursor-pointer text-muted-foreground"
-                                    >
-                                        <MoreHorizontal className="size-4" />
-                                        <span className="sr-only">Opções da Listagem</span>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem
-                                        onClick={() => window.open('/usuarios/exportar', '_blank')}
-                                        className="cursor-pointer"
-                                    >
-                                        <Download className="mr-2 size-4" /> Exportar CSV
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
                         </div>
                     </div>
 
@@ -238,6 +288,12 @@ export default function UsuariosIndex({
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem
+                                                            onClick={() => setUsuarioEditar(user)}
+                                                            className="cursor-pointer"
+                                                        >
+                                                            <Pencil className="mr-2 size-4" /> Editar Usuário
+                                                        </DropdownMenuItem>
                                                         {user.status === UserStatus.Pendente && (
                                                             <DropdownMenuItem
                                                                 onClick={() => setUsuarioReenviar(user)}
@@ -249,9 +305,17 @@ export default function UsuariosIndex({
                                                         {user.status === UserStatus.Ativo && (
                                                             <DropdownMenuItem
                                                                 onClick={() => setUsuarioInativar(user)}
-                                                                className="cursor-pointer text-destructive focus:text-destructive"
+                                                                className="cursor-pointer text-destructive hover:bg-destructive hover:text-white focus:bg-destructive focus:text-white data-highlighted:bg-destructive data-highlighted:text-white dark:hover:text-white dark:focus:text-white [&_svg]:text-destructive! hover:[&_svg]:text-white! focus:[&_svg]:text-white! data-highlighted:[&_svg]:text-white!"
                                                             >
                                                                 <ShieldAlert className="mr-2 size-4" /> Inativar Usuário
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                        {user.status === UserStatus.Inativo && (
+                                                            <DropdownMenuItem
+                                                                onClick={() => setUsuarioAtivar(user)}
+                                                                className="cursor-pointer text-emerald-600 hover:bg-success hover:text-success-foreground focus:bg-success focus:text-success-foreground data-highlighted:bg-success data-highlighted:text-success-foreground dark:text-emerald-400 dark:hover:text-white! dark:focus:text-white! dark:data-highlighted:text-white! [&_svg]:text-emerald-600! hover:[&_svg]:text-success-foreground! focus:[&_svg]:text-success-foreground! data-highlighted:[&_svg]:text-success-foreground! dark:[&_svg]:text-emerald-400! dark:hover:[&_svg]:text-white! dark:focus:[&_svg]:text-white! dark:data-highlighted:[&_svg]:text-white!"
+                                                            >
+                                                                <ShieldCheck className="mr-2 size-4" /> Ativar Usuário
                                                             </DropdownMenuItem>
                                                         )}
                                                     </DropdownMenuContent>
@@ -265,38 +329,130 @@ export default function UsuariosIndex({
                     </div>
 
                     {/* Cards Mobile */}
-                    <div className="flex flex-col gap-3 border-t border-border/40 p-4 md:hidden">
-                        {usuarios.data.map((user) => (
-                            <div
-                                key={user.id}
-                                className="flex items-center justify-between rounded-xl border border-border/60 bg-background p-3.5"
-                            >
-                                <div>
-                                    <p className="text-sm font-semibold text-foreground">{user.name}</p>
-                                    <p className="text-xs text-muted-foreground">{user.email}</p>
-                                    <p className="mt-1 text-xs text-foreground/80">
-                                        {user.role === UserRole.Admin ? 'Administrador' : 'Usuário Padrão'}
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Badge
-                                        variant={
-                                            user.status === UserStatus.Ativo
-                                                ? 'success'
-                                                : user.status === UserStatus.Pendente
-                                                  ? 'warning'
-                                                  : 'destructive'
-                                        }
-                                    >
-                                        {user.status === UserStatus.Ativo
-                                            ? 'ATIVO'
-                                            : user.status === UserStatus.Pendente
-                                              ? 'PENDENTE'
-                                              : 'INATIVO'}
-                                    </Badge>
-                                </div>
+                    <div className="flex flex-col gap-3 px-4 pb-4 md:hidden">
+                        {usuarios.data.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center gap-2 py-8 text-center text-muted-foreground">
+                                <FolderOpen className="size-8 stroke-1 text-muted-foreground/60" />
+                                <p className="text-sm">Nenhum usuário encontrado com os filtros aplicados.</p>
                             </div>
-                        ))}
+                        ) : (
+                            usuarios.data.map((user) => (
+                                <div
+                                    key={user.id}
+                                    className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-background p-4 shadow-xs"
+                                >
+                                    {/* Topo do Card Mobile */}
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="min-w-0 flex-1">
+                                            <p className="truncate text-sm font-semibold text-foreground">
+                                                {user.name}
+                                            </p>
+                                            <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+                                        </div>
+                                        <div className="flex shrink-0 items-center gap-1.5">
+                                            <Badge
+                                                variant={
+                                                    user.status === UserStatus.Ativo
+                                                        ? 'success'
+                                                        : user.status === UserStatus.Pendente
+                                                          ? 'warning'
+                                                          : 'destructive'
+                                                }
+                                            >
+                                                {user.status === UserStatus.Ativo
+                                                    ? 'ATIVO'
+                                                    : user.status === UserStatus.Pendente
+                                                      ? 'PENDENTE'
+                                                      : 'INATIVO'}
+                                            </Badge>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="size-8 cursor-pointer"
+                                                    >
+                                                        <MoreVertical className="size-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem
+                                                        onClick={() => setUsuarioEditar(user)}
+                                                        className="cursor-pointer"
+                                                    >
+                                                        <Pencil className="mr-2 size-4" /> Editar Usuário
+                                                    </DropdownMenuItem>
+                                                    {user.status === UserStatus.Pendente && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => setUsuarioReenviar(user)}
+                                                            className="cursor-pointer"
+                                                        >
+                                                            <RefreshCw className="mr-2 size-4" /> Reenviar Convite
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    {user.status === UserStatus.Ativo && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => setUsuarioInativar(user)}
+                                                            className="cursor-pointer text-destructive hover:bg-destructive hover:text-white focus:bg-destructive focus:text-white data-highlighted:bg-destructive data-highlighted:text-white dark:hover:text-white dark:focus:text-white [&_svg]:text-destructive! hover:[&_svg]:text-white! focus:[&_svg]:text-white! data-highlighted:[&_svg]:text-white!"
+                                                        >
+                                                            <ShieldAlert className="mr-2 size-4" /> Inativar Usuário
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    {user.status === UserStatus.Inativo && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => setUsuarioAtivar(user)}
+                                                            className="cursor-pointer text-emerald-600 hover:bg-success hover:text-success-foreground focus:bg-success focus:text-success-foreground data-highlighted:bg-success data-highlighted:text-success-foreground dark:text-emerald-400 dark:hover:text-white! dark:focus:text-white! dark:data-highlighted:text-white! [&_svg]:text-emerald-600! hover:[&_svg]:text-success-foreground! focus:[&_svg]:text-success-foreground! data-highlighted:[&_svg]:text-success-foreground! dark:[&_svg]:text-emerald-400! dark:hover:[&_svg]:text-white! dark:focus:[&_svg]:text-white! dark:data-highlighted:[&_svg]:text-white!"
+                                                        >
+                                                            <ShieldCheck className="mr-2 size-4" /> Ativar Usuário
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    </div>
+
+                                    {/* Metadados em Grid Neutro */}
+                                    <div className="grid grid-cols-2 gap-2.5 rounded-xl border border-border/30 bg-muted/40 p-3">
+                                        <div>
+                                            <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                                Perfil
+                                            </span>
+                                            <p className="mt-0.5 truncate text-sm font-normal text-foreground">
+                                                {user.role === UserRole.Admin ? 'Administrador' : 'Usuário Padrão'}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                                Plano
+                                            </span>
+                                            <p className="mt-0.5 truncate text-sm font-normal text-foreground">
+                                                {user.plano ? user.plano.nome : 'Sem Plano'}
+                                            </p>
+                                        </div>
+                                        {user.telefone && (
+                                            <div>
+                                                <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                                    Telefone
+                                                </span>
+                                                <p className="mt-0.5 truncate text-sm font-normal text-foreground">
+                                                    {formatarTelefoneExibicao(user.telefone)}
+                                                </p>
+                                            </div>
+                                        )}
+                                        {user.cpf_cnpj && (
+                                            <div>
+                                                <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                                    CPF / CNPJ
+                                                </span>
+                                                <p className="mt-0.5 truncate text-sm font-normal text-foreground">
+                                                    {formatarCpfCnpjExibicao(user.cpf_cnpj)}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
 
                     <Paginacao
@@ -313,6 +469,12 @@ export default function UsuariosIndex({
             </div>
 
             <ModalConvidarUsuario aberto={modalConvidarAberto} onAbertoAlterado={setModalConvidarAberto} />
+
+            <ModalEditarUsuario
+                usuario={usuarioEditar}
+                aberto={Boolean(usuarioEditar)}
+                onAbertoAlterado={(aberto) => !aberto && setUsuarioEditar(null)}
+            />
 
             {/* Modal de Inativação Segura (#ce3765) */}
             <ConfirmationModal
@@ -331,6 +493,29 @@ export default function UsuariosIndex({
                             {
                                 preserveScroll: true,
                                 onSuccess: () => setUsuarioInativar(null),
+                            },
+                        );
+                    }
+                }}
+            />
+
+            {/* Modal de Ativação Segura */}
+            <ConfirmationModal
+                open={Boolean(usuarioAtivar)}
+                onOpenChange={(aberto) => !aberto && setUsuarioAtivar(null)}
+                title="Ativar Usuário"
+                description={`Tem certeza que deseja ativar o acesso de ${usuarioAtivar?.name}? O colaborador poderá acessar o sistema novamente.`}
+                confirmText="Ativar"
+                cancelText="Voltar"
+                variant="success"
+                onConfirm={() => {
+                    if (usuarioAtivar) {
+                        router.put(
+                            `/usuarios/${usuarioAtivar.id}/ativar`,
+                            {},
+                            {
+                                preserveScroll: true,
+                                onSuccess: () => setUsuarioAtivar(null),
                             },
                         );
                     }

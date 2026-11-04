@@ -64,3 +64,11 @@ export interface ConvidarUsuarioFormData {
     cpf_cnpj: string;
     role: UserRole;
 }
+
+export interface EditarUsuarioFormData {
+    name: string;
+    email: string;
+    telefone: string;
+    cpf_cnpj: string;
+    role: UserRole;
+}

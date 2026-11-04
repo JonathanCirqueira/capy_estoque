@@ -159,7 +159,7 @@ export function ModalConvidarUsuario({ aberto, onAbertoAlterado }: ModalConvidar
                                             setData('cpf_cnpj', aplicarMascaraCpfCnpj(e.target.value));
                                             if (errors.cpf_cnpj) clearErrors('cpf_cnpj');
                                         }}
-                                        placeholder="Ex: 000.000.000-00 ou 00.000.000/0001-00"
+                                        placeholder="Ex: 000.000.000-00"
                                         error={Boolean(errors.cpf_cnpj)}
                                         disabled={processing}
                                     />
@@ -199,7 +199,7 @@ export function ModalConvidarUsuario({ aberto, onAbertoAlterado }: ModalConvidar
                         </div>
                     </div>
 
-                    <DialogFooter className="flex shrink-0 items-center justify-between border-t border-border/40 bg-muted/20 p-4 sm:justify-between">
+                    <DialogFooter className="flex w-full shrink-0 flex-row items-center justify-between border-t border-border/40 bg-muted/20 p-4 sm:justify-between">
                         <DialogClose asChild>
                             <Botao
                                 type="button"

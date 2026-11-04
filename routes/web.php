@@ -103,6 +103,26 @@ Route::middleware(['auth'])->group(function () {
             ],
         ]);
     })->name('usuarios.index');
+
+    Route::put('/usuarios/{id}', function () {
+        return back();
+    })->name('usuarios.update');
+
+    Route::post('/usuarios/convidar', function () {
+        return back();
+    })->name('usuarios.convidar');
+
+    Route::put('/usuarios/{id}/inativar', function () {
+        return back();
+    })->name('usuarios.inativar');
+
+    Route::put('/usuarios/{id}/ativar', function () {
+        return back();
+    })->name('usuarios.ativar');
+
+    Route::post('/usuarios/{id}/reenviar-convite', function () {
+        return back();
+    })->name('usuarios.reenviar-convite');
 });
 
 require __DIR__.'/settings.php';
