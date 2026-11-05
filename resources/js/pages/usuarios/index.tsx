@@ -29,6 +29,12 @@ import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { Paginacao } from '@/components/paginacao';
 import { ModalConvidarUsuario } from './components/modal-convidar-usuario';
 import { ModalEditarUsuario } from './components/modal-editar-usuario';
+import {
+    inativar as inativarRoute,
+    ativar as ativarRoute,
+    reenviarConvite as reenviarConviteRoute,
+    exportar as exportarRoute,
+} from '@/routes/usuarios';
 import { UserRole } from '@/types/enums/user-role';
 import { UserStatus } from '@/types/enums/user-status';
 import type { UsuariosPageProps, UsuarioListItem } from './types';
@@ -75,9 +81,55 @@ export default function UsuariosIndex({
     const [usuarioAtivar, setUsuarioAtivar] = useState<UsuarioListItem | null>(null);
     const [usuarioReenviar, setUsuarioReenviar] = useState<UsuarioListItem | null>(null);
 
+    const [estaInativando, setEstaInativando] = useState(false);
+    const [estaAtivando, setEstaAtivando] = useState(false);
+    const [estaReenviando, setEstaReenviando] = useState(false);
+
     const [termoBusca, setTermoBusca] = useState(filtros?.busca ?? '');
     const [roleFiltro, setRoleFiltro] = useState(filtros?.role ?? 'todos');
     const [abaStatus, setAbaStatus] = useState(filtros?.aba ?? 'todos');
+
+    const debounceBuscaRef = React.useRef<NodeJS.Timeout | null>(null);
+
+    const filtrosAtuaisRef = React.useRef({
+        busca: termoBusca,
+        role: roleFiltro,
+        aba: abaStatus,
+        ordem_campo: filtros.ordem_campo ?? 'name',
+        ordem_direcao: filtros.ordem_direcao ?? 'asc',
+        per_page: filtros.per_page ?? 10,
+    });
+
+    React.useEffect(() => {
+        filtrosAtuaisRef.current = {
+            busca: termoBusca,
+            role: roleFiltro,
+            aba: abaStatus,
+            ordem_campo: filtros.ordem_campo ?? 'name',
+            ordem_direcao: filtros.ordem_direcao ?? 'asc',
+            per_page: filtros.per_page ?? 10,
+        };
+    }, [termoBusca, roleFiltro, abaStatus, filtros]);
+
+    React.useEffect(() => {
+        setTermoBusca(filtros?.busca ?? '');
+    }, [filtros?.busca]);
+
+    React.useEffect(() => {
+        setRoleFiltro(filtros?.role ?? 'todos');
+    }, [filtros?.role]);
+
+    React.useEffect(() => {
+        setAbaStatus(filtros?.aba ?? 'todos');
+    }, [filtros?.aba]);
+
+    React.useEffect(() => {
+        return () => {
+            if (debounceBuscaRef.current) {
+                clearTimeout(debounceBuscaRef.current);
+            }
+        };
+    }, []);
 
     const statusTabs: StatusTabItem[] = useMemo(
         () => [
@@ -90,15 +142,35 @@ export default function UsuariosIndex({
     );
 
     const handleFiltrar = (novosFiltros: Partial<typeof filtros>) => {
-        router.get(
-            '/usuarios',
-            {
-                ...filtros,
-                ...novosFiltros,
-                page: 1,
-            },
-            { preserveState: true, preserveScroll: true },
-        );
+        const params = {
+            ...filtrosAtuaisRef.current,
+            page: 1,
+            ...novosFiltros,
+        };
+
+        router.get('/usuarios', params, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
+
+    const handleBuscaChange = (valor: string) => {
+        setTermoBusca(valor);
+        if (debounceBuscaRef.current) {
+            clearTimeout(debounceBuscaRef.current);
+        }
+        debounceBuscaRef.current = setTimeout(() => {
+            handleFiltrar({ busca: valor });
+        }, 300);
+    };
+
+    const handleBuscaClear = () => {
+        setTermoBusca('');
+        if (debounceBuscaRef.current) {
+            clearTimeout(debounceBuscaRef.current);
+        }
+        handleFiltrar({ busca: '' });
     };
 
     const handleSort = (coluna: string) => {
@@ -136,17 +208,11 @@ export default function UsuariosIndex({
                             <div className="order-1 min-w-0 flex-1">
                                 <Input
                                     value={termoBusca}
-                                    onChange={(e) => {
-                                        setTermoBusca(e.target.value);
-                                        handleFiltrar({ busca: e.target.value });
-                                    }}
+                                    onChange={(e) => handleBuscaChange(e.target.value)}
                                     placeholder="Filtrar por nome ou e-mail..."
                                     leftIcon={<Search className="size-4 text-muted-foreground/60" />}
                                     clearable={Boolean(termoBusca)}
-                                    onClear={() => {
-                                        setTermoBusca('');
-                                        handleFiltrar({ busca: '' });
-                                    }}
+                                    onClear={handleBuscaClear}
                                 />
                             </div>
 
@@ -164,7 +230,13 @@ export default function UsuariosIndex({
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem
-                                            onClick={() => window.open('/usuarios/exportar', '_blank')}
+                                            onClick={() => {
+                                                const query: Record<string, string> = {};
+                                                if (termoBusca) query.busca = termoBusca;
+                                                if (roleFiltro && roleFiltro !== 'todos') query.role = roleFiltro;
+                                                if (abaStatus && abaStatus !== 'todos') query.aba = abaStatus;
+                                                window.open(exportarRoute.url({ query }), '_blank');
+                                            }}
                                             className="cursor-pointer"
                                         >
                                             <Download className="mr-2 size-4" /> Exportar CSV
@@ -177,8 +249,9 @@ export default function UsuariosIndex({
                                 <Combobox
                                     value={roleFiltro}
                                     onChange={(val) => {
-                                        setRoleFiltro(val);
-                                        handleFiltrar({ role: val });
+                                        const novoRole = val || 'todos';
+                                        setRoleFiltro(novoRole);
+                                        handleFiltrar({ role: novoRole });
                                     }}
                                     options={[
                                         { value: 'todos', label: 'Todos os Perfis' },
@@ -479,19 +552,22 @@ export default function UsuariosIndex({
             {/* Modal de Inativação Segura (#ce3765) */}
             <ConfirmationModal
                 open={Boolean(usuarioInativar)}
-                onOpenChange={(aberto) => !aberto && setUsuarioInativar(null)}
+                onOpenChange={(aberto) => !aberto && !estaInativando && setUsuarioInativar(null)}
                 title="Inativar Usuário"
                 description={`Tem certeza que deseja inativar o acesso de ${usuarioInativar?.name}? O colaborador não conseguirá mais entrar no sistema.`}
                 confirmText="Inativar"
                 cancelText="Voltar"
                 variant="destructive"
+                isLoading={estaInativando}
                 onConfirm={() => {
                     if (usuarioInativar) {
                         router.put(
-                            `/usuarios/${usuarioInativar.id}/inativar`,
+                            inativarRoute.url(usuarioInativar.id),
                             {},
                             {
                                 preserveScroll: true,
+                                onStart: () => setEstaInativando(true),
+                                onFinish: () => setEstaInativando(false),
                                 onSuccess: () => setUsuarioInativar(null),
                             },
                         );
@@ -502,19 +578,22 @@ export default function UsuariosIndex({
             {/* Modal de Ativação Segura */}
             <ConfirmationModal
                 open={Boolean(usuarioAtivar)}
-                onOpenChange={(aberto) => !aberto && setUsuarioAtivar(null)}
+                onOpenChange={(aberto) => !aberto && !estaAtivando && setUsuarioAtivar(null)}
                 title="Ativar Usuário"
                 description={`Tem certeza que deseja ativar o acesso de ${usuarioAtivar?.name}? O colaborador poderá acessar o sistema novamente.`}
                 confirmText="Ativar"
                 cancelText="Voltar"
                 variant="success"
+                isLoading={estaAtivando}
                 onConfirm={() => {
                     if (usuarioAtivar) {
                         router.put(
-                            `/usuarios/${usuarioAtivar.id}/ativar`,
+                            ativarRoute.url(usuarioAtivar.id),
                             {},
                             {
                                 preserveScroll: true,
+                                onStart: () => setEstaAtivando(true),
+                                onFinish: () => setEstaAtivando(false),
                                 onSuccess: () => setUsuarioAtivar(null),
                             },
                         );
@@ -525,19 +604,22 @@ export default function UsuariosIndex({
             {/* Modal de Confirmação para Reenvio de Convite por E-mail */}
             <ConfirmationModal
                 open={Boolean(usuarioReenviar)}
-                onOpenChange={(aberto) => !aberto && setUsuarioReenviar(null)}
+                onOpenChange={(aberto) => !aberto && !estaReenviando && setUsuarioReenviar(null)}
                 title="Reenviar Convite"
                 description={`Deseja reenviar o e-mail de convite com link de definição de senha para ${usuarioReenviar?.email}?`}
                 confirmText="Enviar E-mail"
                 cancelText="Voltar"
                 variant="default"
+                isLoading={estaReenviando}
                 onConfirm={() => {
                     if (usuarioReenviar) {
                         router.post(
-                            `/usuarios/${usuarioReenviar.id}/reenviar-convite`,
+                            reenviarConviteRoute.url(usuarioReenviar.id),
                             {},
                             {
                                 preserveScroll: true,
+                                onStart: () => setEstaReenviando(true),
+                                onFinish: () => setEstaReenviando(false),
                                 onSuccess: () => setUsuarioReenviar(null),
                             },
                         );

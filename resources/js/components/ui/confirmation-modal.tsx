@@ -104,14 +104,18 @@ export function ConfirmationModal({
 
     const defaultIcon = icon || currentVariant.defaultIcon;
 
-    const defaultConfirmIcon = confirmIcon || (
-        isLoading ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" strokeWidth={2.5} />
-    );
+    const defaultConfirmIcon = confirmIcon || <Check className="size-4" strokeWidth={2.5} />;
 
     const defaultCancelIcon = cancelIcon || <ArrowLeft className="size-4" />;
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog
+            open={open}
+            onOpenChange={(nextOpen) => {
+                if (isLoading) return;
+                onOpenChange(nextOpen);
+            }}
+        >
             <DialogContent className="sm:max-w-md rounded-3xl p-6 gap-5 border border-border/60 shadow-lg">
                 <DialogHeader className="gap-2 text-left">
                     <DialogTitle className="flex items-center gap-2.5 text-lg font-bold">
@@ -153,8 +157,14 @@ export function ConfirmationModal({
                             confirmClassName
                         )}
                     >
-                        {defaultConfirmIcon}
-                        <span>{confirmText}</span>
+                        {isLoading ? (
+                            <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                            <>
+                                {defaultConfirmIcon}
+                                <span>{confirmText}</span>
+                            </>
+                        )}
                     </Button>
                 </DialogFooter>
             </DialogContent>
