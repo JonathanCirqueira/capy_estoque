@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\UserRole;
+use App\Enums\UserStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -29,8 +31,23 @@ final class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
+            'telefone' => null,
+            'cpf_cnpj' => null,
             'email_verified_at' => now(),
             'password' => self::$password ??= Hash::make('password'),
+            'role' => UserRole::UsuarioPadrao,
+            'status' => UserStatus::Ativo,
+            'convite_token' => null,
+            'convite_expira_em' => null,
+            'plano_id' => null,
+            'assinatura_status' => null,
+            'assinatura_origem' => null,
+            'data_inicio' => null,
+            'data_vencimento' => null,
+            'cancel_at_period_end' => false,
+            'stripe_customer_id' => null,
+            'stripe_subscription_id' => null,
+            'stripe_price_id' => null,
             'remember_token' => Str::random(10),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
@@ -45,18 +62,6 @@ final class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes): array => [
             'email_verified_at' => null,
-        ]);
-    }
-
-    /**
-     * Indicate that the model has two-factor authentication configured.
-     */
-    public function withTwoFactor(): static
-    {
-        return $this->state(fn (array $attributes): array => [
-            'two_factor_secret' => encrypt('secret'),
-            'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code-1'])),
-            'two_factor_confirmed_at' => now(),
         ]);
     }
 }
