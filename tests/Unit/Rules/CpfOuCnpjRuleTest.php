@@ -3,13 +3,16 @@
 declare(strict_types=1);
 
 use App\Rules\CpfOuCnpjRule;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 test('cpf valido passa na validacao com ou sem mascara', function (string $cpfValido) {
     $rule = new CpfOuCnpjRule();
     $erros = [];
 
-    $rule->validate('cpf_cnpj', $cpfValido, function (string $msg) use (&$erros) {
+    $rule->validate('cpf_cnpj', $cpfValido, function (string $msg) use (&$erros): PotentiallyTranslatedString {
         $erros[] = $msg;
+
+        return new PotentiallyTranslatedString($msg, app('translator'));
     });
 
     expect($erros)->toBeEmpty();
@@ -24,8 +27,10 @@ test('cnpj valido passa na validacao com ou sem mascara', function (string $cnpj
     $rule = new CpfOuCnpjRule();
     $erros = [];
 
-    $rule->validate('cpf_cnpj', $cnpjValido, function (string $msg) use (&$erros) {
+    $rule->validate('cpf_cnpj', $cnpjValido, function (string $msg) use (&$erros): PotentiallyTranslatedString {
         $erros[] = $msg;
+
+        return new PotentiallyTranslatedString($msg, app('translator'));
     });
 
     expect($erros)->toBeEmpty();
@@ -40,8 +45,10 @@ test('cpf ou cnpj invalido falha na validacao', function (string $invalido) {
     $rule = new CpfOuCnpjRule();
     $erros = [];
 
-    $rule->validate('cpf_cnpj', $invalido, function (string $msg) use (&$erros) {
+    $rule->validate('cpf_cnpj', $invalido, function (string $msg) use (&$erros): PotentiallyTranslatedString {
         $erros[] = $msg;
+
+        return new PotentiallyTranslatedString($msg, app('translator'));
     });
 
     expect($erros)->not->toBeEmpty();

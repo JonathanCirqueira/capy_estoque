@@ -3,13 +3,16 @@
 declare(strict_types=1);
 
 use App\Rules\TelefoneBrasileiroRule;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 test('telefone brasileiro valido passa na validacao com ou sem mascara', function (string $telefoneValido) {
     $rule = new TelefoneBrasileiroRule();
     $erros = [];
 
-    $rule->validate('telefone', $telefoneValido, function (string $msg) use (&$erros) {
+    $rule->validate('telefone', $telefoneValido, function (string $msg) use (&$erros): PotentiallyTranslatedString {
         $erros[] = $msg;
+
+        return new PotentiallyTranslatedString($msg, app('translator'));
     });
 
     expect($erros)->toBeEmpty();
@@ -27,8 +30,10 @@ test('telefone brasileiro invalido falha na validacao', function (string $invali
     $rule = new TelefoneBrasileiroRule();
     $erros = [];
 
-    $rule->validate('telefone', $invalido, function (string $msg) use (&$erros) {
+    $rule->validate('telefone', $invalido, function (string $msg) use (&$erros): PotentiallyTranslatedString {
         $erros[] = $msg;
+
+        return new PotentiallyTranslatedString($msg, app('translator'));
     });
 
     expect($erros)->not->toBeEmpty();
