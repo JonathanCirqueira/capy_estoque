@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
+use App\Enums\UserStatus;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -22,6 +24,8 @@ final class DatabaseSeeder extends Seeder
                 'name' => 'Admin',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
+                'role' => UserRole::Admin,
+                'status' => UserStatus::Ativo,
             ]
         );
     }

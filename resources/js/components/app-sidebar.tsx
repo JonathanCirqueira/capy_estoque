@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { LayoutGrid } from 'lucide-react';
+import { LayoutGrid, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -15,6 +15,11 @@ export function AppSidebar() {
             title: 'Dashboard',
             href: dashboard().url,
             icon: LayoutGrid,
+        },
+        {
+            title: 'Usuários',
+            href: '/usuarios',
+            icon: Users,
         },
     ];
 

@@ -64,12 +64,15 @@ export function PageHeader({ title, description, action, children, className, sh
 
     return (
         <div
-            className={cn('flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between', className)}
+            className={cn(
+                'flex flex-col items-center gap-3.5 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left',
+                className,
+            )}
         >
-            <Heading className="mb-0" title={title} description={description} />
+            <Heading className="mb-0 text-center sm:text-left" title={title} description={description} />
 
             {hasActions && (
-                <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex w-full flex-wrap items-center justify-center gap-2.5 sm:w-auto sm:justify-start">
                     {renderAction()}
                     {children}
                 </div>
