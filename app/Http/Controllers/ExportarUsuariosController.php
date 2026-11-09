@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Enums\AssinaturaStatus;
-use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Http\Requests\ListarUsuariosRequest;
 use App\Models\User;
@@ -73,13 +72,6 @@ final class ExportarUsuariosController extends Controller
                         ->orWhere('email', 'like', sprintf('%%%s%%', $termo))
                         ->orWhere('empresa', 'like', sprintf('%%%s%%', $termo));
                 });
-            }
-
-            if (! empty($filtros['role']) && is_string($filtros['role'])) {
-                $roleEnum = UserRole::tryFrom($filtros['role']);
-                if ($roleEnum !== null) {
-                    $query->where('role', $roleEnum);
-                }
             }
 
             if (! empty($filtros['assinatura']) && is_string($filtros['assinatura'])) {

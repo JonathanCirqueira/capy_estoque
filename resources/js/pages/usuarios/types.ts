@@ -50,7 +50,6 @@ export interface UsuariosPageProps {
     filtros: {
         busca?: string;
         aba?: string;
-        role?: string;
         assinatura?: string;
         ordem_campo?: string;
         ordem_direcao?: 'asc' | 'desc';

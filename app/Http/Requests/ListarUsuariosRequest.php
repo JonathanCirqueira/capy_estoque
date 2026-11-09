@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
-use App\Enums\UserRole;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 final class ListarUsuariosRequest extends FormRequest
 {
@@ -18,7 +16,6 @@ final class ListarUsuariosRequest extends FormRequest
         return [
             'busca' => ['sometimes', 'nullable', 'string', 'max:255'],
             'aba' => ['sometimes', 'string', 'in:todos,ativo,ativos,inativo,inativos,pendente,pendentes'],
-            'role' => ['sometimes', 'nullable', 'string', Rule::enum(UserRole::class)],
             'assinatura' => ['sometimes', 'nullable', 'string', 'in:todos,ativa,pendente,inativa'],
             'ordem_campo' => ['sometimes', 'string', 'in:name,email,empresa,role,status,created_at'],
             'ordem_direcao' => ['sometimes', 'string', 'in:asc,desc'],

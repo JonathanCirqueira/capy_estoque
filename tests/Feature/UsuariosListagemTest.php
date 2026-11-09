@@ -154,36 +154,6 @@ test('filtro de assinatura filtra usuarios com status de assinatura ativo, pende
     );
 });
 
-test('filtro de perfil de acesso filtra administradores e usuarios padrao', function () {
-    $admin = User::factory()->create([
-        'name' => 'Admin Chefe',
-        'role' => UserRole::Admin,
-    ]);
-
-    User::factory()->create([
-        'name' => 'Funcionario Normal',
-        'role' => UserRole::UsuarioPadrao,
-    ]);
-
-    $responseAdmin = $this->actingAs($admin)->get(route('usuarios.index', ['role' => UserRole::Admin->value]));
-
-    $responseAdmin->assertOk();
-    $responseAdmin->assertInertia(fn (Assert $page) => $page
-        ->component('usuarios/index')
-        ->has('usuarios.data', 1)
-        ->where('usuarios.data.0.name', 'Admin Chefe')
-    );
-
-    $responsePadrao = $this->actingAs($admin)->get(route('usuarios.index', ['role' => UserRole::UsuarioPadrao->value]));
-
-    $responsePadrao->assertOk();
-    $responsePadrao->assertInertia(fn (Assert $page) => $page
-        ->component('usuarios/index')
-        ->has('usuarios.data', 1)
-        ->where('usuarios.data.0.name', 'Funcionario Normal')
-    );
-});
-
 test('filtro de aba de status filtra usuarios inativos ou ativos', function () {
     $admin = User::factory()->create([
         'role' => UserRole::Admin,
