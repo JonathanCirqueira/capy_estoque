@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\AssinaturaStatus;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Http\Requests\ListarUsuariosRequest;
@@ -81,11 +82,33 @@ final class ExportarUsuariosController extends Controller
                 }
             }
 
+            if (! empty($filtros['assinatura']) && is_string($filtros['assinatura'])) {
+                match ($filtros['assinatura']) {
+                    'ativa' => $query->where(function (Builder $q): void {
+                        $q->whereIn('assinatura_status', [
+                            AssinaturaStatus::Active,
+                            AssinaturaStatus::Trialing,
+                        ]);
+                    }),
+                    'pendente' => $query->where(function (Builder $q): void {
+                        $q->whereIn('assinatura_status', [
+                            AssinaturaStatus::PastDue,
+                            AssinaturaStatus::Incomplete,
+                        ]);
+                    }),
+                    'inativa' => $query->where(function (Builder $q): void {
+                        $q->where('assinatura_status', AssinaturaStatus::Canceled)
+                            ->orWhereNull('assinatura_status');
+                    }),
+                    default => null,
+                };
+            }
+
             $aba = isset($filtros['aba']) && is_string($filtros['aba']) ? $filtros['aba'] : 'todos';
             match ($aba) {
-                'ativos' => $query->where('status', UserStatus::Ativo),
-                'inativos' => $query->where('status', UserStatus::Inativo),
-                'pendentes' => $query->where('status', UserStatus::Pendente),
+                'ativo', 'ativos' => $query->where('status', UserStatus::Ativo),
+                'inativo', 'inativos' => $query->where('status', UserStatus::Inativo),
+                'pendente', 'pendentes' => $query->where('status', UserStatus::Pendente),
                 default => null,
             };
 

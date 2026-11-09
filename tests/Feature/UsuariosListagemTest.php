@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\AssinaturaStatus;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Models\User;
@@ -34,9 +35,9 @@ test('usuario autenticado como admin pode visualizar listagem de usuarios com co
         ->component('usuarios/index')
         ->has('usuarios.data', 3)
         ->where('contadores.todos', 3)
-        ->where('contadores.ativos', 2)
-        ->where('contadores.inativos', 1)
-        ->where('contadores.pendentes', 0)
+        ->where('contadores.ativo', 2)
+        ->where('contadores.inativo', 1)
+        ->where('contadores.pendente', 0)
     );
 });
 
@@ -103,6 +104,53 @@ test('filtro de busca por empresa filtra usuarios no banco', function () {
         ->has('usuarios.data', 1)
         ->where('usuarios.data.0.name', 'Carlos Silveira')
         ->where('usuarios.data.0.empresa', 'Capycorp Logistica')
+    );
+});
+
+test('filtro de assinatura filtra usuarios com status de assinatura ativo, pendente ou inativo', function () {
+    $admin = User::factory()->create([
+        'name' => 'Admin Chefe',
+        'role' => UserRole::Admin,
+        'status' => UserStatus::Ativo,
+        'assinatura_status' => AssinaturaStatus::Active,
+    ]);
+
+    User::factory()->create([
+        'name' => 'Usuario Com Assinatura Atrasada',
+        'role' => UserRole::UsuarioPadrao,
+        'status' => UserStatus::Ativo,
+        'assinatura_status' => AssinaturaStatus::PastDue,
+    ]);
+
+    User::factory()->create([
+        'name' => 'Usuario Cancelado',
+        'role' => UserRole::UsuarioPadrao,
+        'status' => UserStatus::Ativo,
+        'assinatura_status' => AssinaturaStatus::Canceled,
+    ]);
+
+    $responseAtiva = $this->actingAs($admin)->get(route('usuarios.index', ['assinatura' => 'ativa']));
+    $responseAtiva->assertOk();
+    $responseAtiva->assertInertia(fn (Assert $page) => $page
+        ->component('usuarios/index')
+        ->has('usuarios.data', 1)
+        ->where('usuarios.data.0.name', 'Admin Chefe')
+    );
+
+    $responsePendente = $this->actingAs($admin)->get(route('usuarios.index', ['assinatura' => 'pendente']));
+    $responsePendente->assertOk();
+    $responsePendente->assertInertia(fn (Assert $page) => $page
+        ->component('usuarios/index')
+        ->has('usuarios.data', 1)
+        ->where('usuarios.data.0.name', 'Usuario Com Assinatura Atrasada')
+    );
+
+    $responseInativa = $this->actingAs($admin)->get(route('usuarios.index', ['assinatura' => 'inativa']));
+    $responseInativa->assertOk();
+    $responseInativa->assertInertia(fn (Assert $page) => $page
+        ->component('usuarios/index')
+        ->has('usuarios.data', 1)
+        ->where('usuarios.data.0.name', 'Usuario Cancelado')
     );
 });
 

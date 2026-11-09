@@ -51,6 +51,7 @@ export interface UsuariosPageProps {
         busca?: string;
         aba?: string;
         role?: string;
+        assinatura?: string;
         ordem_campo?: string;
         ordem_direcao?: 'asc' | 'desc';
         page?: number;

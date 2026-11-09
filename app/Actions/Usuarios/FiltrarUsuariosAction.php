@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Usuarios;
 
+use App\Enums\AssinaturaStatus;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Models\User;
@@ -71,7 +72,7 @@ final class FiltrarUsuariosAction
 
     /**
      * @param  array<string, mixed>  $filtros
-     * @return array{todos: int, ativos: int, inativos: int, pendentes: int}
+     * @return array{todos: int, ativo: int, inativo: int, pendente: int}
      */
     public function contadores(array $filtros): array
     {
@@ -85,9 +86,9 @@ final class FiltrarUsuariosAction
 
         return [
             'todos' => (clone $baseQuery)->count(),
-            'ativos' => (clone $baseQuery)->where('status', UserStatus::Ativo)->count(),
-            'inativos' => (clone $baseQuery)->where('status', UserStatus::Inativo)->count(),
-            'pendentes' => (clone $baseQuery)->where('status', UserStatus::Pendente)->count(),
+            'ativo' => (clone $baseQuery)->where('status', UserStatus::Ativo)->count(),
+            'inativo' => (clone $baseQuery)->where('status', UserStatus::Inativo)->count(),
+            'pendente' => (clone $baseQuery)->where('status', UserStatus::Pendente)->count(),
         ];
     }
 
@@ -113,11 +114,41 @@ final class FiltrarUsuariosAction
             }
         }
 
+        if (! empty($filtros['assinatura']) && is_string($filtros['assinatura'])) {
+            $this->aplicarFiltroAssinatura($query, $filtros['assinatura']);
+        }
+
         $aba = isset($filtros['aba']) && is_string($filtros['aba']) ? $filtros['aba'] : 'todos';
         match ($aba) {
-            'ativos' => $query->where('status', UserStatus::Ativo),
-            'inativos' => $query->where('status', UserStatus::Inativo),
-            'pendentes' => $query->where('status', UserStatus::Pendente),
+            'ativo', 'ativos' => $query->where('status', UserStatus::Ativo),
+            'inativo', 'inativos' => $query->where('status', UserStatus::Inativo),
+            'pendente', 'pendentes' => $query->where('status', UserStatus::Pendente),
+            default => null,
+        };
+    }
+
+    /**
+     * @param  Builder<User>  $query
+     */
+    private function aplicarFiltroAssinatura(Builder $query, string $assinatura): void
+    {
+        match ($assinatura) {
+            'ativa' => $query->where(function (Builder $q): void {
+                $q->whereIn('assinatura_status', [
+                    AssinaturaStatus::Active,
+                    AssinaturaStatus::Trialing,
+                ]);
+            }),
+            'pendente' => $query->where(function (Builder $q): void {
+                $q->whereIn('assinatura_status', [
+                    AssinaturaStatus::PastDue,
+                    AssinaturaStatus::Incomplete,
+                ]);
+            }),
+            'inativa' => $query->where(function (Builder $q): void {
+                $q->where('assinatura_status', AssinaturaStatus::Canceled)
+                    ->orWhereNull('assinatura_status');
+            }),
             default => null,
         };
     }

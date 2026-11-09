@@ -73,7 +73,7 @@ const formatarCpfCnpjExibicao = (valor?: string | null): string => {
 export default function UsuariosIndex({
     usuarios = { data: [], current_page: 1, last_page: 1, per_page: 10, total: 0, from: 0, to: 0, links: [] },
     contadores = { todos: 0, ativo: 0, pendente: 0, inativo: 0 },
-    filtros = { busca: '', role: 'todos', aba: 'todos', ordem_campo: 'name', ordem_direcao: 'asc', per_page: 10 },
+    filtros = { busca: '', assinatura: 'todos', aba: 'todos', ordem_campo: 'name', ordem_direcao: 'asc', per_page: 10 },
 }: UsuariosPageProps) {
     const [modalConvidarAberto, setModalConvidarAberto] = useState(false);
     const [usuarioEditar, setUsuarioEditar] = useState<UsuarioListItem | null>(null);
@@ -86,14 +86,14 @@ export default function UsuariosIndex({
     const [estaReenviando, setEstaReenviando] = useState(false);
 
     const [termoBusca, setTermoBusca] = useState(filtros?.busca ?? '');
-    const [roleFiltro, setRoleFiltro] = useState(filtros?.role ?? 'todos');
+    const [assinaturaFiltro, setAssinaturaFiltro] = useState(filtros?.assinatura ?? 'todos');
     const [abaStatus, setAbaStatus] = useState(filtros?.aba ?? 'todos');
 
     const debounceBuscaRef = React.useRef<NodeJS.Timeout | null>(null);
 
     const filtrosAtuaisRef = React.useRef({
         busca: termoBusca,
-        role: roleFiltro,
+        assinatura: assinaturaFiltro,
         aba: abaStatus,
         ordem_campo: filtros.ordem_campo ?? 'name',
         ordem_direcao: filtros.ordem_direcao ?? 'asc',
@@ -103,21 +103,21 @@ export default function UsuariosIndex({
     React.useEffect(() => {
         filtrosAtuaisRef.current = {
             busca: termoBusca,
-            role: roleFiltro,
+            assinatura: assinaturaFiltro,
             aba: abaStatus,
             ordem_campo: filtros.ordem_campo ?? 'name',
             ordem_direcao: filtros.ordem_direcao ?? 'asc',
             per_page: filtros.per_page ?? 10,
         };
-    }, [termoBusca, roleFiltro, abaStatus, filtros]);
+    }, [termoBusca, assinaturaFiltro, abaStatus, filtros]);
 
     React.useEffect(() => {
         setTermoBusca(filtros?.busca ?? '');
     }, [filtros?.busca]);
 
     React.useEffect(() => {
-        setRoleFiltro(filtros?.role ?? 'todos');
-    }, [filtros?.role]);
+        setAssinaturaFiltro(filtros?.assinatura ?? 'todos');
+    }, [filtros?.assinatura]);
 
     React.useEffect(() => {
         setAbaStatus(filtros?.aba ?? 'todos');
@@ -233,7 +233,8 @@ export default function UsuariosIndex({
                                             onClick={() => {
                                                 const query: Record<string, string> = {};
                                                 if (termoBusca) query.busca = termoBusca;
-                                                if (roleFiltro && roleFiltro !== 'todos') query.role = roleFiltro;
+                                                if (assinaturaFiltro && assinaturaFiltro !== 'todos')
+                                                    query.assinatura = assinaturaFiltro;
                                                 if (abaStatus && abaStatus !== 'todos') query.aba = abaStatus;
                                                 window.open(exportarRoute.url({ query }), '_blank');
                                             }}
@@ -247,18 +248,19 @@ export default function UsuariosIndex({
 
                             <div className="order-3 w-full sm:order-2 sm:w-56">
                                 <Combobox
-                                    value={roleFiltro}
+                                    value={assinaturaFiltro}
                                     onChange={(val) => {
-                                        const novoRole = val || 'todos';
-                                        setRoleFiltro(novoRole);
-                                        handleFiltrar({ role: novoRole });
+                                        const novaAssinatura = val || 'todos';
+                                        setAssinaturaFiltro(novaAssinatura);
+                                        handleFiltrar({ assinatura: novaAssinatura });
                                     }}
                                     options={[
-                                        { value: 'todos', label: 'Todos os Perfis' },
-                                        { value: UserRole.Admin, label: 'Administrador' },
-                                        { value: UserRole.UsuarioPadrao, label: 'Usuário Padrão' },
+                                        { value: 'todos', label: 'Todas as Assinaturas' },
+                                        { value: 'ativa', label: 'Ativas' },
+                                        { value: 'pendente', label: 'Pendentes' },
+                                        { value: 'inativa', label: 'Inativas' },
                                     ]}
-                                    placeholder="Perfil de Acesso"
+                                    placeholder="Status da Assinatura"
                                 />
                             </div>
                         </div>
