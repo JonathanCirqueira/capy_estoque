@@ -167,7 +167,9 @@ export function ModalEditarUsuario({ usuario, aberto, onAbertoAlterado }: ModalE
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="edit-telefone">Telefone / WhatsApp</Label>
+                                    <Label htmlFor="edit-telefone">
+                                        Telefone / WhatsApp <span className="text-destructive">*</span>
+                                    </Label>
                                     <Input
                                         id="edit-telefone"
                                         type="tel"
@@ -184,7 +186,9 @@ export function ModalEditarUsuario({ usuario, aberto, onAbertoAlterado }: ModalE
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="edit-cpf_cnpj">CPF / CNPJ</Label>
+                                    <Label htmlFor="edit-cpf_cnpj">
+                                        CPF / CNPJ <span className="text-destructive">*</span>
+                                    </Label>
                                     <Input
                                         id="edit-cpf_cnpj"
                                         value={data.cpf_cnpj}

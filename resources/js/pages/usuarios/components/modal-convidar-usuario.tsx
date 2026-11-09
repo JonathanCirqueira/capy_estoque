@@ -151,7 +151,9 @@ export function ModalConvidarUsuario({ aberto, onAbertoAlterado }: ModalConvidar
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="telefone">Telefone / WhatsApp</Label>
+                                    <Label htmlFor="telefone">
+                                        Telefone / WhatsApp <span className="text-destructive">*</span>
+                                    </Label>
                                     <Input
                                         id="telefone"
                                         type="tel"
@@ -168,7 +170,9 @@ export function ModalConvidarUsuario({ aberto, onAbertoAlterado }: ModalConvidar
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="cpf_cnpj">CPF / CNPJ</Label>
+                                    <Label htmlFor="cpf_cnpj">
+                                        CPF / CNPJ <span className="text-destructive">*</span>
+                                    </Label>
                                     <Input
                                         id="cpf_cnpj"
                                         value={data.cpf_cnpj}

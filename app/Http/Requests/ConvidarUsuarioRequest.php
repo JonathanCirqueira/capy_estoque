@@ -6,6 +6,8 @@ namespace App\Http\Requests;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Rules\CpfOuCnpjRule;
+use App\Rules\TelefoneBrasileiroRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,8 +29,29 @@ final class ConvidarUsuarioRequest extends FormRequest
             ],
             'role' => ['required', 'string', Rule::enum(UserRole::class)],
             'empresa' => ['nullable', 'string', 'max:255'],
-            'telefone' => ['nullable', 'string', 'max:20'],
-            'cpf_cnpj' => ['nullable', 'string', 'max:18'],
+            'telefone' => ['required', 'string', 'max:20', new TelefoneBrasileiroRule()],
+            'cpf_cnpj' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique(User::class, 'cpf_cnpj'),
+                new CpfOuCnpjRule(),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'name' => 'nome',
+            'email' => 'e-mail',
+            'role' => 'nível de acesso',
+            'empresa' => 'empresa',
+            'telefone' => 'telefone',
+            'cpf_cnpj' => 'CPF/CNPJ',
         ];
     }
 }

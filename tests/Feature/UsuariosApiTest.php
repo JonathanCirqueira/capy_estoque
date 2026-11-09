@@ -21,7 +21,7 @@ test('admin pode convidar novo usuario com dados validos', function () {
         'role' => UserRole::UsuarioPadrao->value,
         'empresa' => 'Capy Tech Ltda',
         'telefone' => '11999998888',
-        'cpf_cnpj' => '123.456.789-00',
+        'cpf_cnpj' => '529.982.247-25',
     ];
 
     $response = $this->actingAs($admin)->post(route('usuarios.convidar'), $payload);
@@ -36,6 +36,7 @@ test('admin pode convidar novo usuario com dados validos', function () {
         'status' => UserStatus::Pendente->value,
         'empresa' => 'Capy Tech Ltda',
         'telefone' => '11999998888',
+        'cpf_cnpj' => '529.982.247-25',
     ]);
 
     Mail::assertQueued(ConviteUsuarioMail::class, function (ConviteUsuarioMail $mail) {
@@ -54,6 +55,8 @@ test('admin pode convidar usuario sem campo empresa', function () {
         'name' => 'Sem Empresa',
         'email' => 'sem.empresa@exemplo.com.br',
         'role' => UserRole::UsuarioPadrao->value,
+        'telefone' => '(11) 98888-7777',
+        'cpf_cnpj' => '042.846.591-97',
     ];
 
     $response = $this->actingAs($admin)->post(route('usuarios.convidar'), $payload);
@@ -65,6 +68,33 @@ test('admin pode convidar usuario sem campo empresa', function () {
         'email' => 'sem.empresa@exemplo.com.br',
         'empresa' => null,
     ]);
+});
+
+test('exige telefone e cpf_cnpj obrigatorios e validos ao convidar', function () {
+    Mail::fake();
+
+    $admin = User::factory()->create([
+        'role' => UserRole::Admin,
+    ]);
+
+    $responseVazio = $this->actingAs($admin)->post(route('usuarios.convidar'), [
+        'name' => 'Teste Invalido',
+        'email' => 'invalido@exemplo.com.br',
+        'role' => UserRole::UsuarioPadrao->value,
+    ]);
+
+    $responseVazio->assertSessionHasErrors(['telefone', 'cpf_cnpj']);
+
+    $responseFormatoInvalido = $this->actingAs($admin)->post(route('usuarios.convidar'), [
+        'name' => 'Teste Formato Invalido',
+        'email' => 'formato.invalido@exemplo.com.br',
+        'role' => UserRole::UsuarioPadrao->value,
+        'telefone' => '1234',
+        'cpf_cnpj' => '111.111.111-11',
+    ]);
+
+    $responseFormatoInvalido->assertSessionHasErrors(['telefone', 'cpf_cnpj']);
+    Mail::assertNothingQueued();
 });
 
 test('nao permite convidar usuario com email duplicado', function () {
@@ -82,6 +112,8 @@ test('nao permite convidar usuario com email duplicado', function () {
         'name' => 'Outro Usuario',
         'email' => 'existente@exemplo.com.br',
         'role' => UserRole::UsuarioPadrao->value,
+        'telefone' => '11999998888',
+        'cpf_cnpj' => '529.982.247-25',
     ];
 
     $response = $this->actingAs($admin)->post(route('usuarios.convidar'), $payload);
@@ -101,6 +133,8 @@ test('usuario padrao nao pode convidar usuarios', function () {
         'name' => 'Outro Usuario',
         'email' => 'outro@exemplo.com.br',
         'role' => UserRole::UsuarioPadrao->value,
+        'telefone' => '11999998888',
+        'cpf_cnpj' => '529.982.247-25',
     ];
 
     $response = $this->actingAs($userPadrao)->post(route('usuarios.convidar'), $payload);
@@ -126,7 +160,7 @@ test('admin pode atualizar dados de um usuario existente', function () {
         'role' => UserRole::Admin->value,
         'empresa' => 'Nova Empresa S/A',
         'telefone' => '11988887777',
-        'cpf_cnpj' => '11122233344',
+        'cpf_cnpj' => '042.846.591-97',
     ];
 
     $response = $this->actingAs($admin)->put(route('usuarios.update', $usuario), $payload);
@@ -138,7 +172,28 @@ test('admin pode atualizar dados de um usuario existente', function () {
     expect($usuario->name)->toBe('Nome Atualizado')
         ->and($usuario->role)->toBe(UserRole::Admin)
         ->and($usuario->empresa)->toBe('Nova Empresa S/A')
-        ->and($usuario->telefone)->toBe('11988887777');
+        ->and($usuario->telefone)->toBe('11988887777')
+        ->and($usuario->cpf_cnpj)->toBe('042.846.591-97');
+});
+
+test('nao permite atualizar usuario com telefone ou cpf_cnpj invalidos', function () {
+    $admin = User::factory()->create([
+        'role' => UserRole::Admin,
+    ]);
+
+    $usuario = User::factory()->create([
+        'role' => UserRole::UsuarioPadrao,
+    ]);
+
+    $response = $this->actingAs($admin)->put(route('usuarios.update', $usuario), [
+        'name' => 'Usuario Teste',
+        'email' => $usuario->email,
+        'role' => UserRole::UsuarioPadrao->value,
+        'telefone' => '999',
+        'cpf_cnpj' => '000.000.000-00',
+    ]);
+
+    $response->assertSessionHasErrors(['telefone', 'cpf_cnpj']);
 });
 
 test('admin pode inativar um usuario que nao seja ele mesmo', function () {
