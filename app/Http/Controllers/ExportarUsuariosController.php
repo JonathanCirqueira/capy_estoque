@@ -34,8 +34,9 @@ final class ExportarUsuariosController extends Controller
                 return;
             }
 
-            // UTF-8 BOM para garantir correta abertura no Excel
+            // UTF-8 BOM e instrução explícita sep=; para o Excel abrir separando em colunas A, B, C...
             fwrite($handle, "\xEF\xBB\xBF");
+            fwrite($handle, "sep=;\r\n");
 
             fputcsv($handle, [
                 'ID',

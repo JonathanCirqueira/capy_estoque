@@ -185,6 +185,10 @@ test('usuario autenticado como admin pode exportar listagem de usuarios em csv',
 
     $response->assertOk();
     $response->assertHeader('content-type', 'text/csv; charset=UTF-8');
+    $content = $response->streamedContent();
+
+    expect($content)->toStartWith("\xEF\xBB\xBFsep=;\r\n")
+        ->and($content)->toContain('ID;Nome;E-mail;Empresa;Telefone;CPF/CNPJ;Perfil;Status;Plano;"Cadastrado em"');
 });
 
 test('exportacao de usuarios respeita filtro de busca', function () {
