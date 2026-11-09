@@ -30,6 +30,7 @@ final class AtualizarUsuarioRequest extends FormRequest
                 Rule::unique(User::class, 'email')->ignore($userId),
             ],
             'role' => ['required', 'string', Rule::enum(UserRole::class)],
+            'empresa' => ['nullable', 'string', 'max:255'],
             'telefone' => ['nullable', 'string', 'max:20'],
             'cpf_cnpj' => ['nullable', 'string', 'max:18'],
         ];

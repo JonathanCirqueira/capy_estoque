@@ -24,6 +24,7 @@ final class FiltrarUsuariosAction
                 'id',
                 'name',
                 'email',
+                'empresa',
                 'telefone',
                 'cpf_cnpj',
                 'role',
@@ -48,7 +49,7 @@ final class FiltrarUsuariosAction
             ? $filtros['ordem_direcao']
             : 'desc';
 
-        if (! in_array($ordemCampo, ['name', 'email', 'role', 'status', 'created_at'], true)) {
+        if (! in_array($ordemCampo, ['name', 'email', 'empresa', 'role', 'status', 'created_at'], true)) {
             $ordemCampo = 'created_at';
         }
 
@@ -100,7 +101,8 @@ final class FiltrarUsuariosAction
             $termo = trim($filtros['busca']);
             $query->where(function (Builder $q) use ($termo): void {
                 $q->where('name', 'like', sprintf('%%%s%%', $termo))
-                    ->orWhere('email', 'like', sprintf('%%%s%%', $termo));
+                    ->orWhere('email', 'like', sprintf('%%%s%%', $termo))
+                    ->orWhere('empresa', 'like', sprintf('%%%s%%', $termo));
             });
         }
 

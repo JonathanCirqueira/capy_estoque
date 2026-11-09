@@ -57,6 +57,7 @@ export function ModalEditarUsuario({ usuario, aberto, onAbertoAlterado }: ModalE
     const { data, setData, put, processing, errors, clearErrors } = useForm<EditarUsuarioFormData>({
         name: '',
         email: '',
+        empresa: '',
         telefone: '',
         cpf_cnpj: '',
         role: UserRole.UsuarioPadrao,
@@ -67,6 +68,7 @@ export function ModalEditarUsuario({ usuario, aberto, onAbertoAlterado }: ModalE
             setData({
                 name: usuario.name ?? '',
                 email: usuario.email ?? '',
+                empresa: usuario.empresa ?? '',
                 telefone: usuario.telefone ? aplicarMascaraTelefone(usuario.telefone) : '',
                 cpf_cnpj: usuario.cpf_cnpj ? aplicarMascaraCpfCnpj(usuario.cpf_cnpj) : '',
                 role: usuario.role ?? UserRole.UsuarioPadrao,
@@ -146,6 +148,22 @@ export function ModalEditarUsuario({ usuario, aberto, onAbertoAlterado }: ModalE
                                         disabled={processing}
                                     />
                                     <InputError message={errors.email} />
+                                </div>
+
+                                <div className="space-y-1.5 sm:col-span-2">
+                                    <Label htmlFor="edit-empresa">Empresa</Label>
+                                    <Input
+                                        id="edit-empresa"
+                                        value={data.empresa}
+                                        onChange={(e) => {
+                                            setData('empresa', e.target.value);
+                                            if (errors.empresa) clearErrors('empresa');
+                                        }}
+                                        placeholder="Ex: Capy Estoque Ltda (opcional)"
+                                        error={Boolean(errors.empresa)}
+                                        disabled={processing}
+                                    />
+                                    <InputError message={errors.empresa} />
                                 </div>
 
                                 <div className="space-y-1.5">

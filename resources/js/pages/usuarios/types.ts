@@ -15,6 +15,7 @@ export interface UsuarioListItem {
     id: number;
     name: string;
     email: string;
+    empresa?: string | null;
     telefone?: string | null;
     cpf_cnpj?: string | null;
     role: UserRole;
@@ -60,6 +61,7 @@ export interface UsuariosPageProps {
 export interface ConvidarUsuarioFormData {
     name: string;
     email: string;
+    empresa: string;
     telefone: string;
     cpf_cnpj: string;
     role: UserRole;
@@ -68,6 +70,7 @@ export interface ConvidarUsuarioFormData {
 export interface EditarUsuarioFormData {
     name: string;
     email: string;
+    empresa: string;
     telefone: string;
     cpf_cnpj: string;
     role: UserRole;

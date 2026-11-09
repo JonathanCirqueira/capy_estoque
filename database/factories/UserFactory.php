@@ -31,6 +31,7 @@ final class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
+            'empresa' => null,
             'telefone' => null,
             'cpf_cnpj' => null,
             'email_verified_at' => now(),

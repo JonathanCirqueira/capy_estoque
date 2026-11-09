@@ -19,6 +19,7 @@ test('admin pode convidar novo usuario com dados validos', function () {
         'name' => 'Novo Colaborador',
         'email' => 'novo.colaborador@exemplo.com.br',
         'role' => UserRole::UsuarioPadrao->value,
+        'empresa' => 'Capy Tech Ltda',
         'telefone' => '11999998888',
         'cpf_cnpj' => '123.456.789-00',
     ];
@@ -33,12 +34,37 @@ test('admin pode convidar novo usuario com dados validos', function () {
         'email' => 'novo.colaborador@exemplo.com.br',
         'role' => UserRole::UsuarioPadrao->value,
         'status' => UserStatus::Pendente->value,
+        'empresa' => 'Capy Tech Ltda',
         'telefone' => '11999998888',
     ]);
 
     Mail::assertQueued(ConviteUsuarioMail::class, function (ConviteUsuarioMail $mail) {
         return $mail->usuario->email === 'novo.colaborador@exemplo.com.br';
     });
+});
+
+test('admin pode convidar usuario sem campo empresa', function () {
+    Mail::fake();
+
+    $admin = User::factory()->create([
+        'role' => UserRole::Admin,
+    ]);
+
+    $payload = [
+        'name' => 'Sem Empresa',
+        'email' => 'sem.empresa@exemplo.com.br',
+        'role' => UserRole::UsuarioPadrao->value,
+    ];
+
+    $response = $this->actingAs($admin)->post(route('usuarios.convidar'), $payload);
+
+    $response->assertSessionHas('success');
+    $response->assertRedirect();
+
+    $this->assertDatabaseHas('users', [
+        'email' => 'sem.empresa@exemplo.com.br',
+        'empresa' => null,
+    ]);
 });
 
 test('nao permite convidar usuario com email duplicado', function () {
@@ -98,6 +124,7 @@ test('admin pode atualizar dados de um usuario existente', function () {
         'name' => 'Nome Atualizado',
         'email' => 'antigo@exemplo.com.br',
         'role' => UserRole::Admin->value,
+        'empresa' => 'Nova Empresa S/A',
         'telefone' => '11988887777',
         'cpf_cnpj' => '11122233344',
     ];
@@ -110,6 +137,7 @@ test('admin pode atualizar dados de um usuario existente', function () {
     $usuario->refresh();
     expect($usuario->name)->toBe('Nome Atualizado')
         ->and($usuario->role)->toBe(UserRole::Admin)
+        ->and($usuario->empresa)->toBe('Nova Empresa S/A')
         ->and($usuario->telefone)->toBe('11988887777');
 });
 

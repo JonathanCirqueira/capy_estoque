@@ -72,6 +72,40 @@ test('filtro de busca por nome ou email filtra usuarios no banco', function () {
     );
 });
 
+test('filtro de busca por empresa filtra usuarios no banco', function () {
+    $admin = User::factory()->create([
+        'name' => 'Admin Chefe',
+        'role' => UserRole::Admin,
+        'status' => UserStatus::Ativo,
+    ]);
+
+    User::factory()->create([
+        'name' => 'Carlos Silveira',
+        'email' => 'carlos@outro.com.br',
+        'empresa' => 'Capycorp Logistica',
+        'role' => UserRole::UsuarioPadrao,
+        'status' => UserStatus::Ativo,
+    ]);
+
+    User::factory()->create([
+        'name' => 'Beatriz Santos',
+        'email' => 'beatriz@outro.com.br',
+        'empresa' => 'Outra Empresa',
+        'role' => UserRole::UsuarioPadrao,
+        'status' => UserStatus::Ativo,
+    ]);
+
+    $response = $this->actingAs($admin)->get(route('usuarios.index', ['busca' => 'Capycorp']));
+
+    $response->assertOk();
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('usuarios/index')
+        ->has('usuarios.data', 1)
+        ->where('usuarios.data.0.name', 'Carlos Silveira')
+        ->where('usuarios.data.0.empresa', 'Capycorp Logistica')
+    );
+});
+
 test('filtro de perfil de acesso filtra administradores e usuarios padrao', function () {
     $admin = User::factory()->create([
         'name' => 'Admin Chefe',
@@ -158,6 +192,7 @@ test('exportacao de usuarios respeita filtro de busca', function () {
     $content = $response->streamedContent();
 
     expect($content)->toContain('Carlos Silveira')
+        ->and($content)->toContain('Empresa')
         ->not->toContain('Geisiane Gaspar');
 });
 

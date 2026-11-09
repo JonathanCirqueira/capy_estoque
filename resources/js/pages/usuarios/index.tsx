@@ -284,6 +284,13 @@ export default function UsuariosIndex({
                                         onSort={handleSort}
                                     />
                                     <SortableTableHead
+                                        label="EMPRESA"
+                                        coluna="empresa"
+                                        colunaAtiva={filtros.ordem_campo}
+                                        direcaoAtiva={filtros.ordem_direcao}
+                                        onSort={handleSort}
+                                    />
+                                    <SortableTableHead
                                         label="PERFIL"
                                         coluna="role"
                                         colunaAtiva={filtros.ordem_campo}
@@ -308,7 +315,7 @@ export default function UsuariosIndex({
                             <TableBody>
                                 {usuarios.data.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={6} className="h-48 text-center">
+                                        <TableCell colSpan={7} className="h-48 text-center">
                                             <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
                                                 <FolderOpen className="size-8 stroke-1 text-muted-foreground/60" />
                                                 <p className="text-sm">
@@ -325,6 +332,9 @@ export default function UsuariosIndex({
                                             </TableCell>
                                             <TableCell className="text-sm font-normal text-foreground">
                                                 {user.email}
+                                            </TableCell>
+                                            <TableCell className="text-sm font-normal text-foreground">
+                                                {user.empresa ? user.empresa : '-'}
                                             </TableCell>
                                             <TableCell className="text-sm font-normal text-foreground">
                                                 {user.role === UserRole.Admin ? 'Administrador' : 'Usuário Padrão'}
@@ -486,6 +496,16 @@ export default function UsuariosIndex({
 
                                     {/* Metadados em Grid Neutro */}
                                     <div className="grid grid-cols-2 gap-2.5 rounded-xl border border-border/30 bg-muted/40 p-3">
+                                        {user.empresa && (
+                                            <div className="col-span-2">
+                                                <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                                    Empresa
+                                                </span>
+                                                <p className="mt-0.5 truncate text-sm font-normal text-foreground">
+                                                    {user.empresa}
+                                                </p>
+                                            </div>
+                                        )}
                                         <div>
                                             <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                                                 Perfil

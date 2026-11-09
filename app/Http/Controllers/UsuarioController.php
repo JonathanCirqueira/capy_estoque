@@ -43,7 +43,7 @@ final class UsuarioController extends Controller
     {
         Gate::authorize('create', User::class);
 
-        /** @var array{name: string, email: string, role: string, telefone?: string|null, cpf_cnpj?: string|null} $dados */
+        /** @var array{name: string, email: string, role: string, empresa?: string|null, telefone?: string|null, cpf_cnpj?: string|null} $dados */
         $dados = $request->validated();
         $usuario = $action->execute($dados);
 
@@ -56,7 +56,7 @@ final class UsuarioController extends Controller
     {
         Gate::authorize('update', $user);
 
-        /** @var array{name: string, email: string, role: string, telefone?: string|null, cpf_cnpj?: string|null} $dados */
+        /** @var array{name: string, email: string, role: string, empresa?: string|null, telefone?: string|null, cpf_cnpj?: string|null} $dados */
         $dados = $request->validated();
         $action->execute($user, $dados);
 

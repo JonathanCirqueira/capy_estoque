@@ -41,6 +41,7 @@ final class ExportarUsuariosController extends Controller
                 'ID',
                 'Nome',
                 'E-mail',
+                'Empresa',
                 'Telefone',
                 'CPF/CNPJ',
                 'Perfil',
@@ -55,6 +56,7 @@ final class ExportarUsuariosController extends Controller
                     'id',
                     'name',
                     'email',
+                    'empresa',
                     'telefone',
                     'cpf_cnpj',
                     'role',
@@ -67,7 +69,8 @@ final class ExportarUsuariosController extends Controller
                 $termo = trim($filtros['busca']);
                 $query->where(function (Builder $q) use ($termo): void {
                     $q->where('name', 'like', sprintf('%%%s%%', $termo))
-                        ->orWhere('email', 'like', sprintf('%%%s%%', $termo));
+                        ->orWhere('email', 'like', sprintf('%%%s%%', $termo))
+                        ->orWhere('empresa', 'like', sprintf('%%%s%%', $termo));
                 });
             }
 
@@ -92,6 +95,7 @@ final class ExportarUsuariosController extends Controller
                     $usuario->id,
                     $usuario->name,
                     $usuario->email,
+                    $usuario->empresa ?? '-',
                     $usuario->telefone ?? '-',
                     $usuario->cpf_cnpj ?? '-',
                     $usuario->role->label(),

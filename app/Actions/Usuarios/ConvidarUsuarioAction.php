@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 final class ConvidarUsuarioAction
 {
     /**
-     * @param  array{name: string, email: string, role: string|UserRole, telefone?: string|null, cpf_cnpj?: string|null}  $dados
+     * @param  array{name: string, email: string, role: string|UserRole, empresa?: string|null, telefone?: string|null, cpf_cnpj?: string|null}  $dados
      */
     public function execute(array $dados): User
     {
@@ -28,6 +28,7 @@ final class ConvidarUsuarioAction
                 'email' => $dados['email'],
                 'role' => $role,
                 'status' => UserStatus::Pendente,
+                'empresa' => $dados['empresa'] ?? null,
                 'telefone' => $dados['telefone'] ?? null,
                 'cpf_cnpj' => $dados['cpf_cnpj'] ?? null,
                 'password' => Hash::make(Str::random(32)),

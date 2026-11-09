@@ -56,6 +56,7 @@ export function ModalConvidarUsuario({ aberto, onAbertoAlterado }: ModalConvidar
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm<ConvidarUsuarioFormData>({
         name: '',
         email: '',
+        empresa: '',
         telefone: '',
         cpf_cnpj: '',
         role: UserRole.UsuarioPadrao,
@@ -131,6 +132,22 @@ export function ModalConvidarUsuario({ aberto, onAbertoAlterado }: ModalConvidar
                                         disabled={processing}
                                     />
                                     <InputError message={errors.email} />
+                                </div>
+
+                                <div className="space-y-1.5 sm:col-span-2">
+                                    <Label htmlFor="empresa">Empresa</Label>
+                                    <Input
+                                        id="empresa"
+                                        value={data.empresa}
+                                        onChange={(e) => {
+                                            setData('empresa', e.target.value);
+                                            if (errors.empresa) clearErrors('empresa');
+                                        }}
+                                        placeholder="Ex: Capy Estoque Ltda (opcional)"
+                                        error={Boolean(errors.empresa)}
+                                        disabled={processing}
+                                    />
+                                    <InputError message={errors.empresa} />
                                 </div>
 
                                 <div className="space-y-1.5">
